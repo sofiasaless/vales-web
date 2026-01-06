@@ -10,6 +10,7 @@ import {
   LogOut,
   ChevronRight,
   UtensilsCrossed,
+  CreditCard,
 } from 'lucide-react';
 
 const SettingsScreen = () => {
@@ -83,6 +84,11 @@ const SettingsScreen = () => {
             icon={ChefHat}
             label="Gerenciar Cardápio"
             onClick={() => navigate('/settings/menu')}
+          />
+          <MenuItem
+            icon={CreditCard}
+            label="Mensalidades"
+            onClick={() => navigate('/settings/subscriptions')}
           />
           <MenuItem
             icon={Bell}
