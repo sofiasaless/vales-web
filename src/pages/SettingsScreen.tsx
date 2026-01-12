@@ -11,6 +11,7 @@ import {
   ChevronRight,
   UtensilsCrossed,
   CreditCard,
+  Wallet,
 } from 'lucide-react';
 
 const SettingsScreen = () => {
@@ -84,6 +85,11 @@ const SettingsScreen = () => {
             icon={ChefHat}
             label="Gerenciar Cardápio"
             onClick={() => navigate('/settings/menu')}
+          />
+          <MenuItem
+            icon={Wallet}
+            label="Finanças"
+            onClick={() => navigate('/settings/finances')}
           />
           <MenuItem
             icon={CreditCard}

@@ -17,6 +17,8 @@ import NewEmployeeScreen from "@/pages/NewEmployeeScreen";
 import SettingsScreen from "@/pages/SettingsScreen";
 import MenuManagementScreen from "@/pages/MenuManagementScreen";
 import SubscriptionsScreen from "@/pages/SubscriptionsScreen";
+import FinancesScreen from "@/pages/FinancesScreen";
+import CategoryExpensesScreen from "@/pages/CategoryExpensesScreen";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -60,6 +62,8 @@ const App = () => (
               {/* Settings Stack */}
               <Route path="/settings/menu" element={<MenuManagementScreen />} />
               <Route path="/settings/subscriptions" element={<SubscriptionsScreen />} />
+              <Route path="/settings/finances" element={<FinancesScreen />} />
+              <Route path="/settings/finances/:categoryId" element={<CategoryExpensesScreen />} />
               
               {/* Catch-all */}
               <Route path="*" element={<NotFound />} />
