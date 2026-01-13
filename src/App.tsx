@@ -19,7 +19,10 @@ import MenuManagementScreen from "@/pages/MenuManagementScreen";
 import SubscriptionsScreen from "@/pages/SubscriptionsScreen";
 import FinancesScreen from "@/pages/FinancesScreen";
 import CategoryExpensesScreen from "@/pages/CategoryExpensesScreen";
+import IncentiveHistoryScreen from "@/pages/IncentiveHistoryScreen";
+import IncentiveSalesScreen from "@/pages/IncentiveSalesScreen";
 import NotFound from "@/pages/NotFound";
+import { IncentiveProvider } from "@/context/IncentiveContext";
 
 const queryClient = new QueryClient();
 
@@ -27,50 +30,56 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <EmployeeProvider>
-        <Toaster />
-        <Sonner 
-          position="top-center"
-          toastOptions={{
-            classNames: {
-              toast: "bg-card border-border text-foreground",
-              title: "text-foreground",
-              description: "text-muted-foreground",
-              success: "border-success/30",
-              error: "border-danger/30",
-            }
-          }}
-        />
-        <BrowserRouter>
-          <div className="min-h-screen bg-background">
-            <Routes>
-              {/* Main Tabs */}
-              <Route path="/" element={<EmployeeListScreen />} />
-              <Route path="/new-employee" element={<NewEmployeeScreen />} />
-              <Route path="/settings" element={<SettingsScreen />} />
-              
-              {/* Employee Stack */}
-              <Route path="/employee/:id" element={<EmployeeManagementScreen />} />
-              <Route path="/employee/:id/details" element={<EmployeeDetailScreen />} />
-              <Route path="/employee/:id/history" element={<PaymentHistoryScreen />} />
-              
-              {/* Menu Stack */}
-              <Route path="/menu/:employeeId" element={<MenuScreen />} />
-              
-              {/* Payment Stack */}
-              <Route path="/payment/:employeeId" element={<PaymentConfirmationScreen />} />
-              
-              {/* Settings Stack */}
-              <Route path="/settings/menu" element={<MenuManagementScreen />} />
-              <Route path="/settings/subscriptions" element={<SubscriptionsScreen />} />
-              <Route path="/settings/finances" element={<FinancesScreen />} />
-              <Route path="/settings/finances/:categoryId" element={<CategoryExpensesScreen />} />
-              
-              {/* Catch-all */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-            <BottomNav />
-          </div>
-        </BrowserRouter>
+        <IncentiveProvider>
+          <Toaster />
+          <Sonner 
+            position="top-center"
+            toastOptions={{
+              classNames: {
+                toast: "bg-card border-border text-foreground",
+                title: "text-foreground",
+                description: "text-muted-foreground",
+                success: "border-success/30",
+                error: "border-danger/30",
+              }
+            }}
+          />
+          <BrowserRouter>
+            <div className="min-h-screen bg-background">
+              <Routes>
+                {/* Main Tabs */}
+                <Route path="/" element={<EmployeeListScreen />} />
+                <Route path="/new-employee" element={<NewEmployeeScreen />} />
+                <Route path="/settings" element={<SettingsScreen />} />
+                
+                {/* Employee Stack */}
+                <Route path="/employee/:id" element={<EmployeeManagementScreen />} />
+                <Route path="/employee/:id/details" element={<EmployeeDetailScreen />} />
+                <Route path="/employee/:id/history" element={<PaymentHistoryScreen />} />
+                
+                {/* Menu Stack */}
+                <Route path="/menu/:employeeId" element={<MenuScreen />} />
+                
+                {/* Payment Stack */}
+                <Route path="/payment/:employeeId" element={<PaymentConfirmationScreen />} />
+                
+                {/* Settings Stack */}
+                <Route path="/settings/menu" element={<MenuManagementScreen />} />
+                <Route path="/settings/subscriptions" element={<SubscriptionsScreen />} />
+                <Route path="/settings/finances" element={<FinancesScreen />} />
+                <Route path="/settings/finances/:categoryId" element={<CategoryExpensesScreen />} />
+                <Route path="/settings/incentives" element={<IncentiveHistoryScreen />} />
+                
+                {/* Incentive Stack */}
+                <Route path="/incentive/sales" element={<IncentiveSalesScreen />} />
+                
+                {/* Catch-all */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+              <BottomNav />
+            </div>
+          </BrowserRouter>
+        </IncentiveProvider>
       </EmployeeProvider>
     </TooltipProvider>
   </QueryClientProvider>

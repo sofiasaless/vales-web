@@ -12,6 +12,7 @@ import {
   UtensilsCrossed,
   CreditCard,
   Wallet,
+  Trophy,
 } from 'lucide-react';
 
 const SettingsScreen = () => {
@@ -95,6 +96,11 @@ const SettingsScreen = () => {
             icon={CreditCard}
             label="Mensalidades"
             onClick={() => navigate('/settings/subscriptions')}
+          />
+          <MenuItem
+            icon={Trophy}
+            label="Começar Incentivo"
+            onClick={() => navigate('/settings/incentives')}
           />
           <MenuItem
             icon={Bell}
