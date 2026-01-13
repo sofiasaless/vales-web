@@ -2,6 +2,7 @@ import { useEmployees } from '@/context/EmployeeContext';
 import { EmployeeCard } from '@/components/EmployeeCard';
 import { PageHeader } from '@/components/PageHeader';
 import { MoneyDisplay } from '@/components/MoneyDisplay';
+import { ActiveIncentiveCard } from '@/components/ActiveIncentiveCard';
 import { Users, TrendingDown } from 'lucide-react';
 
 const EmployeeListScreen = () => {
@@ -45,6 +46,9 @@ const EmployeeListScreen = () => {
             </p>
           </div>
         </div>
+
+        {/* Active Incentive Card */}
+        <ActiveIncentiveCard />
 
         {/* Employee Grid */}
         <div className="grid grid-cols-2 gap-3">
