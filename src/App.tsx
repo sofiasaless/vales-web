@@ -21,6 +21,7 @@ import FinancesScreen from "@/pages/FinancesScreen";
 import CategoryExpensesScreen from "@/pages/CategoryExpensesScreen";
 import IncentiveHistoryScreen from "@/pages/IncentiveHistoryScreen";
 import IncentiveSalesScreen from "@/pages/IncentiveSalesScreen";
+import ManagersScreen from "@/pages/ManagersScreen";
 import NotFound from "@/pages/NotFound";
 import { IncentiveProvider } from "@/context/IncentiveContext";
 
@@ -69,6 +70,7 @@ const App = () => (
                 <Route path="/settings/finances" element={<FinancesScreen />} />
                 <Route path="/settings/finances/:categoryId" element={<CategoryExpensesScreen />} />
                 <Route path="/settings/incentives" element={<IncentiveHistoryScreen />} />
+                <Route path="/settings/managers" element={<ManagersScreen />} />
                 
                 {/* Incentive Stack */}
                 <Route path="/incentive/sales" element={<IncentiveSalesScreen />} />
