@@ -13,6 +13,7 @@ import {
   CreditCard,
   Wallet,
   Trophy,
+  Users,
 } from 'lucide-react';
 
 const SettingsScreen = () => {
@@ -101,6 +102,11 @@ const SettingsScreen = () => {
             icon={Trophy}
             label="Começar Incentivo"
             onClick={() => navigate('/settings/incentives')}
+          />
+          <MenuItem
+            icon={Users}
+            label="Gerentes e Auxiliares"
+            onClick={() => navigate('/settings/managers')}
           />
           <MenuItem
             icon={Bell}
