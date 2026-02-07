@@ -4,6 +4,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { mockManager } from '@/data/mockData';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/context/AuthContext';
 import {
   ChefHat,
   Bell,
@@ -14,10 +15,12 @@ import {
   Wallet,
   Trophy,
   Users,
+  UserCog,
 } from 'lucide-react';
 
 const SettingsScreen = () => {
   const navigate = useNavigate();
+  const { manager, logout, logoutManager } = useAuth();
 
   const MenuItem = ({
     icon: Icon,
@@ -56,13 +59,17 @@ const SettingsScreen = () => {
         {/* Profile Card */}
         <Card className="p-6 glass-card border-border">
           <div className="flex items-center gap-4">
-            <AvatarInitials name={mockManager.name} size="lg" />
+            <AvatarInitials name={manager?.nome || mockManager.name} size="lg" />
             <div>
-              <h2 className="text-xl font-bold">{mockManager.name}</h2>
+              <h2 className="text-xl font-bold">{manager?.nome || mockManager.name}</h2>
               <p className="text-muted-foreground">{mockManager.email}</p>
               <div className="flex items-center gap-1 mt-1 text-primary text-sm">
-                <ChefHat className="w-4 h-4" />
-                <span>Gerente</span>
+                {manager?.tipo === 'GERENTE' ? (
+                  <ChefHat className="w-4 h-4" />
+                ) : (
+                  <UserCog className="w-4 h-4" />
+                )}
+                <span>{manager?.tipo === 'GERENTE' ? 'Gerente' : 'Auxiliar'}</span>
               </div>
             </div>
           </div>
@@ -115,13 +122,24 @@ const SettingsScreen = () => {
           />
         </Card>
 
-        {/* Logout */}
-        <Card className="glass-card border-border overflow-hidden">
+        {/* Logout Options */}
+        <Card className="glass-card border-border overflow-hidden divide-y divide-border">
+          <MenuItem
+            icon={UserCog}
+            label="Trocar Usuário"
+            onClick={() => {
+              logoutManager();
+              navigate('/select-manager');
+            }}
+          />
           <MenuItem
             icon={LogOut}
-            label="Sair"
+            label="Sair do Restaurante"
             danger
-            onClick={() => {}}
+            onClick={() => {
+              logout();
+              navigate('/login');
+            }}
           />
         </Card>
 
