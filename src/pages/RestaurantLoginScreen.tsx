@@ -1,45 +1,47 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useAuthActions } from '@/hooks/useAuth';
+import { Loader2, Lock, Mail, Store } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { Store, Mail, Lock, Loader2 } from 'lucide-react';
 
 const RestaurantLoginScreen = () => {
   const navigate = useNavigate();
-  const { loginRestaurant } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+
+  const { login } = useAuthActions()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!email.trim() || !password.trim()) {
       toast.error('Preencha todos os campos');
       return;
     }
 
-    setIsLoading(true);
-    
-    try {
-      const success = await loginRestaurant(email, password);
-      
-      if (success) {
-        toast.success('Login realizado com sucesso!');
-        navigate('/select-manager');
-      } else {
-        toast.error('Email ou senha incorretos');
-      }
-    } catch (error) {
-      toast.error('Erro ao fazer login');
-    } finally {
-      setIsLoading(false);
-    }
+    login.mutate({ email, password })
   };
+
+  const [isLoading] = useState(login.isPending);
+
+  useEffect(() => {
+    if (login.isPending) return;
+
+    if (login.isSuccess) {
+      toast.success('Login realizado com sucesso!');
+      navigate('/select-manager');
+      return
+    }
+
+    if (login.isError) {
+      toast.error(`Erro ao fazer login: ${login.error.message}`);
+      return
+    }
+  }, [login.isPending])
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -55,7 +57,7 @@ const RestaurantLoginScreen = () => {
             </CardDescription>
           </div>
         </CardHeader>
-        
+
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
@@ -73,7 +75,7 @@ const RestaurantLoginScreen = () => {
                 />
               </div>
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="password">Senha</Label>
               <div className="relative">
@@ -101,12 +103,6 @@ const RestaurantLoginScreen = () => {
               )}
             </Button>
           </form>
-
-          <div className="mt-6 p-4 bg-muted/50 rounded-lg">
-            <p className="text-xs text-muted-foreground text-center">
-              <strong>Demo:</strong> admin@restaurante.com / 1234
-            </p>
-          </div>
         </CardContent>
       </Card>
     </div>
