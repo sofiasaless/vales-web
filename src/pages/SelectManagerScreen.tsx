@@ -1,8 +1,4 @@
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Button, Card, Input, Radio, App } from 'antd';
 import { useAuthActions } from '@/hooks/useAuth';
 import { useCurrentEnterprise } from '@/hooks/useEnterprise';
 import { useListManagers, useManagers } from '@/hooks/useManager';
@@ -10,7 +6,6 @@ import { GerenteResponseBody } from '@/types/gerente.type';
 import { Loader2, Lock, LogOut, Shield, UserCog, Users } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
 
 const getTypeIcon = (tipo: GerenteResponseBody['tipo']) => {
   return tipo === 'GERENTE' ? Shield : UserCog;
@@ -24,31 +19,26 @@ const SelectManagerScreen = () => {
   const navigate = useNavigate();
   const [selectedManagerId, setSelectedManagerId] = useState('');
   const [password, setPassword] = useState('');
+  const { message } = App.useApp();
 
-  const { data: activeManagers } = useListManagers()
-  const { autenticate } = useManagers()
+  const { data: activeManagers } = useListManagers();
+  const { autenticate } = useManagers();
+  const { logout } = useAuthActions();
+  const { data: restaurant } = useCurrentEnterprise();
 
-  const { logout } = useAuthActions()
-  const { data: restaurant } = useCurrentEnterprise()
+  const isLoading = autenticate.isPending;
 
-  const [isLoading] = useState(autenticate.isPending);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!selectedManagerId) {
-      toast.error('Selecione um usuário');
+      message.error('Selecione um usuário');
       return;
     }
-
     if (!password.trim()) {
-      toast.error('Digite a senha');
+      message.error('Digite a senha');
       return;
     }
-
-    autenticate.mutate({
-      body: { id: selectedManagerId, senha: password }
-    })
-
+    autenticate.mutate({ body: { id: selectedManagerId, senha: password } });
   };
 
   const handleLogout = () => {
@@ -57,122 +47,98 @@ const SelectManagerScreen = () => {
 
   useEffect(() => {
     if (logout.isPending || autenticate.isPending) return;
-
     if (logout.isSuccess) navigate('/login');
     if (autenticate.isSuccess) {
-      toast.success('Login realizado com sucesso!')
-      navigate('/')
+      message.success('Login realizado com sucesso!');
+      navigate('/');
     }
-  }, [logout.isPending, autenticate.isPending])
+  }, [logout.isPending, autenticate.isPending]);
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center space-y-4">
-          <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
-            <Users className="w-8 h-8 text-primary" />
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
+      <Card style={{ width: '100%', maxWidth: 420 }}>
+        <div style={{ textAlign: 'center', marginBottom: 24 }}>
+          <div style={{
+            width: 64, height: 64, borderRadius: '50%',
+            background: 'rgba(45, 184, 164, 0.1)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            margin: '0 auto 16px',
+          }}>
+            <Users style={{ width: 32, height: 32, color: 'var(--color-primary)' }} />
           </div>
-          <div>
-            <CardTitle className="text-2xl">Selecione seu usuário</CardTitle>
-            <CardDescription className="mt-2">
-              {restaurant?.nome_fantasia}
-            </CardDescription>
-          </div>
-        </CardHeader>
+          <h2 style={{ fontSize: 24, fontWeight: 700, margin: 0, color: 'var(--color-text)' }}>Selecione seu usuário</h2>
+          <p style={{ color: 'var(--color-text-secondary)', marginTop: 8 }}>
+            {restaurant?.nome_fantasia}
+          </p>
+        </div>
 
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-3">
-              <Label>Usuário</Label>
-              <RadioGroup
-                value={selectedManagerId}
-                onValueChange={(v) => {
-                  setSelectedManagerId(v)
-                }}
-                className="space-y-2"
-              >
-                {activeManagers?.map((manager) => {
-                  const TypeIcon = getTypeIcon(manager.tipo);
-                  return (
-                    <div
-                      key={manager.id}
-                      className={`flex items-center space-x-3 p-3 rounded-lg border transition-colors cursor-pointer ${selectedManagerId === manager.id
-                          ? 'border-primary bg-primary/5'
-                          : 'border-border hover:bg-muted/50'
-                      }`}
-                      onClick={() => setSelectedManagerId(manager.id)}
-                    >
-                      <RadioGroupItem value={manager.id} id={manager.id} />
-                      <div className="flex-1">
-                        <Label
-                          htmlFor={manager.id}
-                          className="cursor-pointer font-medium"
-                        >
-                          {manager.nome}
-                        </Label>
-                        <div className="flex items-center gap-1.5 mt-0.5">
-                          <TypeIcon className="w-3 h-3 text-muted-foreground" />
-                          <span className="text-xs text-muted-foreground">
-                            {getTypeLabel(manager.tipo)}
-                          </span>
-                        </div>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+          <div>
+            <label style={{ display: 'block', fontSize: 14, fontWeight: 500, marginBottom: 8, color: 'var(--color-text)' }}>Usuário</label>
+            <Radio.Group
+              value={selectedManagerId}
+              onChange={(e) => setSelectedManagerId(e.target.value)}
+              style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 8 }}
+            >
+              {activeManagers?.map((mgr) => {
+                const TypeIcon = getTypeIcon(mgr.tipo);
+                return (
+                  <div
+                    key={mgr.id}
+                    onClick={() => setSelectedManagerId(mgr.id)}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 12,
+                      padding: 12,
+                      borderRadius: 8,
+                      border: `1px solid ${selectedManagerId === mgr.id ? 'var(--color-primary)' : 'var(--color-border)'}`,
+                      background: selectedManagerId === mgr.id ? 'rgba(45, 184, 164, 0.05)' : 'transparent',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
+                    }}
+                  >
+                    <Radio value={mgr.id} />
+                    <div style={{ flex: 1 }}>
+                      <p style={{ fontWeight: 500, margin: 0, color: 'var(--color-text)' }}>{mgr.nome}</p>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
+                        <TypeIcon style={{ width: 12, height: 12, color: 'var(--color-text-secondary)' }} />
+                        <span style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>{getTypeLabel(mgr.tipo)}</span>
                       </div>
                     </div>
-                  );
-                })}
-              </RadioGroup>
+                  </div>
+                );
+              })}
+            </Radio.Group>
 
-              {activeManagers?.length === 0 && (
-                <p className="text-sm text-muted-foreground text-center py-4">
-                  Nenhum usuário ativo encontrado
-                </p>
-              )}
-            </div>
+            {activeManagers?.length === 0 && (
+              <p style={{ fontSize: 14, color: 'var(--color-text-secondary)', textAlign: 'center', padding: '16px 0' }}>
+                Nenhum usuário ativo encontrado
+              </p>
+            )}
+          </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="password">Senha</Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="pl-10"
-                  disabled={isLoading}
-                />
-              </div>
-            </div>
+          <div>
+            <label style={{ display: 'block', fontSize: 14, fontWeight: 500, marginBottom: 6, color: 'var(--color-text)' }}>Senha</label>
+            <Input.Password
+              prefix={<Lock style={{ width: 16, height: 16, color: 'var(--color-text-secondary)' }} />}
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              disabled={isLoading}
+              size="large"
+            />
+          </div>
 
-            <div className="space-y-2">
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={isLoading || !selectedManagerId}
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Entrando...
-                  </>
-                ) : (
-                  'Entrar'
-                )}
-              </Button>
-
-              <Button
-                type="button"
-                variant="ghost"
-                className="w-full"
-                onClick={handleLogout}
-              >
-                <LogOut className="w-4 h-4" />
-                Voltar para login do restaurante
-              </Button>
-            </div>
-          </form>
-        </CardContent>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <Button type="primary" htmlType="submit" block size="large" loading={isLoading} disabled={!selectedManagerId}>
+              {isLoading ? 'Entrando...' : 'Entrar'}
+            </Button>
+            <Button type="text" block icon={<LogOut style={{ width: 16, height: 16 }} />} onClick={handleLogout}>
+              Voltar para login do restaurante
+            </Button>
+          </div>
+        </form>
       </Card>
     </div>
   );

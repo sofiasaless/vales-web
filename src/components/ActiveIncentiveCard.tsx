@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, Button } from 'antd';
 import { MoneyDisplay } from '@/components/MoneyDisplay';
 import { useIncentive } from '@/context/IncentiveContext';
 import { useEmployees } from '@/context/EmployeeContext';
@@ -14,14 +13,12 @@ export const ActiveIncentiveCard = () => {
   const { state: employeeState } = useEmployees();
 
   const activeIncentive = getActiveIncentive();
-
   if (!activeIncentive) return null;
 
   const winner = activeIncentive.ganhador_id 
     ? employeeState.employees.find(e => e.id === activeIncentive.ganhador_id)
     : null;
 
-  // Find current leader
   let leader = { name: '', count: 0 };
   if (!winner) {
     for (const employee of employeeState.employees) {
@@ -33,57 +30,58 @@ export const ActiveIncentiveCard = () => {
   }
 
   return (
-    <Card className="p-4 glass-card border-primary/30 bg-gradient-to-br from-primary/10 to-transparent">
-      <div className="flex items-center gap-2 text-primary mb-3">
-        <Trophy className="w-5 h-5" />
-        <span className="font-semibold text-sm">Incentivo Ativo</span>
+    <Card
+      style={{
+        background: 'linear-gradient(135deg, rgba(45, 184, 164, 0.1), transparent)',
+        border: '1px solid rgba(45, 184, 164, 0.3)',
+        marginBottom: 16,
+      }}
+      styles={{ body: { padding: 16 } }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--color-primary)', marginBottom: 12 }}>
+        <Trophy style={{ width: 20, height: 20 }} />
+        <span style={{ fontWeight: 600, fontSize: 14 }}>Incentivo Ativo</span>
       </div>
 
-      <p className="text-foreground font-medium mb-2 line-clamp-2">
+      <p style={{ fontWeight: 500, marginBottom: 8, color: 'var(--color-text)', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
         {activeIncentive.descricao}
       </p>
 
-      <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
-        <span className="flex items-center gap-1">
-          <Calendar className="w-4 h-4" />
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16, fontSize: 14, color: 'var(--color-text-secondary)', marginBottom: 12 }}>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          <Calendar style={{ width: 16, height: 16 }} />
           {format(new Date(activeIncentive.data_expiracao), "dd/MM", { locale: ptBR })}
         </span>
-        <span className="flex items-center gap-1">
-          <Target className="w-4 h-4" />
+        <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          <Target style={{ width: 16, height: 16 }} />
           Meta: {activeIncentive.meta}
         </span>
       </div>
 
-      <div className="flex items-center justify-between mb-3">
-        <MoneyDisplay 
-          value={activeIncentive.valor_incentivo} 
-          size="lg" 
-          variant="positive" 
-        />
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+        <MoneyDisplay value={activeIncentive.valor_incentivo} size="lg" variant="positive" />
         
         {winner ? (
-          <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-success/20 border border-success/30">
-            <Crown className="w-4 h-4 text-success" />
-            <span className="text-sm text-success font-medium">
-              {winner.name}
-            </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '4px 8px', borderRadius: 8, background: 'rgba(45, 184, 106, 0.2)', border: '1px solid rgba(45, 184, 106, 0.3)' }}>
+            <Crown style={{ width: 16, height: 16, color: 'var(--color-success)' }} />
+            <span style={{ fontSize: 14, color: 'var(--color-success)', fontWeight: 500 }}>{winner.name}</span>
           </div>
         ) : leader.count > 0 ? (
-          <div className="text-right">
-            <p className="text-xs text-muted-foreground">Líder</p>
-            <p className="text-sm text-foreground font-medium">
-              {leader.name} ({leader.count})
-            </p>
+          <div style={{ textAlign: 'right' }}>
+            <p style={{ fontSize: 12, color: 'var(--color-text-secondary)', margin: 0 }}>Líder</p>
+            <p style={{ fontSize: 14, fontWeight: 500, color: 'var(--color-text)', margin: 0 }}>{leader.name} ({leader.count})</p>
           </div>
         ) : null}
       </div>
 
       {!winner && (
-        <Button 
-          className="w-full gap-2"
+        <Button
+          type="primary"
+          block
+          icon={<ShoppingCart style={{ width: 16, height: 16 }} />}
           onClick={() => navigate('/incentive/sales')}
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
         >
-          <ShoppingCart className="w-4 h-4" />
           Registrar Vendas
         </Button>
       )}

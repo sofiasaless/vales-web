@@ -1,52 +1,25 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PageHeader } from '@/components/PageHeader';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { MoneyDisplay } from '@/components/MoneyDisplay';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
+import { Button, Input, Modal, App } from 'antd';
 import { useIncentive } from '@/context/IncentiveContext';
 import { Trophy, Plus, Calendar, Target, Crown, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { toast } from 'sonner';
 
 const IncentiveHistoryScreen = () => {
   const navigate = useNavigate();
   const { state, addIncentive } = useIncentive();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [formData, setFormData] = useState({
-    descricao: '',
-    valor_incentivo: '',
-    meta: '',
-    data_expiracao: '',
-  });
+  const [formData, setFormData] = useState({ descricao: '', valor_incentivo: '', meta: '', data_expiracao: '' });
+  const { message } = App.useApp();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!formData.descricao || !formData.valor_incentivo || !formData.meta || !formData.data_expiracao) {
-      toast.error('Preencha todos os campos');
-      return;
-    }
-
-    addIncentive({
-      descricao: formData.descricao,
-      valor_incentivo: parseFloat(formData.valor_incentivo),
-      meta: parseInt(formData.meta),
-      data_expiracao: new Date(formData.data_expiracao),
-    });
-
-    toast.success('Incentivo criado com sucesso!');
+    if (!formData.descricao || !formData.valor_incentivo || !formData.meta || !formData.data_expiracao) { message.error('Preencha todos os campos'); return; }
+    addIncentive({ descricao: formData.descricao, valor_incentivo: parseFloat(formData.valor_incentivo), meta: parseInt(formData.meta), data_expiracao: new Date(formData.data_expiracao) });
+    message.success('Incentivo criado com sucesso!');
     setFormData({ descricao: '', valor_incentivo: '', meta: '', data_expiracao: '' });
     setIsDialogOpen(false);
   };
@@ -55,168 +28,75 @@ const IncentiveHistoryScreen = () => {
   const historyIncentives = state.incentivos.filter(i => !i.status || i.ganhador_id);
 
   return (
-    <div className="min-h-screen bg-background pb-20">
-      <PageHeader 
-        title="Incentivos" 
-        subtitle="Motive sua equipe" 
-        showBack 
-      />
+    <div style={{ minHeight: '100vh', paddingBottom: 80 }}>
+      <PageHeader title="Incentivos" subtitle="Motive sua equipe" showBack />
 
-      <div className="px-4 py-4 max-w-lg mx-auto space-y-4">
-        {/* Active Incentive Banner */}
+      <div style={{ padding: 16, maxWidth: 512, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 16 }}>
         {activeIncentive && (
-          <Card className="p-4 glass-card border-primary/30 bg-primary/5">
-            <div className="flex items-center gap-2 text-primary mb-2">
-              <Trophy className="w-5 h-5" />
-              <span className="font-semibold">Incentivo Ativo</span>
-            </div>
-            <p className="text-foreground font-medium">{activeIncentive.descricao}</p>
-            <div className="flex items-center justify-between mt-2">
+          <div className="glass-card" style={{ border: '1px solid rgba(45,184,164,0.3)', background: 'rgba(45,184,164,0.05)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--color-primary)', marginBottom: 8 }}><Trophy style={{ width: 20, height: 20 }} /><span style={{ fontWeight: 600 }}>Incentivo Ativo</span></div>
+            <p style={{ fontWeight: 500, margin: 0 }}>{activeIncentive.descricao}</p>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 8 }}>
               <MoneyDisplay value={activeIncentive.valor_incentivo} size="lg" variant="positive" />
-              <span className="text-sm text-muted-foreground">
-                Meta: {activeIncentive.meta} vendas
-              </span>
+              <span style={{ fontSize: 14, color: 'var(--color-text-secondary)' }}>Meta: {activeIncentive.meta} vendas</span>
             </div>
-          </Card>
+          </div>
         )}
 
-        {/* New Incentive Button */}
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button 
-              className="w-full gap-2" 
-              size="lg"
-              disabled={!!activeIncentive}
-            >
-              <Plus className="w-5 h-5" />
-              Começar Novo Incentivo
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="glass-card border-border">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <Trophy className="w-5 h-5 text-primary" />
-                Novo Incentivo
-              </DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-              <div className="space-y-2">
-                <Label htmlFor="descricao">Descrição</Label>
-                <Textarea
-                  id="descricao"
-                  placeholder="Ex: Vender 30 sobremesas do dia"
-                  value={formData.descricao}
-                  onChange={(e) => setFormData({ ...formData, descricao: e.target.value })}
-                  className="bg-secondary border-border"
-                />
-              </div>
+        <Button type="primary" block size="large" icon={<Plus style={{ width: 20, height: 20 }} />} disabled={!!activeIncentive} onClick={() => setIsDialogOpen(true)}
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+          Começar Novo Incentivo
+        </Button>
 
-              <div className="space-y-2">
-                <Label htmlFor="valor">Valor do Prêmio (R$)</Label>
-                <Input
-                  id="valor"
-                  type="number"
-                  step="0.01"
-                  placeholder="150.00"
-                  value={formData.valor_incentivo}
-                  onChange={(e) => setFormData({ ...formData, valor_incentivo: e.target.value })}
-                  className="bg-secondary border-border"
-                />
-              </div>
+        {activeIncentive && <p style={{ fontSize: 14, color: 'var(--color-text-secondary)', textAlign: 'center' }}>Finalize o incentivo ativo para criar um novo</p>}
 
-              <div className="space-y-2">
-                <Label htmlFor="meta">Meta (quantidade de vendas)</Label>
-                <Input
-                  id="meta"
-                  type="number"
-                  placeholder="20"
-                  value={formData.meta}
-                  onChange={(e) => setFormData({ ...formData, meta: e.target.value })}
-                  className="bg-secondary border-border"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="expiracao">Data de Expiração</Label>
-                <Input
-                  id="expiracao"
-                  type="date"
-                  value={formData.data_expiracao}
-                  onChange={(e) => setFormData({ ...formData, data_expiracao: e.target.value })}
-                  className="bg-secondary border-border"
-                />
-              </div>
-
-              <Button type="submit" className="w-full">
-                Criar Incentivo
-              </Button>
-            </form>
-          </DialogContent>
-        </Dialog>
-
-        {activeIncentive && (
-          <p className="text-sm text-muted-foreground text-center">
-            Finalize o incentivo ativo para criar um novo
-          </p>
-        )}
-
-        {/* History */}
-        <div className="space-y-3">
-          <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
-            <Clock className="w-5 h-5 text-muted-foreground" />
-            Histórico de Incentivos
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <h2 style={{ fontSize: 18, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8, margin: 0 }}>
+            <Clock style={{ width: 20, height: 20, color: 'var(--color-text-secondary)' }} /> Histórico de Incentivos
           </h2>
 
           {historyIncentives.length === 0 ? (
-            <Card className="p-8 glass-card border-border text-center">
-              <Trophy className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">Nenhum incentivo registrado</p>
-              <p className="text-sm text-muted-foreground">
-                Crie seu primeiro incentivo para motivar a equipe
-              </p>
-            </Card>
-          ) : (
-            historyIncentives.map((incentivo) => (
-              <Card 
-                key={incentivo.id} 
-                className="p-4 glass-card border-border"
-              >
-                <div className="flex items-start justify-between mb-2">
-                  <div className="flex-1">
-                    <p className="font-medium text-foreground">{incentivo.descricao}</p>
-                    <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
-                      <span className="flex items-center gap-1">
-                        <Target className="w-4 h-4" />
-                        Meta: {incentivo.meta}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Calendar className="w-4 h-4" />
-                        {format(new Date(incentivo.data_expiracao), "dd/MM/yy", { locale: ptBR })}
-                      </span>
-                    </div>
+            <div className="glass-card" style={{ textAlign: 'center', padding: 32 }}>
+              <Trophy style={{ width: 48, height: 48, color: 'var(--color-text-secondary)', margin: '0 auto 16px' }} />
+              <p style={{ color: 'var(--color-text-secondary)' }}>Nenhum incentivo registrado</p>
+              <p style={{ fontSize: 14, color: 'var(--color-text-secondary)' }}>Crie seu primeiro incentivo para motivar a equipe</p>
+            </div>
+          ) : historyIncentives.map((inc) => (
+            <div key={inc.id} className="glass-card">
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 8 }}>
+                <div style={{ flex: 1 }}>
+                  <p style={{ fontWeight: 500, margin: 0 }}>{inc.descricao}</p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 4, fontSize: 14, color: 'var(--color-text-secondary)' }}>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><Target style={{ width: 16, height: 16 }} />Meta: {inc.meta}</span>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><Calendar style={{ width: 16, height: 16 }} />{format(new Date(inc.data_expiracao), "dd/MM/yy", { locale: ptBR })}</span>
                   </div>
-                  <MoneyDisplay value={incentivo.valor_incentivo} size="md" variant="positive" />
                 </div>
-
-                {incentivo.ganhador_nome ? (
-                  <div className="flex items-center gap-2 mt-3 p-2 rounded-lg bg-success/10 border border-success/20">
-                    <Crown className="w-4 h-4 text-success" />
-                    <span className="text-sm text-success font-medium">
-                      Ganhador: {incentivo.ganhador_nome}
-                    </span>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2 mt-3 p-2 rounded-lg bg-muted">
-                    <span className="text-sm text-muted-foreground">
-                      Expirado sem ganhador
-                    </span>
-                  </div>
-                )}
-              </Card>
-            ))
-          )}
+                <MoneyDisplay value={inc.valor_incentivo} size="md" variant="positive" />
+              </div>
+              {inc.ganhador_nome ? (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 12, padding: 8, borderRadius: 8, background: 'rgba(45,184,106,0.1)', border: '1px solid rgba(45,184,106,0.2)' }}>
+                  <Crown style={{ width: 16, height: 16, color: 'var(--color-success)' }} />
+                  <span style={{ fontSize: 14, color: 'var(--color-success)', fontWeight: 500 }}>Ganhador: {inc.ganhador_nome}</span>
+                </div>
+              ) : (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 12, padding: 8, borderRadius: 8, background: 'var(--color-bg-muted)' }}>
+                  <span style={{ fontSize: 14, color: 'var(--color-text-secondary)' }}>Expirado sem ganhador</span>
+                </div>
+              )}
+            </div>
+          ))}
         </div>
       </div>
+
+      <Modal open={isDialogOpen} onCancel={() => setIsDialogOpen(false)} title={<span style={{ display: 'flex', alignItems: 'center', gap: 8 }}><Trophy style={{ width: 20, height: 20, color: 'var(--color-primary)' }} />Novo Incentivo</span>} footer={null}>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 16 }}>
+          <div><label style={{ display: 'block', fontSize: 14, fontWeight: 500, marginBottom: 6 }}>Descrição</label><Input.TextArea placeholder="Ex: Vender 30 sobremesas do dia" value={formData.descricao} onChange={(e) => setFormData({ ...formData, descricao: e.target.value })} /></div>
+          <div><label style={{ display: 'block', fontSize: 14, fontWeight: 500, marginBottom: 6 }}>Valor do Prêmio (R$)</label><Input type="number" step="0.01" placeholder="150.00" value={formData.valor_incentivo} onChange={(e) => setFormData({ ...formData, valor_incentivo: e.target.value })} /></div>
+          <div><label style={{ display: 'block', fontSize: 14, fontWeight: 500, marginBottom: 6 }}>Meta (quantidade de vendas)</label><Input type="number" placeholder="20" value={formData.meta} onChange={(e) => setFormData({ ...formData, meta: e.target.value })} /></div>
+          <div><label style={{ display: 'block', fontSize: 14, fontWeight: 500, marginBottom: 6 }}>Data de Expiração</label><Input type="date" value={formData.data_expiracao} onChange={(e) => setFormData({ ...formData, data_expiracao: e.target.value })} /></div>
+          <Button type="primary" htmlType="submit" block>Criar Incentivo</Button>
+        </form>
+      </Modal>
     </div>
   );
 };

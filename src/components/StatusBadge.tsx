@@ -1,36 +1,28 @@
-import { cn } from '@/lib/utils';
-
 interface StatusBadgeProps {
   status: 'pending' | 'paid' | 'today';
-  className?: string;
 }
 
 const statusConfig = {
-  pending: {
-    label: 'A receber',
-    classes: 'bg-warning/15 text-warning border border-warning/30',
-  },
-  paid: {
-    label: 'Pago',
-    classes: 'bg-success/15 text-success border border-success/30',
-  },
-  today: {
-    label: 'Pago hoje',
-    classes: 'bg-success/20 text-success border border-success/40',
-  },
+  pending: { label: 'A receber', bg: 'rgba(242, 166, 13, 0.15)', color: '#f2a60d', border: 'rgba(242, 166, 13, 0.3)' },
+  paid: { label: 'Pago', bg: 'rgba(45, 184, 106, 0.15)', color: '#2db86a', border: 'rgba(45, 184, 106, 0.3)' },
+  today: { label: 'Pago hoje', bg: 'rgba(45, 184, 106, 0.2)', color: '#2db86a', border: 'rgba(45, 184, 106, 0.4)' },
 };
 
-export const StatusBadge = ({ status, className }: StatusBadgeProps) => {
+export const StatusBadge = ({ status }: StatusBadgeProps) => {
   const config = statusConfig[status];
 
   return (
-    <span
-      className={cn(
-        'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium',
-        config.classes,
-        className
-      )}
-    >
+    <span style={{
+      display: 'inline-flex',
+      alignItems: 'center',
+      padding: '2px 8px',
+      borderRadius: 12,
+      fontSize: 12,
+      fontWeight: 500,
+      background: config.bg,
+      color: config.color,
+      border: `1px solid ${config.border}`,
+    }}>
       {config.label}
     </span>
   );

@@ -3,8 +3,7 @@ import { useEmployees } from '@/context/EmployeeContext';
 import { PageHeader } from '@/components/PageHeader';
 import { MoneyDisplay } from '@/components/MoneyDisplay';
 import { VoucherItemCard } from '@/components/VoucherItemCard';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { Button } from 'antd';
 import { formatDateTime } from '@/utils/format';
 import { History, AlertCircle, Receipt, ChevronDown, ChevronUp } from 'lucide-react';
 import { useState } from 'react';
@@ -19,17 +18,11 @@ const PaymentHistoryScreen = () => {
 
   if (!employee) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <AlertCircle className="w-12 h-12 text-danger mx-auto mb-4" />
-          <p className="text-lg font-medium">Funcionário não encontrado</p>
-          <Button
-            variant="outline"
-            className="mt-4"
-            onClick={() => navigate('/')}
-          >
-            Voltar
-          </Button>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ textAlign: 'center' }}>
+          <AlertCircle style={{ width: 48, height: 48, color: 'var(--color-danger)', margin: '0 auto 16px' }} />
+          <p style={{ fontSize: 18, fontWeight: 500 }}>Funcionário não encontrado</p>
+          <Button onClick={() => navigate('/')} style={{ marginTop: 16 }}>Voltar</Button>
         </div>
       </div>
     );
@@ -40,116 +33,77 @@ const PaymentHistoryScreen = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-8">
-      <PageHeader
-        title="Histórico de Pagamentos"
-        subtitle={employee.name}
-        showBack
-      />
+    <div style={{ minHeight: '100vh', paddingBottom: 32 }}>
+      <PageHeader title="Histórico de Pagamentos" subtitle={employee.name} showBack />
 
-      <div className="px-4 py-4 max-w-lg mx-auto">
+      <div style={{ padding: 16, maxWidth: 512, margin: '0 auto' }}>
         {employee.paymentHistory.length > 0 ? (
-          <div className="space-y-3">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {employee.paymentHistory.map((payment) => {
               const isExpanded = expandedPayment === payment.id;
 
               return (
-                <Card
-                  key={payment.id}
-                  className="glass-card border-border overflow-hidden"
-                >
+                <div key={payment.id} className="glass-card" style={{ padding: 0, overflow: 'hidden' }}>
                   <button
                     onClick={() => toggleExpand(payment.id)}
-                    className="w-full p-4 text-left tap-highlight-none"
+                    className="tap-highlight-none"
+                    style={{ width: '100%', padding: 16, textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text)' }}
                   >
-                    <div className="flex items-center justify-between">
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <div>
-                        <p className="text-sm text-muted-foreground">
-                          {formatDateTime(payment.date)}
-                        </p>
-                        <div className="flex items-center gap-2 mt-1">
-                          <MoneyDisplay
-                            value={payment.amountPaid}
-                            size="lg"
-                            variant="positive"
-                          />
-                          <span className="text-xs text-muted-foreground">
-                            pago
-                          </span>
+                        <p style={{ fontSize: 14, color: 'var(--color-text-secondary)', margin: 0 }}>{formatDateTime(payment.date)}</p>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
+                          <MoneyDisplay value={payment.amountPaid} size="lg" variant="positive" />
+                          <span style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>pago</span>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <div className="text-right">
-                          <p className="text-xs text-muted-foreground">
-                            Vale descontado
-                          </p>
-                          <MoneyDisplay
-                            value={-payment.voucherTotal}
-                            size="sm"
-                            variant="negative"
-                          />
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <div style={{ textAlign: 'right' }}>
+                          <p style={{ fontSize: 12, color: 'var(--color-text-secondary)', margin: 0 }}>Vale descontado</p>
+                          <MoneyDisplay value={-payment.voucherTotal} size="sm" variant="negative" />
                         </div>
-                        {isExpanded ? (
-                          <ChevronUp className="w-5 h-5 text-muted-foreground" />
-                        ) : (
-                          <ChevronDown className="w-5 h-5 text-muted-foreground" />
-                        )}
+                        {isExpanded ? <ChevronUp style={{ width: 20, height: 20, color: 'var(--color-text-secondary)' }} /> : <ChevronDown style={{ width: 20, height: 20, color: 'var(--color-text-secondary)' }} />}
                       </div>
                     </div>
                   </button>
 
                   {isExpanded && (
-                    <div className="px-4 pb-4 border-t border-border pt-3 animate-slide-down">
-                      <div className="grid grid-cols-2 gap-2 mb-3">
-                        <div className="p-2 bg-secondary/50 rounded-lg">
-                          <p className="text-xs text-muted-foreground">
-                            Salário Base
-                          </p>
+                    <div className="animate-slide-down" style={{ padding: '12px 16px 16px', borderTop: '1px solid var(--color-border)' }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 12 }}>
+                        <div style={{ padding: 8, background: 'rgba(39, 44, 54, 0.5)', borderRadius: 8 }}>
+                          <p style={{ fontSize: 12, color: 'var(--color-text-secondary)', margin: 0 }}>Salário Base</p>
                           <MoneyDisplay value={payment.baseSalary} size="sm" />
                         </div>
-                        <div className="p-2 bg-danger/10 rounded-lg">
-                          <p className="text-xs text-muted-foreground">
-                            Desconto Vale
-                          </p>
-                          <MoneyDisplay
-                            value={-payment.voucherTotal}
-                            size="sm"
-                            variant="negative"
-                          />
+                        <div style={{ padding: 8, background: 'rgba(217, 54, 54, 0.1)', borderRadius: 8 }}>
+                          <p style={{ fontSize: 12, color: 'var(--color-text-secondary)', margin: 0 }}>Desconto Vale</p>
+                          <MoneyDisplay value={-payment.voucherTotal} size="sm" variant="negative" />
                         </div>
                       </div>
 
                       {payment.voucherItems.length > 0 && (
                         <div>
-                          <p className="text-sm font-medium mb-2 flex items-center gap-2">
-                            <Receipt className="w-4 h-4" />
+                          <p style={{ fontSize: 14, fontWeight: 500, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <Receipt style={{ width: 16, height: 16 }} />
                             Itens do Vale
                           </p>
-                          <div className="space-y-2">
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                             {payment.voucherItems.map((item) => (
-                              <VoucherItemCard
-                                key={item.id}
-                                item={item}
-                                showControls={false}
-                                className="bg-secondary/30"
-                              />
+                              <VoucherItemCard key={item.id} item={item} showControls={false} bgColor="rgba(39, 44, 54, 0.3)" />
                             ))}
                           </div>
                         </div>
                       )}
                     </div>
                   )}
-                </Card>
+                </div>
               );
             })}
           </div>
         ) : (
-          <div className="text-center py-12">
-            <History className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-            <p className="text-muted-foreground">Nenhum pagamento registrado</p>
-            <p className="text-sm text-muted-foreground">
-              O histórico aparecerá aqui após o primeiro pagamento
-            </p>
+          <div style={{ textAlign: 'center', padding: '48px 0' }}>
+            <History style={{ width: 48, height: 48, color: 'var(--color-text-secondary)', margin: '0 auto 16px' }} />
+            <p style={{ color: 'var(--color-text-secondary)' }}>Nenhum pagamento registrado</p>
+            <p style={{ fontSize: 14, color: 'var(--color-text-secondary)' }}>O histórico aparecerá aqui após o primeiro pagamento</p>
           </div>
         )}
       </div>

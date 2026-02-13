@@ -1,46 +1,63 @@
 import { ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
-import { cn } from '@/lib/utils';
 
 interface PageHeaderProps {
   title: string;
   subtitle?: string;
   showBack?: boolean;
   rightAction?: ReactNode;
-  className?: string;
 }
 
-export const PageHeader = ({
-  title,
-  subtitle,
-  showBack = false,
-  rightAction,
-  className,
-}: PageHeaderProps) => {
+export const PageHeader = ({ title, subtitle, showBack = false, rightAction }: PageHeaderProps) => {
   const navigate = useNavigate();
 
   return (
-    <header
-      className={cn(
-        'sticky top-0 z-30 bg-background/95 backdrop-blur-sm border-b border-border px-4 py-3',
-        className
-      )}
-    >
-      <div className="flex items-center justify-between max-w-lg mx-auto">
-        <div className="flex items-center gap-3">
+    <header style={{
+      position: 'sticky',
+      top: 0,
+      zIndex: 30,
+      background: 'rgba(17, 24, 39, 0.95)',
+      backdropFilter: 'blur(8px)',
+      borderBottom: '1px solid var(--color-border)',
+      padding: '12px 16px',
+    }}>
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        maxWidth: 512,
+        margin: '0 auto',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           {showBack && (
             <button
               onClick={() => navigate(-1)}
-              className="p-2 -ml-2 rounded-full hover:bg-secondary tap-highlight-none transition-colors"
+              className="tap-highlight-none"
+              style={{
+                padding: 8,
+                marginLeft: -8,
+                borderRadius: '50%',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                color: 'var(--color-text)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
             >
-              <ArrowLeft className="w-5 h-5" />
+              <ArrowLeft style={{ width: 20, height: 20 }} />
             </button>
           )}
           <div>
-            <h1 className="text-lg font-semibold">{title}</h1>
+            <h1 style={{ fontSize: 18, fontWeight: 600, color: 'var(--color-text)', margin: 0 }}>
+              {title}
+            </h1>
             {subtitle && (
-              <p className="text-sm text-muted-foreground">{subtitle}</p>
+              <p style={{ fontSize: 14, color: 'var(--color-text-secondary)', margin: 0 }}>
+                {subtitle}
+              </p>
             )}
           </div>
         </div>
