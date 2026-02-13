@@ -1,156 +1,99 @@
 import { PageHeader } from '@/components/PageHeader';
 import { AvatarInitials } from '@/components/AvatarInitials';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { mockManager } from '@/data/mockData';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import {
-  ChefHat,
-  Bell,
-  LogOut,
-  ChevronRight,
-  UtensilsCrossed,
-  CreditCard,
-  Wallet,
-  Trophy,
-  Users,
-  UserCog,
+  ChefHat, Bell, LogOut, ChevronRight, UtensilsCrossed,
+  CreditCard, Wallet, Trophy, Users, UserCog,
 } from 'lucide-react';
 
 const SettingsScreen = () => {
   const navigate = useNavigate();
   const { manager, logout, logoutManager } = useAuth();
 
-  const MenuItem = ({
-    icon: Icon,
-    label,
-    onClick,
-    danger = false,
-  }: {
-    icon: any;
-    label: string;
-    onClick?: () => void;
-    danger?: boolean;
+  const MenuItem = ({ icon: Icon, label, onClick, danger = false }: {
+    icon: any; label: string; onClick?: () => void; danger?: boolean;
   }) => (
     <button
       onClick={onClick}
-      className={`flex items-center w-full p-4 tap-highlight-none transition-colors ${
-        danger ? 'text-danger' : 'text-foreground'
-      }`}
+      className="tap-highlight-none"
+      style={{
+        display: 'flex', alignItems: 'center', width: '100%', padding: 16,
+        background: 'none', border: 'none', cursor: 'pointer',
+        color: danger ? 'var(--color-danger)' : 'var(--color-text)',
+        transition: 'background 0.2s',
+      }}
     >
-      <div
-        className={`p-2 rounded-lg mr-3 ${
-          danger ? 'bg-danger/10' : 'bg-secondary'
-        }`}
-      >
-        <Icon className={`w-5 h-5 ${danger ? 'text-danger' : 'text-muted-foreground'}`} />
+      <div style={{
+        padding: 8, borderRadius: 8, marginRight: 12,
+        background: danger ? 'rgba(217, 54, 54, 0.1)' : 'var(--color-bg-secondary)',
+      }}>
+        <Icon style={{ width: 20, height: 20, color: danger ? 'var(--color-danger)' : 'var(--color-text-secondary)' }} />
       </div>
-      <span className="flex-1 text-left font-medium">{label}</span>
-      <ChevronRight className="w-5 h-5 text-muted-foreground" />
+      <span style={{ flex: 1, textAlign: 'left', fontWeight: 500 }}>{label}</span>
+      <ChevronRight style={{ width: 20, height: 20, color: 'var(--color-text-secondary)' }} />
     </button>
   );
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div style={{ minHeight: '100vh', paddingBottom: 80 }}>
       <PageHeader title="Configurações" subtitle={mockManager.restaurantName} />
 
-      <div className="px-4 py-4 max-w-lg mx-auto space-y-4">
-        {/* Profile Card */}
-        <Card className="p-6 glass-card border-border">
-          <div className="flex items-center gap-4">
+      <div style={{ padding: 16, maxWidth: 512, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 16 }}>
+        {/* Profile */}
+        <div className="glass-card" style={{ padding: 24 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
             <AvatarInitials name={manager?.nome || mockManager.name} size="lg" />
             <div>
-              <h2 className="text-xl font-bold">{manager?.nome || mockManager.name}</h2>
-              <p className="text-muted-foreground">{mockManager.email}</p>
-              <div className="flex items-center gap-1 mt-1 text-primary text-sm">
-                {manager?.tipo === 'GERENTE' ? (
-                  <ChefHat className="w-4 h-4" />
-                ) : (
-                  <UserCog className="w-4 h-4" />
-                )}
+              <h2 style={{ fontSize: 20, fontWeight: 700, margin: 0, color: 'var(--color-text)' }}>{manager?.nome || mockManager.name}</h2>
+              <p style={{ color: 'var(--color-text-secondary)', margin: 0 }}>{mockManager.email}</p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 4, color: 'var(--color-primary)', fontSize: 14 }}>
+                {manager?.tipo === 'GERENTE' ? <ChefHat style={{ width: 16, height: 16 }} /> : <UserCog style={{ width: 16, height: 16 }} />}
                 <span>{manager?.tipo === 'GERENTE' ? 'Gerente' : 'Auxiliar'}</span>
               </div>
             </div>
           </div>
-        </Card>
+        </div>
 
-        {/* Restaurant Info */}
-        <Card className="p-4 glass-card border-border">
-          <div className="flex items-center gap-3">
-            <div className="p-3 rounded-xl bg-primary/20">
-              <UtensilsCrossed className="w-6 h-6 text-primary" />
+        {/* Restaurant */}
+        <div className="glass-card">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{ padding: 12, borderRadius: 12, background: 'rgba(45, 184, 164, 0.2)' }}>
+              <UtensilsCrossed style={{ width: 24, height: 24, color: 'var(--color-primary)' }} />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Restaurante</p>
-              <p className="font-semibold">{mockManager.restaurantName}</p>
+              <p style={{ fontSize: 14, color: 'var(--color-text-secondary)', margin: 0 }}>Restaurante</p>
+              <p style={{ fontWeight: 600, margin: 0, color: 'var(--color-text)' }}>{mockManager.restaurantName}</p>
             </div>
           </div>
-        </Card>
+        </div>
 
         {/* Menu */}
-        <Card className="glass-card border-border overflow-hidden divide-y divide-border">
-          <MenuItem
-            icon={ChefHat}
-            label="Gerenciar Cardápio"
-            onClick={() => navigate('/settings/menu')}
-          />
-          <MenuItem
-            icon={Wallet}
-            label="Finanças"
-            onClick={() => navigate('/settings/finances')}
-          />
-          <MenuItem
-            icon={CreditCard}
-            label="Mensalidades"
-            onClick={() => navigate('/settings/subscriptions')}
-          />
-          <MenuItem
-            icon={Trophy}
-            label="Começar Incentivo"
-            onClick={() => navigate('/settings/incentives')}
-          />
-          <MenuItem
-            icon={Users}
-            label="Gerentes e Auxiliares"
-            onClick={() => navigate('/settings/managers')}
-          />
-          <MenuItem
-            icon={Bell}
-            label="Notificações"
-            onClick={() => {}}
-          />
-        </Card>
+        <div className="glass-card" style={{ padding: 0, overflow: 'hidden' }}>
+          <MenuItem icon={ChefHat} label="Gerenciar Cardápio" onClick={() => navigate('/settings/menu')} />
+          <div style={{ height: 1, background: 'var(--color-border)' }} />
+          <MenuItem icon={Wallet} label="Finanças" onClick={() => navigate('/settings/finances')} />
+          <div style={{ height: 1, background: 'var(--color-border)' }} />
+          <MenuItem icon={CreditCard} label="Mensalidades" onClick={() => navigate('/settings/subscriptions')} />
+          <div style={{ height: 1, background: 'var(--color-border)' }} />
+          <MenuItem icon={Trophy} label="Começar Incentivo" onClick={() => navigate('/settings/incentives')} />
+          <div style={{ height: 1, background: 'var(--color-border)' }} />
+          <MenuItem icon={Users} label="Gerentes e Auxiliares" onClick={() => navigate('/settings/managers')} />
+          <div style={{ height: 1, background: 'var(--color-border)' }} />
+          <MenuItem icon={Bell} label="Notificações" onClick={() => {}} />
+        </div>
 
-        {/* Logout Options */}
-        <Card className="glass-card border-border overflow-hidden divide-y divide-border">
-          <MenuItem
-            icon={UserCog}
-            label="Trocar Usuário"
-            onClick={() => {
-              logoutManager();
-              navigate('/select-manager');
-            }}
-          />
-          <MenuItem
-            icon={LogOut}
-            label="Sair do Restaurante"
-            danger
-            onClick={() => {
-              logout();
-              navigate('/login');
-            }}
-          />
-        </Card>
+        {/* Logout */}
+        <div className="glass-card" style={{ padding: 0, overflow: 'hidden' }}>
+          <MenuItem icon={UserCog} label="Trocar Usuário" onClick={() => { logoutManager(); navigate('/select-manager'); }} />
+          <div style={{ height: 1, background: 'var(--color-border)' }} />
+          <MenuItem icon={LogOut} label="Sair do Restaurante" danger onClick={() => { logout(); navigate('/login'); }} />
+        </div>
 
-        {/* App Info */}
-        <div className="text-center pt-6">
-          <p className="text-xs text-muted-foreground">
-            Vale Restaurante v1.0.0
-          </p>
-          <p className="text-xs text-muted-foreground mt-1">
-            Feito com ❤️ para gerentes
-          </p>
+        <div style={{ textAlign: 'center', paddingTop: 24 }}>
+          <p style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>Vale Restaurante v1.0.0</p>
+          <p style={{ fontSize: 12, color: 'var(--color-text-secondary)', marginTop: 4 }}>Feito com ❤️ para gerentes</p>
         </div>
       </div>
     </div>

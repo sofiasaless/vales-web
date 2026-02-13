@@ -1,21 +1,20 @@
-import { useLocation } from "react-router-dom";
-import { useEffect } from "react";
+import { useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Button } from 'antd';
 
 const NotFound = () => {
   const location = useLocation();
 
   useEffect(() => {
-    console.error("404 Error: User attempted to access non-existent route:", location.pathname);
+    console.error('404 Error: User attempted to access non-existent route:', location.pathname);
   }, [location.pathname]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-muted">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">404</h1>
-        <p className="mb-4 text-xl text-muted-foreground">Oops! Page not found</p>
-        <a href="/" className="text-primary underline hover:text-primary/90">
-          Return to Home
-        </a>
+    <div style={{ display: 'flex', minHeight: '100vh', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg-muted)' }}>
+      <div style={{ textAlign: 'center' }}>
+        <h1 style={{ marginBottom: 16, fontSize: 48, fontWeight: 700 }}>404</h1>
+        <p style={{ marginBottom: 16, fontSize: 20, color: 'var(--color-text-secondary)' }}>Oops! Página não encontrada</p>
+        <Button type="link" href="/">Voltar para o início</Button>
       </div>
     </div>
   );
