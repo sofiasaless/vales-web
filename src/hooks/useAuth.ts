@@ -1,10 +1,10 @@
 import { AuthService } from "@/services/auth.service";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
-export function useAuthAcoes() {
+export function useAuthActions() {
   
-  const entrar = useMutation({
-    mutationFn: ({email, senha}: {email: string, senha: string}) => AuthService.entrarComEmpresa(email, senha),
+  const login = useMutation({
+    mutationFn: ({email, password}: {email: string, password: string}) => AuthService.loginWithEnterprise(email, password),
 
     onSuccess: () => {
       console.info('login efetuado com sucesso')
@@ -15,8 +15,21 @@ export function useAuthAcoes() {
     }
   })
 
+  const logout = useMutation({
+    mutationFn: () => AuthService.logout(),
+
+    onSuccess: () => {
+      console.info('logout efetuado com sucesso')
+    },
+
+    onError: () => {
+      console.error('nao foi possível fazer logout')
+    }
+  })
+
   return {
-    entrar
+    login,
+    logout
   }
 
 }
