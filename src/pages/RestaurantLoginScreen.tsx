@@ -71,7 +71,7 @@ const RestaurantLoginScreen = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="pl-10"
-                  disabled={isLoading}
+                  disabled={login.isPending}
                 />
               </div>
             </div>
@@ -87,13 +87,13 @@ const RestaurantLoginScreen = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="pl-10"
-                  disabled={isLoading}
+                  disabled={login.isPending}
                 />
               </div>
             </div>
 
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? (
+            <Button type="submit" className="w-full" disabled={login.isPending}>
+              {login.isPending ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
                   Entrando...

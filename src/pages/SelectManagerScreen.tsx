@@ -2,7 +2,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useAuthActions } from '@/hooks/useAuth';
 import { useCurrentEnterprise } from '@/hooks/useEnterprise';
 import { useListManagers, useManagers } from '@/hooks/useManager';
@@ -11,6 +10,10 @@ import { Loader2, Lock, LogOut, Shield, UserCog, Users } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { Radio, Typography } from 'antd'
+import { antdTheme } from '@/theme/antTheme';
+
+const { Text } = Typography
 
 const getTypeIcon = (tipo: GerenteResponseBody['tipo']) => {
   return tipo === 'GERENTE' ? Shield : UserCog;
@@ -31,7 +34,6 @@ const SelectManagerScreen = () => {
   const { logout } = useAuthActions()
   const { data: restaurant } = useCurrentEnterprise()
 
-  const [isLoading] = useState(autenticate.isPending);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -59,9 +61,15 @@ const SelectManagerScreen = () => {
     if (logout.isPending || autenticate.isPending) return;
 
     if (logout.isSuccess) navigate('/login');
+
     if (autenticate.isSuccess) {
       toast.success('Login realizado com sucesso!')
       navigate('/')
+      return
+    }
+
+    if (autenticate.isError) {
+      toast.error(`Erro ao autenticar ${autenticate.error}`)
     }
   }, [logout.isPending, autenticate.isPending])
 
@@ -83,44 +91,42 @@ const SelectManagerScreen = () => {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-3">
-              <Label>Usuário</Label>
-              <RadioGroup
-                value={selectedManagerId}
-                onValueChange={(v) => {
-                  setSelectedManagerId(v)
-                }}
-                className="space-y-2"
-              >
-                {activeManagers?.map((manager) => {
-                  const TypeIcon = getTypeIcon(manager.tipo);
-                  return (
-                    <div
-                      key={manager.id}
-                      className={`flex items-center space-x-3 p-3 rounded-lg border transition-colors cursor-pointer ${selectedManagerId === manager.id
-                          ? 'border-primary bg-primary/5'
-                          : 'border-border hover:bg-muted/50'
-                      }`}
-                      onClick={() => setSelectedManagerId(manager.id)}
-                    >
-                      <RadioGroupItem value={manager.id} id={manager.id} />
-                      <div className="flex-1">
-                        <Label
-                          htmlFor={manager.id}
-                          className="cursor-pointer font-medium"
-                        >
-                          {manager.nome}
-                        </Label>
-                        <div className="flex items-center gap-1.5 mt-0.5">
-                          <TypeIcon className="w-3 h-3 text-muted-foreground" />
-                          <span className="text-xs text-muted-foreground">
-                            {getTypeLabel(manager.tipo)}
-                          </span>
-                        </div>
+              <Label>Operadores</Label>
+              <Radio.Group
+              value={selectedManagerId}
+              onChange={(e) => setSelectedManagerId(e.target.value)}
+              style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 8 }}
+            >
+              {activeManagers?.map((mgr) => {
+                const TypeIcon = getTypeIcon(mgr.tipo);
+                return (
+                  <div
+                    key={mgr.id}
+                    onClick={() => setSelectedManagerId(mgr.id)}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 12,
+                      padding: 12,
+                      borderRadius: 8,
+                      border: `1px solid ${selectedManagerId === mgr.id ? antdTheme.token.colorPrimary : antdTheme.token.colorBorder}`,
+                      background: selectedManagerId === mgr.id ? 'rgba(45, 184, 164, 0.05)' : 'transparent',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
+                    }}
+                  >
+                    <Radio value={mgr.id} />
+                    <div style={{ flex: 1 }}>
+                      <Text style={{ fontWeight: 500, margin: 0, color: 'var(--color-text)' }}>{mgr.nome}</Text>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
+                        <TypeIcon style={{ width: 12, height: 12, color: 'var(--color-text-secondary)' }} />
+                        <span style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>{getTypeLabel(mgr.tipo)}</span>
                       </div>
                     </div>
-                  );
-                })}
-              </RadioGroup>
+                  </div>
+                );
+              })}
+            </Radio.Group>
 
               {activeManagers?.length === 0 && (
                 <p className="text-sm text-muted-foreground text-center py-4">
@@ -140,7 +146,7 @@ const SelectManagerScreen = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="pl-10"
-                  disabled={isLoading}
+                  disabled={autenticate.isPending}
                 />
               </div>
             </div>
@@ -149,9 +155,9 @@ const SelectManagerScreen = () => {
               <Button
                 type="submit"
                 className="w-full"
-                disabled={isLoading || !selectedManagerId}
+                disabled={autenticate.isPending || !selectedManagerId}
               >
-                {isLoading ? (
+                {autenticate.isPending ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
                     Entrando...
