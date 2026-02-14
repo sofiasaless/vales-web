@@ -1,48 +1,60 @@
 import { VoucherItem } from '@/types';
 import { MoneyDisplay } from './MoneyDisplay';
 import { Trash2 } from 'lucide-react';
-import { cn } from '@/lib/utils';
 
 interface VoucherItemCardProps {
   item: VoucherItem;
   onRemove?: () => void;
-  onQuantityChange?: (quantity: number) => void;
   showControls?: boolean;
-  className?: string;
+  bgColor?: string;
 }
 
 export const VoucherItemCard = ({
   item,
   onRemove,
-  onQuantityChange,
   showControls = true,
-  className,
+  bgColor,
 }: VoucherItemCardProps) => {
   const totalValue = item.unitPrice * item.quantity;
 
   return (
-    <div
-      className={cn(
-        'flex items-center justify-between py-3 px-4 bg-secondary/50 rounded-lg',
-        className
-      )}
-    >
-      <div className="flex-1 min-w-0">
-        <p className="font-medium text-foreground truncate">{item.name}</p>
-        <p className="text-sm text-muted-foreground">
+    <div style={{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      padding: '12px 16px',
+      background: bgColor || 'rgba(39, 44, 54, 0.5)',
+      borderRadius: 8,
+    }}>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <p style={{ fontWeight: 500, color: 'var(--color-text)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          {item.name}
+        </p>
+        <p style={{ fontSize: 14, color: 'var(--color-text-secondary)', margin: 0 }}>
           {item.quantity}x <MoneyDisplay value={item.unitPrice} size="sm" />
         </p>
       </div>
 
-      <div className="flex items-center gap-3">
-        <MoneyDisplay value={totalValue} size="md" className="font-semibold" />
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <MoneyDisplay value={totalValue} size="md" style={{ fontWeight: 600 }} />
 
         {showControls && onRemove && (
           <button
             onClick={onRemove}
-            className="p-2 rounded-full bg-danger/10 text-danger hover:bg-danger/20 transition-colors tap-highlight-none"
+            className="tap-highlight-none"
+            style={{
+              padding: 8,
+              borderRadius: '50%',
+              background: 'rgba(217, 54, 54, 0.1)',
+              color: 'var(--color-danger)',
+              border: 'none',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
           >
-            <Trash2 className="w-4 h-4" />
+            <Trash2 style={{ width: 16, height: 16 }} />
           </button>
         )}
       </div>

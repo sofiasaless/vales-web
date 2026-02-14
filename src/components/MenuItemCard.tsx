@@ -1,10 +1,7 @@
-import { useState } from 'react';
 import { MenuProduct } from '@/types';
 import { MoneyDisplay } from './MoneyDisplay';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Button } from '@/components/ui/button';
+import { Button, Checkbox } from 'antd';
 import { Minus, Plus } from 'lucide-react';
-import { cn } from '@/lib/utils';
 
 interface MenuItemCardProps {
   product: MenuProduct;
@@ -12,7 +9,6 @@ interface MenuItemCardProps {
   quantity: number;
   onToggle: () => void;
   onQuantityChange: (quantity: number) => void;
-  className?: string;
 }
 
 export const MenuItemCard = ({
@@ -21,58 +17,64 @@ export const MenuItemCard = ({
   quantity,
   onToggle,
   onQuantityChange,
-  className,
 }: MenuItemCardProps) => {
   return (
     <div
-      className={cn(
-        'flex items-center gap-4 p-4 rounded-xl transition-all tap-highlight-none',
-        selected
-          ? 'bg-primary/10 border border-primary/30'
-          : 'bg-card border border-border hover:border-primary/20',
-        className
-      )}
+      className="tap-highlight-none"
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 16,
+        padding: 16,
+        borderRadius: 12,
+        transition: 'all 0.2s',
+        background: selected ? 'rgba(45, 184, 164, 0.1)' : 'var(--color-bg-card)',
+        border: `1px solid ${selected ? 'rgba(45, 184, 164, 0.3)' : 'var(--color-border)'}`,
+      }}
     >
       <Checkbox
         checked={selected}
-        onCheckedChange={onToggle}
-        className="w-5 h-5 border-2"
+        onChange={onToggle}
       />
 
-      <div className="flex-1 min-w-0">
-        <p className="font-medium text-foreground">{product.name}</p>
-        <p className="text-sm text-muted-foreground">{product.category}</p>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <p style={{ fontWeight: 500, color: 'var(--color-text)', margin: 0 }}>{product.name}</p>
+        <p style={{ fontSize: 14, color: 'var(--color-text-secondary)', margin: 0 }}>{product.category}</p>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         <MoneyDisplay value={product.price} size="md" />
 
         {selected && (
-          <div className="flex items-center gap-1 bg-secondary rounded-full">
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 4,
+            background: 'var(--color-bg-secondary)',
+            borderRadius: 20,
+          }}>
             <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 rounded-full"
+              type="text"
+              size="small"
+              icon={<Minus style={{ width: 16, height: 16 }} />}
               onClick={(e) => {
                 e.stopPropagation();
                 if (quantity > 1) onQuantityChange(quantity - 1);
               }}
               disabled={quantity <= 1}
-            >
-              <Minus className="w-4 h-4" />
-            </Button>
-            <span className="w-8 text-center font-semibold">{quantity}</span>
+              style={{ borderRadius: '50%', width: 32, height: 32 }}
+            />
+            <span style={{ width: 32, textAlign: 'center', fontWeight: 600 }}>{quantity}</span>
             <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 rounded-full"
+              type="text"
+              size="small"
+              icon={<Plus style={{ width: 16, height: 16 }} />}
               onClick={(e) => {
                 e.stopPropagation();
                 onQuantityChange(quantity + 1);
               }}
-            >
-              <Plus className="w-4 h-4" />
-            </Button>
+              style={{ borderRadius: '50%', width: 32, height: 32 }}
+            />
           </div>
         )}
       </div>

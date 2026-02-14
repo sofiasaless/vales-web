@@ -1,60 +1,69 @@
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Button, Card, Input, App } from 'antd';
 import { useAuthActions } from '@/hooks/useAuth';
 import { Loader2, Lock, Mail, Store } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
 
 const RestaurantLoginScreen = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const { message } = App.useApp();
 
-  const { login } = useAuthActions()
+  const { login } = useAuthActions();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!email.trim() || !password.trim()) {
-      toast.error('Preencha todos os campos');
+      message.error('Preencha todos os campos');
       return;
     }
-
-    login.mutate({ email, password })
+    login.mutate({ email, password });
   };
 
-  const [isLoading] = useState(login.isPending);
+  const isLoading = login.isPending;
 
   useEffect(() => {
     if (login.isPending) return;
-
     if (login.isSuccess) {
-      toast.success('Login realizado com sucesso!');
+      message.success('Login realizado com sucesso!');
       navigate('/select-manager');
-      return
     }
-
     if (login.isError) {
-      toast.error(`Erro ao fazer login: ${login.error.message}`);
-      return
+      message.error(`Erro ao fazer login: ${login.error.message}`);
     }
-  }, [login.isPending])
+  }, [login.isPending]);
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center space-y-4">
-          <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
-            <Store className="w-8 h-8 text-primary" />
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
+      <Card style={{ width: '100%', maxWidth: 420 }}>
+        <div style={{ textAlign: 'center', marginBottom: 24 }}>
+          <div style={{
+            width: 64, height: 64, borderRadius: '50%',
+            background: 'rgba(45, 184, 164, 0.1)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            margin: '0 auto 16px',
+          }}>
+            <Store style={{ width: 32, height: 32, color: 'var(--color-primary)' }} />
           </div>
+          <h2 style={{ fontSize: 24, fontWeight: 700, margin: 0, color: 'var(--color-text)' }}>Bem-vindo</h2>
+          <p style={{ color: 'var(--color-text-secondary)', marginTop: 8 }}>
+            Entre com as credenciais do seu restaurante
+          </p>
+        </div>
+
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div>
-            <CardTitle className="text-2xl">Bem-vindo</CardTitle>
-            <CardDescription className="mt-2">
-              Entre com as credenciais do seu restaurante
-            </CardDescription>
+            <label style={{ display: 'block', fontSize: 14, fontWeight: 500, marginBottom: 6, color: 'var(--color-text)' }}>Email</label>
+            <Input
+              prefix={<Mail style={{ width: 16, height: 16, color: 'var(--color-text-secondary)' }} />}
+              type="email"
+              placeholder="seu@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              disabled={isLoading}
+              size="large"
+            />
           </div>
         </CardHeader>
 

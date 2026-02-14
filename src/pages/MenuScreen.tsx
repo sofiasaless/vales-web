@@ -4,9 +4,8 @@ import { useEmployees } from '@/context/EmployeeContext';
 import { PageHeader } from '@/components/PageHeader';
 import { MenuItemCard } from '@/components/MenuItemCard';
 import { MoneyDisplay } from '@/components/MoneyDisplay';
-import { Button } from '@/components/ui/button';
+import { Button, App } from 'antd';
 import { VoucherItem } from '@/types';
-import { toast } from 'sonner';
 import { ShoppingCart, Package } from 'lucide-react';
 
 interface SelectedItem {
@@ -19,6 +18,7 @@ const MenuScreen = () => {
   const navigate = useNavigate();
   const { state, getEmployee, dispatch } = useEmployees();
   const { menuProducts } = state;
+  const { message } = App.useApp();
 
   const employee = getEmployee(employeeId || '');
   const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([]);
@@ -31,19 +31,13 @@ const MenuScreen = () => {
   const toggleItem = (productId: string) => {
     setSelectedItems((prev) => {
       const exists = prev.find((item) => item.productId === productId);
-      if (exists) {
-        return prev.filter((item) => item.productId !== productId);
-      }
+      if (exists) return prev.filter((item) => item.productId !== productId);
       return [...prev, { productId, quantity: 1 }];
     });
   };
 
   const updateQuantity = (productId: string, quantity: number) => {
-    setSelectedItems((prev) =>
-      prev.map((item) =>
-        item.productId === productId ? { ...item, quantity } : item
-      )
-    );
+    setSelectedItems((prev) => prev.map((item) => item.productId === productId ? { ...item, quantity } : item));
   };
 
   const getSelectedQuantity = (productId: string): number => {
@@ -51,12 +45,9 @@ const MenuScreen = () => {
     return item?.quantity || 1;
   };
 
-  const isSelected = (productId: string): boolean => {
-    return selectedItems.some((s) => s.productId === productId);
-  };
+  const isSelected = (productId: string): boolean => selectedItems.some((s) => s.productId === productId);
 
   const totalItems = selectedItems.reduce((sum, item) => sum + item.quantity, 0);
-  
   const totalValue = selectedItems.reduce((sum, item) => {
     const product = menuProducts.find((p) => p.id === item.productId);
     return sum + (product?.price || 0) * item.quantity;
@@ -64,7 +55,6 @@ const MenuScreen = () => {
 
   const handleAddToVoucher = () => {
     if (selectedItems.length === 0) return;
-
     const voucherItems: VoucherItem[] = selectedItems.map((selected) => {
       const product = menuProducts.find((p) => p.id === selected.productId)!;
       return {
@@ -76,34 +66,24 @@ const MenuScreen = () => {
         addedAt: new Date(),
       };
     });
-
-    dispatch({
-      type: 'ADD_VOUCHER_ITEMS',
-      payload: { employeeId: employee.id, items: voucherItems },
-    });
-
-    toast.success(`${totalItems} item(ns) adicionado(s) ao vale`);
+    dispatch({ type: 'ADD_VOUCHER_ITEMS', payload: { employeeId: employee.id, items: voucherItems } });
+    message.success(`${totalItems} item(ns) adicionado(s) ao vale`);
     navigate(`/employee/${employee.id}`);
   };
 
-  // Group by category
   const categories = [...new Set(menuProducts.map((p) => p.category))];
 
   return (
-    <div className="min-h-screen bg-background pb-24">
-      <PageHeader
-        title="Cardápio"
-        subtitle={`Adicionar ao vale de ${employee.name}`}
-        showBack
-      />
+    <div style={{ minHeight: '100vh', paddingBottom: 96 }}>
+      <PageHeader title="Cardápio" subtitle={`Adicionar ao vale de ${employee.name}`} showBack />
 
-      <div className="px-4 py-4 max-w-lg mx-auto">
+      <div style={{ padding: 16, maxWidth: 512, margin: '0 auto' }}>
         {categories.map((category) => (
-          <div key={category} className="mb-6">
-            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
+          <div key={category} style={{ marginBottom: 24 }}>
+            <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 12 }}>
               {category}
             </h3>
-            <div className="space-y-2">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {menuProducts
                 .filter((p) => p.category === category && p.available)
                 .map((product) => (
@@ -121,25 +101,27 @@ const MenuScreen = () => {
         ))}
 
         {menuProducts.length === 0 && (
-          <div className="text-center py-12">
-            <Package className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-            <p className="text-muted-foreground">Nenhum produto no cardápio</p>
+          <div style={{ textAlign: 'center', padding: '48px 0' }}>
+            <Package style={{ width: 48, height: 48, color: 'var(--color-text-secondary)', margin: '0 auto 16px' }} />
+            <p style={{ color: 'var(--color-text-secondary)' }}>Nenhum produto no cardápio</p>
           </div>
         )}
       </div>
 
-      {/* Floating Add Button */}
       {selectedItems.length > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-background via-background to-transparent">
-          <div className="max-w-lg mx-auto">
+        <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, padding: 16, background: 'linear-gradient(to top, var(--color-bg), var(--color-bg), transparent)' }}>
+          <div style={{ maxWidth: 512, margin: '0 auto' }}>
             <Button
-              className="w-full h-14 text-base bg-primary hover:bg-primary/90 shadow-glow animate-pulse-glow"
+              type="primary"
+              block
+              size="large"
+              className="animate-pulse-glow"
               onClick={handleAddToVoucher}
+              style={{ height: 56, fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
             >
-              <ShoppingCart className="w-5 h-5 mr-2" />
-              Adicionar ao Vale ({totalItems} itens)
-              <span className="ml-2 opacity-80">•</span>
-              <MoneyDisplay value={totalValue} size="md" className="ml-2 text-primary-foreground" />
+              <ShoppingCart style={{ width: 20, height: 20 }} />
+              Adicionar ao Vale ({totalItems} itens) •{' '}
+              <MoneyDisplay value={totalValue} size="md" style={{ color: 'inherit' }} />
             </Button>
           </div>
         </div>

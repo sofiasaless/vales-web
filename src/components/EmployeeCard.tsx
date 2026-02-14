@@ -3,14 +3,12 @@ import { Employee } from '@/types';
 import { AvatarInitials } from './AvatarInitials';
 import { MoneyDisplay } from './MoneyDisplay';
 import { StatusBadge } from './StatusBadge';
-import { cn } from '@/lib/utils';
 
 interface EmployeeCardProps {
   employee: Employee;
-  className?: string;
 }
 
-export const EmployeeCard = ({ employee, className }: EmployeeCardProps) => {
+export const EmployeeCard = ({ employee }: EmployeeCardProps) => {
   const navigate = useNavigate();
 
   const voucherTotal = employee.currentVoucher.reduce(
@@ -18,7 +16,6 @@ export const EmployeeCard = ({ employee, className }: EmployeeCardProps) => {
     0
   );
 
-  // Check if paid today
   const today = new Date();
   const paidToday = employee.paymentHistory.some((payment) => {
     const paymentDate = new Date(payment.date);
@@ -34,31 +31,47 @@ export const EmployeeCard = ({ employee, className }: EmployeeCardProps) => {
   return (
     <button
       onClick={() => navigate(`/employee/${employee.id}`)}
-      className={cn(
-        'glass-card rounded-xl p-4 text-left w-full card-interactive tap-highlight-none',
-        'hover:border-primary/30 focus:outline-none focus:ring-2 focus:ring-primary/50',
-        className
-      )}
+      className="glass-card card-interactive tap-highlight-none"
+      style={{
+        width: '100%',
+        textAlign: 'center',
+        border: '1px solid var(--color-border)',
+        background: 'none',
+        cursor: 'pointer',
+        padding: 16,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+      }}
     >
-      <div className="flex flex-col items-center text-center">
-        <AvatarInitials name={employee.name} size="md" className="mb-3" />
-        
-        <h3 className="font-semibold text-foreground truncate w-full">
-          {employee.name}
-        </h3>
-        
-        <p className="text-xs text-muted-foreground mb-2">{employee.role}</p>
-        
-        <div className="mb-2">
-          <MoneyDisplay
-            value={voucherTotal}
-            size="lg"
-            variant={voucherTotal > 0 ? 'negative' : 'default'}
-          />
-        </div>
-        
-        <StatusBadge status={status} />
+      <AvatarInitials name={employee.name} size="md" style={{ marginBottom: 12 }} />
+      
+      <h3 style={{
+        fontWeight: 600,
+        color: 'var(--color-text)',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap',
+        width: '100%',
+        fontSize: 14,
+        margin: 0,
+      }}>
+        {employee.name}
+      </h3>
+      
+      <p style={{ fontSize: 12, color: 'var(--color-text-secondary)', margin: '4px 0 8px' }}>
+        {employee.role}
+      </p>
+      
+      <div style={{ marginBottom: 8 }}>
+        <MoneyDisplay
+          value={voucherTotal}
+          size="lg"
+          variant={voucherTotal > 0 ? 'negative' : 'default'}
+        />
       </div>
+      
+      <StatusBadge status={status} />
     </button>
   );
 };

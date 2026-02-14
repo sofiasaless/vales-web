@@ -10,8 +10,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 // Auth Pages
-import RestaurantLoginScreen from "@/pages/RestaurantLoginScreen";
-import SelectManagerScreen from "@/pages/SelectManagerScreen";
+import RestaurantLoginScreen from '@/pages/RestaurantLoginScreen';
+import SelectManagerScreen from '@/pages/SelectManagerScreen';
 
 // Pages
 import CategoryExpensesScreen from "@/pages/CategoryExpensesScreen";

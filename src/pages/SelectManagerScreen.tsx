@@ -27,30 +27,26 @@ const SelectManagerScreen = () => {
   const navigate = useNavigate();
   const [selectedManagerId, setSelectedManagerId] = useState('');
   const [password, setPassword] = useState('');
+  const { message } = App.useApp();
 
-  const { data: activeManagers } = useListManagers()
-  const { autenticate } = useManagers()
+  const { data: activeManagers } = useListManagers();
+  const { autenticate } = useManagers();
+  const { logout } = useAuthActions();
+  const { data: restaurant } = useCurrentEnterprise();
 
-  const { logout } = useAuthActions()
-  const { data: restaurant } = useCurrentEnterprise()
+  const isLoading = autenticate.isPending;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!selectedManagerId) {
-      toast.error('Selecione um usuário');
+      message.error('Selecione um usuário');
       return;
     }
-
     if (!password.trim()) {
-      toast.error('Digite a senha');
+      message.error('Digite a senha');
       return;
     }
-
-    autenticate.mutate({
-      body: { id: selectedManagerId, senha: password }
-    })
-
+    autenticate.mutate({ body: { id: selectedManagerId, senha: password } });
   };
 
   const handleLogout = () => {
@@ -59,7 +55,6 @@ const SelectManagerScreen = () => {
 
   useEffect(() => {
     if (logout.isPending || autenticate.isPending) return;
-
     if (logout.isSuccess) navigate('/login');
 
     if (autenticate.isSuccess) {
@@ -71,22 +66,25 @@ const SelectManagerScreen = () => {
     if (autenticate.isError) {
       toast.error(`Erro ao autenticar ${autenticate.error}`)
     }
-  }, [logout.isPending, autenticate.isPending])
+  }, [logout.isPending, autenticate.isPending]);
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center space-y-4">
-          <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
-            <Users className="w-8 h-8 text-primary" />
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
+      <Card style={{ width: '100%', maxWidth: 420 }}>
+        <div style={{ textAlign: 'center', marginBottom: 24 }}>
+          <div style={{
+            width: 64, height: 64, borderRadius: '50%',
+            background: 'rgba(45, 184, 164, 0.1)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            margin: '0 auto 16px',
+          }}>
+            <Users style={{ width: 32, height: 32, color: 'var(--color-primary)' }} />
           </div>
-          <div>
-            <CardTitle className="text-2xl">Selecione seu usuário</CardTitle>
-            <CardDescription className="mt-2">
-              {restaurant?.nome_fantasia}
-            </CardDescription>
-          </div>
-        </CardHeader>
+          <h2 style={{ fontSize: 24, fontWeight: 700, margin: 0, color: 'var(--color-text)' }}>Selecione seu usuário</h2>
+          <p style={{ color: 'var(--color-text-secondary)', marginTop: 8 }}>
+            {restaurant?.nome_fantasia}
+          </p>
+        </div>
 
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -167,18 +165,15 @@ const SelectManagerScreen = () => {
                 )}
               </Button>
 
-              <Button
-                type="button"
-                variant="ghost"
-                className="w-full"
-                onClick={handleLogout}
-              >
-                <LogOut className="w-4 h-4" />
-                Voltar para login do restaurante
-              </Button>
-            </div>
-          </form>
-        </CardContent>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <Button type="primary" htmlType="submit" block size="large" loading={isLoading} disabled={!selectedManagerId}>
+              {isLoading ? 'Entrando...' : 'Entrar'}
+            </Button>
+            <Button type="text" block icon={<LogOut style={{ width: 16, height: 16 }} />} onClick={handleLogout}>
+              Voltar para login do restaurante
+            </Button>
+          </div>
+        </form>
       </Card>
     </div>
   );

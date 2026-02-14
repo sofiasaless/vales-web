@@ -4,38 +4,24 @@ import { PageHeader } from '@/components/PageHeader';
 import { AvatarInitials } from '@/components/AvatarInitials';
 import { MoneyDisplay } from '@/components/MoneyDisplay';
 import { VoucherItemCard } from '@/components/VoucherItemCard';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { toast } from 'sonner';
-import { 
-  Plus, 
-  CreditCard, 
-  User, 
-  History, 
-  ShoppingBag,
-  AlertCircle 
-} from 'lucide-react';
+import { Button, Card, App } from 'antd';
+import { Plus, CreditCard, User, History, ShoppingBag, AlertCircle } from 'lucide-react';
 
 const EmployeeManagementScreen = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { getEmployee, getVoucherTotal, dispatch } = useEmployees();
+  const { message } = App.useApp();
 
   const employee = getEmployee(id || '');
 
   if (!employee) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <AlertCircle className="w-12 h-12 text-danger mx-auto mb-4" />
-          <p className="text-lg font-medium">Funcionário não encontrado</p>
-          <Button
-            variant="outline"
-            className="mt-4"
-            onClick={() => navigate('/')}
-          >
-            Voltar
-          </Button>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ textAlign: 'center' }}>
+          <AlertCircle style={{ width: 48, height: 48, color: 'var(--color-danger)', margin: '0 auto 16px' }} />
+          <p style={{ fontSize: 18, fontWeight: 500 }}>Funcionário não encontrado</p>
+          <Button onClick={() => navigate('/')} style={{ marginTop: 16 }}>Voltar</Button>
         </div>
       </div>
     );
@@ -44,113 +30,80 @@ const EmployeeManagementScreen = () => {
   const voucherTotal = getVoucherTotal(employee.id);
 
   const handleRemoveItem = (itemId: string) => {
-    dispatch({
-      type: 'REMOVE_VOUCHER_ITEM',
-      payload: { employeeId: employee.id, itemId },
-    });
-    toast.success('Item removido do vale');
+    dispatch({ type: 'REMOVE_VOUCHER_ITEM', payload: { employeeId: employee.id, itemId } });
+    message.success('Item removido do vale');
   };
 
   return (
-    <div className="min-h-screen bg-background pb-8">
-      <PageHeader
-        title={employee.name}
-        subtitle={employee.role}
-        showBack
-      />
+    <div style={{ minHeight: '100vh', paddingBottom: 32 }}>
+      <PageHeader title={employee.name} subtitle={employee.role} showBack />
 
-      <div className="px-4 py-4 max-w-lg mx-auto space-y-4">
+      <div style={{ padding: 16, maxWidth: 512, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 16 }}>
         {/* Employee Header */}
-        <Card className="p-4 glass-card border-border">
-          <div className="flex items-center gap-4">
+        <div className="glass-card" style={{ padding: 16 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
             <AvatarInitials name={employee.name} size="lg" />
-            <div className="flex-1">
-              <h2 className="text-xl font-bold">{employee.name}</h2>
-              <p className="text-muted-foreground">{employee.role}</p>
-              <p className="text-sm text-muted-foreground">
+            <div style={{ flex: 1 }}>
+              <h2 style={{ fontSize: 20, fontWeight: 700, margin: 0 }}>{employee.name}</h2>
+              <p style={{ color: 'var(--color-text-secondary)', margin: 0 }}>{employee.role}</p>
+              <p style={{ fontSize: 14, color: 'var(--color-text-secondary)', margin: 0 }}>
                 {employee.type === 'DIARISTA' ? 'Diarista' : 'Fixo (Quinzenas)'}
               </p>
             </div>
           </div>
-        </Card>
+        </div>
 
-        {/* Current Voucher Section */}
+        {/* Voucher */}
         <div>
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-lg font-semibold flex items-center gap-2">
-              <ShoppingBag className="w-5 h-5 text-primary" />
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+            <h3 style={{ fontSize: 18, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8, margin: 0 }}>
+              <ShoppingBag style={{ width: 20, height: 20, color: 'var(--color-primary)' }} />
               Vale Atual
             </h3>
-            <Button
-              size="sm"
-              onClick={() => navigate(`/menu/${employee.id}`)}
-              className="bg-primary text-primary-foreground"
-            >
-              <Plus className="w-4 h-4 mr-1" />
+            <Button type="primary" size="small" icon={<Plus style={{ width: 16, height: 16 }} />} onClick={() => navigate(`/menu/${employee.id}`)}>
               Itens
             </Button>
           </div>
 
           {employee.currentVoucher.length > 0 ? (
-            <div className="space-y-2">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {employee.currentVoucher.map((item) => (
-                <VoucherItemCard
-                  key={item.id}
-                  item={item}
-                  onRemove={() => handleRemoveItem(item.id)}
-                />
+                <VoucherItemCard key={item.id} item={item} onRemove={() => handleRemoveItem(item.id)} />
               ))}
             </div>
           ) : (
-            <Card className="p-6 glass-card border-border text-center">
-              <ShoppingBag className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-              <p className="text-muted-foreground">Nenhum item no vale</p>
-              <p className="text-sm text-muted-foreground">
-                Toque em "+ Itens" para adicionar
-              </p>
-            </Card>
+            <div className="glass-card" style={{ textAlign: 'center', padding: 24 }}>
+              <ShoppingBag style={{ width: 32, height: 32, color: 'var(--color-text-secondary)', margin: '0 auto 8px' }} />
+              <p style={{ color: 'var(--color-text-secondary)', margin: 0 }}>Nenhum item no vale</p>
+              <p style={{ fontSize: 14, color: 'var(--color-text-secondary)', margin: 0 }}>Toque em "+ Itens" para adicionar</p>
+            </div>
           )}
 
-          {/* Voucher Total */}
-          <Card className="p-4 mt-3 bg-secondary/50 border-border">
-            <div className="flex items-center justify-between">
-              <span className="font-medium">Total do Vale</span>
-              <MoneyDisplay
-                value={voucherTotal}
-                size="lg"
-                variant={voucherTotal > 0 ? 'negative' : 'default'}
-              />
-            </div>
-          </Card>
+          <div className="glass-card" style={{ marginTop: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span style={{ fontWeight: 500 }}>Total do Vale</span>
+            <MoneyDisplay value={voucherTotal} size="lg" variant={voucherTotal > 0 ? 'negative' : 'default'} />
+          </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="space-y-3 pt-4">
+        {/* Actions */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, paddingTop: 16 }}>
           <Button
-            className="w-full h-12 text-base bg-primary hover:bg-primary/90"
+            type="primary"
+            block
+            size="large"
+            icon={<CreditCard style={{ width: 20, height: 20 }} />}
             onClick={() => navigate(`/payment/${employee.id}`)}
             disabled={employee.currentVoucher.length === 0 && voucherTotal === 0}
+            style={{ height: 48, fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
           >
-            <CreditCard className="w-5 h-5 mr-2" />
             Pagar Funcionário
           </Button>
 
-          <div className="grid grid-cols-2 gap-3">
-            <Button
-              variant="outline"
-              className="h-12"
-              onClick={() => navigate(`/employee/${employee.id}/details`)}
-            >
-              <User className="w-4 h-4 mr-2" />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <Button block size="large" icon={<User style={{ width: 16, height: 16 }} />} onClick={() => navigate(`/employee/${employee.id}/details`)} style={{ height: 48, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
               Ver Detalhes
             </Button>
-
-            <Button
-              variant="outline"
-              className="h-12"
-              onClick={() => navigate(`/employee/${employee.id}/history`)}
-            >
-              <History className="w-4 h-4 mr-2" />
+            <Button block size="large" icon={<History style={{ width: 16, height: 16 }} />} onClick={() => navigate(`/employee/${employee.id}/history`)} style={{ height: 48, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
               Histórico
             </Button>
           </div>

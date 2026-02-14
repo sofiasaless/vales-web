@@ -1,24 +1,23 @@
-import { cn } from '@/lib/utils';
-
 interface MoneyDisplayProps {
   value: number;
   size?: 'sm' | 'md' | 'lg' | 'xl';
   variant?: 'default' | 'positive' | 'negative';
   showSign?: boolean;
   className?: string;
+  style?: React.CSSProperties;
 }
 
-const sizeClasses = {
-  sm: 'text-sm',
-  md: 'text-base',
-  lg: 'text-xl',
-  xl: 'text-3xl',
+const sizeMap = {
+  sm: 14,
+  md: 16,
+  lg: 20,
+  xl: 30,
 };
 
-const variantClasses = {
-  default: 'text-foreground',
-  positive: 'text-success',
-  negative: 'text-danger',
+const variantColors = {
+  default: 'var(--color-text)',
+  positive: 'var(--color-success)',
+  negative: 'var(--color-danger)',
 };
 
 export const MoneyDisplay = ({
@@ -27,6 +26,7 @@ export const MoneyDisplay = ({
   variant = 'default',
   showSign = false,
   className,
+  style,
 }: MoneyDisplayProps) => {
   const formattedValue = new Intl.NumberFormat('pt-BR', {
     style: 'currency',
@@ -37,12 +37,14 @@ export const MoneyDisplay = ({
 
   return (
     <span
-      className={cn(
-        'font-mono font-medium tracking-tight',
-        sizeClasses[size],
-        variantClasses[variant],
-        className
-      )}
+      className={`money-display ${className || ''}`}
+      style={{
+        fontSize: sizeMap[size],
+        color: variantColors[variant],
+        fontWeight: 500,
+        letterSpacing: '-0.02em',
+        ...style,
+      }}
     >
       {sign}{formattedValue}
     </span>
