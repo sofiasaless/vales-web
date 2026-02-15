@@ -31,20 +31,15 @@ export const MenuItemCard = ({
           : 'bg-card border border-border hover:border-primary/20',
         className
       )}
-      style={{cursor: 'pointer'}}
+      style={{ cursor: 'pointer' }}
       onClick={onToggle}
     >
-      <Checkbox
-        checked={selected}
-        onCheckedChange={onToggle}
-        className="w-5 h-5 border-2"
-      />
 
       <div className="flex-1 min-w-0">
         <p className="font-medium text-foreground">{product.descricao}</p>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div style={{ flexDirection: 'column' }} className="flex items-center gap-3">
         <MoneyDisplay value={product.preco} size="md" />
 
         {selected && (

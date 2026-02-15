@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useEmployee } from '@/hooks/useEmployee';
 import { useListMenu } from '@/hooks/useMenu';
 import { Vale } from '@/types/vale.type';
+import { Spin } from 'antd';
 import { Package, ShoppingCart } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -18,7 +19,7 @@ interface SelectedItem {
 const MenuScreen = () => {
   const { employeeId } = useParams<{ employeeId: string }>();
   const navigate = useNavigate();
-  const { data: menuProducts } = useListMenu()
+  const { data: menuProducts, isLoading: isLoadingMenu, isPending } = useListMenu()
 
   const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([]);
 
@@ -103,7 +104,11 @@ const MenuScreen = () => {
 
       <div className="px-4 py-4 max-w-lg mx-auto">
         <div className="space-y-2">
-          {menuProducts?.map((product) => (
+          {
+          (isLoadingMenu || isPending)?
+          <Spin />
+          :
+          menuProducts?.map((product) => (
             <MenuItemCard
               key={product.id}
               product={product}
@@ -112,7 +117,8 @@ const MenuScreen = () => {
               onToggle={() => toggleItem(product.id)}
               onQuantityChange={(qty) => updateQuantity(product.id, qty)}
             />
-          ))}
+          ))
+          }
         </div>
 
         {menuProducts?.length === 0 && (

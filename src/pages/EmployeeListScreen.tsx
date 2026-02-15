@@ -4,11 +4,12 @@ import { MoneyDisplay } from '@/components/MoneyDisplay';
 import { PageHeader } from '@/components/PageHeader';
 import { useListEmployee } from '@/hooks/useEmployee';
 import { calculateTotalVauchers } from '@/utils/calculate';
+import { Spin } from 'antd';
 import { TrendingDown, TrendingUp, Users } from 'lucide-react';
 import { useMemo } from 'react';
 
 const EmployeeListScreen = () => {
-  const {data: employees } = useListEmployee()
+  const { data: employees, isLoading, isPending } = useListEmployee()
 
   const totalVouchers = useMemo(() => {
     return employees?.reduce((acc, func) => {
@@ -37,7 +38,11 @@ const EmployeeListScreen = () => {
               <Users className="w-4 h-4" />
               <span className="text-xs font-medium">Total</span>
             </div>
-            <p className="text-2xl font-bold text-foreground">{employees?.length}</p>
+            {(isLoading || isPending) ?
+              <Spin size='small' />
+              :
+              <p className="text-2xl font-bold text-foreground">{employees?.length}</p>
+            }
             <p className="text-xs text-muted-foreground">funcionários</p>
           </div>
 
@@ -46,10 +51,16 @@ const EmployeeListScreen = () => {
               <TrendingUp className="w-4 h-4" />
               <span className="text-xs font-medium">Vales Abertos</span>
             </div>
-            <MoneyDisplay value={totalVouchers} size="lg" variant="positive" />
-            <p className="text-xs text-muted-foreground mt-1">
-              {employeesWithVoucher} funcionário(s)
-            </p>
+            {(isLoading || isPending) ?
+              <Spin size='small' />
+              :
+              <>
+                <MoneyDisplay value={totalVouchers} size="lg" variant="positive" />
+                <p className="text-xs text-muted-foreground mt-1">
+                  {employeesWithVoucher} funcionário(s)
+                </p>
+              </>
+            }
           </div>
         </div>
 
@@ -58,9 +69,13 @@ const EmployeeListScreen = () => {
 
         {/* Employee Grid */}
         <div className="grid grid-cols-2 gap-3">
-          {employees?.map((employee) => (
+          {(isLoading || isPending)?
+          <Spin />
+          :
+          employees?.map((employee) => (
             <EmployeeCard key={employee.id} employee={employee} />
-          ))}
+          ))
+          }
         </div>
 
         {employees?.length === 0 && (
