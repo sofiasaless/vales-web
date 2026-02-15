@@ -50,6 +50,7 @@ export const VoucherItemCard = ({
         <p className="text-sm text-muted-foreground">
           {item.quantidade}x <MoneyDisplay value={item.preco_unit} size="sm" />
         </p>
+        <p className="text-sm text-muted-foreground">Adc. em {new Date(item.data_adicao).toLocaleString()}</p>
       </div>
 
       <div className="flex items-center gap-3">
