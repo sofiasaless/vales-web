@@ -137,7 +137,7 @@ const EmployeeManagementScreen = () => {
           </div>
 
           {employee?.vales.length > 0 ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div style={{ maxHeight: 300, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 8, paddingRight: 4 }}>
               {employee?.vales.map((item) => (
                 <VoucherItemCard
                   key={item.id}

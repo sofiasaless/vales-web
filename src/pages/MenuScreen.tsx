@@ -1,13 +1,12 @@
 import { MenuItemCard } from '@/components/MenuItemCard';
 import { MoneyDisplay } from '@/components/MoneyDisplay';
 import { PageHeader } from '@/components/PageHeader';
-import { Button } from '@/components/ui/button';
 import { useEmployee } from '@/hooks/useEmployee';
 import { useListMenu } from '@/hooks/useMenu';
 import { Vale } from '@/types/vale.type';
-import { Spin } from 'antd';
-import { Package, ShoppingCart } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { Button, Input, Spin } from 'antd';
+import { Package, Search, ShoppingCart } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 
@@ -22,6 +21,15 @@ const MenuScreen = () => {
   const { data: menuProducts, isLoading: isLoadingMenu, isPending } = useListMenu()
 
   const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredProducts = useMemo(() => {
+    if (!menuProducts) return [];
+    if (!searchQuery.trim()) return menuProducts;
+    return menuProducts.filter((p) =>
+      p.descricao.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [menuProducts, searchQuery]);
 
   const toggleItem = (productId: string) => {
     setSelectedItems((prev) => {
@@ -95,20 +103,29 @@ const MenuScreen = () => {
   }, [addMultipleVouchers.isPending])
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div style={{ minHeight: '100vh', paddingBottom: 96 }}>
       <PageHeader
         title="Cardápio"
         subtitle={`Adicionar ao vale`}
         showBack
       />
 
-      <div className="px-4 py-4 max-w-lg mx-auto">
-        <div className="space-y-2">
+      <div style={{ padding: '16px', maxWidth: 512, margin: '0 auto' }}>
+        <Input
+          prefix={<Search style={{ width: 16, height: 16, color: 'var(--text-secondary)' }} />}
+          placeholder="Buscar produto..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          allowClear
+          size="large"
+          style={{ marginBottom: 12 }}
+        />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {
           (isLoadingMenu || isPending)?
           <Spin />
           :
-          menuProducts?.map((product) => (
+          filteredProducts.map((product) => (
             <MenuItemCard
               key={product.id}
               product={product}
@@ -121,26 +138,29 @@ const MenuScreen = () => {
           }
         </div>
 
-        {menuProducts?.length === 0 && (
-          <div className="text-center py-12">
-            <Package className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-            <p className="text-muted-foreground">Nenhum produto no cardápio</p>
+        {filteredProducts.length === 0 && !isLoadingMenu && (
+          <div style={{ textAlign: 'center', padding: '48px 0' }}>
+            <Package style={{ width: 48, height: 48, color: 'var(--text-secondary)', margin: '0 auto 16px' }} />
+            <p style={{ color: 'var(--text-secondary)' }}>
+              {searchQuery ? 'Nenhum produto encontrado' : 'Nenhum produto no cardápio'}
+            </p>
           </div>
         )}
       </div>
 
       {/* Floating Add Button */}
       {selectedItems.length > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-background via-background to-transparent">
-          <div className="max-w-lg mx-auto">
+        <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, padding: 16, background: 'linear-gradient(to top, var(--bg-primary), var(--bg-primary), transparent)' }}>
+          <div style={{ maxWidth: 512, margin: '0 auto' }}>
             <Button
-              className="w-full h-14 text-base bg-primary hover:bg-primary/90 shadow-glow animate-pulse-glow"
+              type="primary"
+              block
+              size="large"
+              icon={<ShoppingCart style={{ width: 20, height: 20 }} />}
               onClick={handleAddToVoucher}
+              style={{ height: 56 }}
             >
-              <ShoppingCart className="w-5 h-5 mr-2" />
-              Adicionar ao Vale ({totalItems} itens)
-              <span className="ml-2 opacity-80">•</span>
-              <MoneyDisplay value={totalValue} size="md" className="ml-2 text-primary-foreground" />
+              Adicionar ao Vale ({totalItems} itens) • <MoneyDisplay value={totalValue} size="md" />
             </Button>
           </div>
         </div>
