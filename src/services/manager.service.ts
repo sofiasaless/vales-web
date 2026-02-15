@@ -3,11 +3,15 @@ import { GerenteAutenticatedResponseBody, GerenteAutenticateRequestBody, Gerente
 
 export const ManagerService = {
   async list() {
-    return await api.get<GerenteResponseBody[]>(`/gerente/encontrar`)
+    return await api.get<GerenteResponseBody[]>(`/gerente/listar`)
   },
 
   async autenticate(body: GerenteAutenticateRequestBody) {
     return (await api.post<GerenteAutenticatedResponseBody>(`/gerente/autenticar`, body)).data;
+  },
+
+  async logout() {
+    localStorage.removeItem("usuario");
   }
 
 }

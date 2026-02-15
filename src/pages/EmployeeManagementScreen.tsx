@@ -1,27 +1,38 @@
-import { useParams, useNavigate } from 'react-router-dom';
-import { useEmployees } from '@/context/EmployeeContext';
-import { PageHeader } from '@/components/PageHeader';
 import { AvatarInitials } from '@/components/AvatarInitials';
 import { MoneyDisplay } from '@/components/MoneyDisplay';
-import { VoucherItemCard } from '@/components/VoucherItemCard';
+import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { toast } from 'sonner';
-import { 
-  Plus, 
-  CreditCard, 
-  User, 
-  History, 
+import { VoucherItemCard } from '@/components/VoucherItemCard';
+import { useFindEmployee } from '@/hooks/useEmployee';
+import { calculateTotalVauchers } from '@/utils/calculate';
+import { Spin } from 'antd';
+import {
+  AlertCircle,
+  CreditCard,
+  History,
+  Plus,
   ShoppingBag,
-  AlertCircle 
+  User
 } from 'lucide-react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'sonner';
 
 const EmployeeManagementScreen = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { getEmployee, getVoucherTotal, dispatch } = useEmployees();
 
-  const employee = getEmployee(id || '');
+  const { data: employee, isLoading } = useFindEmployee(id)
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <Spin />
+        </div>
+      </div>
+    );
+  }
 
   if (!employee) {
     return (
@@ -41,21 +52,18 @@ const EmployeeManagementScreen = () => {
     );
   }
 
-  const voucherTotal = getVoucherTotal(employee.id);
+  const voucherTotal = calculateTotalVauchers(employee?.vales);
 
   const handleRemoveItem = (itemId: string) => {
-    dispatch({
-      type: 'REMOVE_VOUCHER_ITEM',
-      payload: { employeeId: employee.id, itemId },
-    });
+
     toast.success('Item removido do vale');
   };
 
   return (
     <div className="min-h-screen bg-background pb-8">
       <PageHeader
-        title={employee.name}
-        subtitle={employee.role}
+        title={employee?.nome}
+        subtitle={employee?.cargo}
         showBack
       />
 
@@ -63,12 +71,12 @@ const EmployeeManagementScreen = () => {
         {/* Employee Header */}
         <Card className="p-4 glass-card border-border">
           <div className="flex items-center gap-4">
-            <AvatarInitials name={employee.name} size="lg" />
+            <AvatarInitials name={employee?.nome} size="lg" />
             <div className="flex-1">
-              <h2 className="text-xl font-bold">{employee.name}</h2>
-              <p className="text-muted-foreground">{employee.role}</p>
+              <h2 className="text-xl font-bold">{employee?.nome}</h2>
+              <p className="text-muted-foreground">{employee?.cargo}</p>
               <p className="text-sm text-muted-foreground">
-                {employee.type === 'DIARISTA' ? 'Diarista' : 'Fixo (Quinzenas)'}
+                {employee?.tipo === 'DIARISTA' ? 'Diarista' : 'Fixo (Quinzenas)'}
               </p>
             </div>
           </div>
@@ -83,7 +91,7 @@ const EmployeeManagementScreen = () => {
             </h3>
             <Button
               size="sm"
-              onClick={() => navigate(`/menu/${employee.id}`)}
+              onClick={() => navigate(`/menu/${employee?.id}`)}
               className="bg-primary text-primary-foreground"
             >
               <Plus className="w-4 h-4 mr-1" />
@@ -91,13 +99,13 @@ const EmployeeManagementScreen = () => {
             </Button>
           </div>
 
-          {employee.currentVoucher.length > 0 ? (
+          {employee?.vales.length > 0 ? (
             <div className="space-y-2">
-              {employee.currentVoucher.map((item) => (
+              {employee?.vales.map((item) => (
                 <VoucherItemCard
                   key={item.id}
                   item={item}
-                  onRemove={() => handleRemoveItem(item.id)}
+                  employeeId={employee.id}
                 />
               ))}
             </div>
@@ -128,8 +136,8 @@ const EmployeeManagementScreen = () => {
         <div className="space-y-3 pt-4">
           <Button
             className="w-full h-12 text-base bg-primary hover:bg-primary/90"
-            onClick={() => navigate(`/payment/${employee.id}`)}
-            disabled={employee.currentVoucher.length === 0 && voucherTotal === 0}
+            onClick={() => navigate(`/payment/${employee?.id}`)}
+            disabled={employee?.vales.length === 0 && voucherTotal === 0}
           >
             <CreditCard className="w-5 h-5 mr-2" />
             Pagar Funcionário
@@ -139,7 +147,7 @@ const EmployeeManagementScreen = () => {
             <Button
               variant="outline"
               className="h-12"
-              onClick={() => navigate(`/employee/${employee.id}/details`)}
+              onClick={() => navigate(`/employee/${employee?.id}/details`)}
             >
               <User className="w-4 h-4 mr-2" />
               Ver Detalhes
@@ -148,7 +156,7 @@ const EmployeeManagementScreen = () => {
             <Button
               variant="outline"
               className="h-12"
-              onClick={() => navigate(`/employee/${employee.id}/history`)}
+              onClick={() => navigate(`/employee/${employee?.id}/history`)}
             >
               <History className="w-4 h-4 mr-2" />
               Histórico

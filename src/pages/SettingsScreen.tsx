@@ -1,26 +1,33 @@
-import { PageHeader } from '@/components/PageHeader';
 import { AvatarInitials } from '@/components/AvatarInitials';
+import { PageHeader } from '@/components/PageHeader';
 import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { mockManager } from '@/data/mockData';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
+import { mockManager } from '@/data/mockData';
+import { useAuthActions } from '@/hooks/useAuth';
+import { useCurrentEnterprise } from '@/hooks/useEnterprise';
+import { useCurrentManager, useManagers } from '@/hooks/useManager';
 import {
-  ChefHat,
   Bell,
-  LogOut,
+  ChefHat,
   ChevronRight,
-  UtensilsCrossed,
   CreditCard,
-  Wallet,
+  LogOut,
   Trophy,
-  Users,
   UserCog,
+  Users,
+  UtensilsCrossed,
+  Wallet,
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const SettingsScreen = () => {
   const navigate = useNavigate();
-  const { manager, logout, logoutManager } = useAuth();
+
+  const { data: enterprise } = useCurrentEnterprise()
+  const { data: manager } = useCurrentManager()
+
+  const { logout } = useAuthActions()
+  const { logoutManager } = useManagers()
 
   const MenuItem = ({
     icon: Icon,
@@ -53,7 +60,7 @@ const SettingsScreen = () => {
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      <PageHeader title="Configurações" subtitle={mockManager.restaurantName} />
+      <PageHeader title="Configurações" subtitle={enterprise?.nome_fantasia} />
 
       <div className="px-4 py-4 max-w-lg mx-auto space-y-4">
         {/* Profile Card */}
@@ -62,7 +69,7 @@ const SettingsScreen = () => {
             <AvatarInitials name={manager?.nome || mockManager.name} size="lg" />
             <div>
               <h2 className="text-xl font-bold">{manager?.nome || mockManager.name}</h2>
-              <p className="text-muted-foreground">{mockManager.email}</p>
+              <p className="text-muted-foreground">{enterprise?.email}</p>
               <div className="flex items-center gap-1 mt-1 text-primary text-sm">
                 {manager?.tipo === 'GERENTE' ? (
                   <ChefHat className="w-4 h-4" />
@@ -83,7 +90,7 @@ const SettingsScreen = () => {
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Restaurante</p>
-              <p className="font-semibold">{mockManager.restaurantName}</p>
+              <p className="font-semibold">{enterprise?.nome_fantasia}</p>
             </div>
           </div>
         </Card>
@@ -127,8 +134,8 @@ const SettingsScreen = () => {
           <MenuItem
             icon={UserCog}
             label="Trocar Usuário"
-            onClick={() => {
-              logoutManager();
+            onClick={async () => {
+              await logoutManager.mutateAsync()
               navigate('/select-manager');
             }}
           />
@@ -136,8 +143,8 @@ const SettingsScreen = () => {
             icon={LogOut}
             label="Sair do Restaurante"
             danger
-            onClick={() => {
-              logout();
+            onClick={async () => {
+              await logout.mutateAsync()
               navigate('/login');
             }}
           />
@@ -146,10 +153,7 @@ const SettingsScreen = () => {
         {/* App Info */}
         <div className="text-center pt-6">
           <p className="text-xs text-muted-foreground">
-            Vale Restaurante v1.0.0
-          </p>
-          <p className="text-xs text-muted-foreground mt-1">
-            Feito com ❤️ para gerentes
+            Vales Web v1.0.0
           </p>
         </div>
       </div>
