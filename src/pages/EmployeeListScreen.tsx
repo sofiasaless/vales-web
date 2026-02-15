@@ -1,23 +1,29 @@
-import { useEmployees } from '@/context/EmployeeContext';
-import { EmployeeCard } from '@/components/EmployeeCard';
-import { PageHeader } from '@/components/PageHeader';
-import { MoneyDisplay } from '@/components/MoneyDisplay';
 import { ActiveIncentiveCard } from '@/components/ActiveIncentiveCard';
-import { Users, TrendingDown } from 'lucide-react';
+import { EmployeeCard } from '@/components/EmployeeCard';
+import { MoneyDisplay } from '@/components/MoneyDisplay';
+import { PageHeader } from '@/components/PageHeader';
+import { useListEmployee } from '@/hooks/useEmployee';
+import { calculateTotalVauchers } from '@/utils/calculate';
+import { TrendingDown, TrendingUp, Users } from 'lucide-react';
+import { useMemo } from 'react';
 
 const EmployeeListScreen = () => {
-  const { state, getVoucherTotal } = useEmployees();
-  const { employees } = state;
+  const {data: employees } = useListEmployee()
 
-  // Calculate totals
-  const totalVouchers = employees.reduce(
-    (sum, emp) => sum + getVoucherTotal(emp.id),
-    0
-  );
+  const totalVouchers = useMemo(() => {
+    return employees?.reduce((acc, func) => {
+      return acc + calculateTotalVauchers(func.vales)
+    }, 0)
+  }, [employees])
 
-  const employeesWithVoucher = employees.filter(
-    (emp) => getVoucherTotal(emp.id) > 0
-  ).length;
+  const employeesWithVoucher = useMemo(() => {
+    return employees?.reduce((acc, func) => {
+      if (func.vales.length > 0) {
+        return acc + 1
+      }
+      return acc + 0
+    }, 0)
+  }, [employees])
 
   return (
     <div className="min-h-screen bg-background pb-20">
@@ -31,16 +37,16 @@ const EmployeeListScreen = () => {
               <Users className="w-4 h-4" />
               <span className="text-xs font-medium">Total</span>
             </div>
-            <p className="text-2xl font-bold text-foreground">{employees.length}</p>
+            <p className="text-2xl font-bold text-foreground">{employees?.length}</p>
             <p className="text-xs text-muted-foreground">funcionários</p>
           </div>
 
           <div className="glass-card rounded-xl p-4">
-            <div className="flex items-center gap-2 text-danger mb-1">
-              <TrendingDown className="w-4 h-4" />
+            <div className="flex items-center gap-2 text-primary mb-1">
+              <TrendingUp className="w-4 h-4" />
               <span className="text-xs font-medium">Vales Abertos</span>
             </div>
-            <MoneyDisplay value={totalVouchers} size="lg" variant="negative" />
+            <MoneyDisplay value={totalVouchers} size="lg" variant="positive" />
             <p className="text-xs text-muted-foreground mt-1">
               {employeesWithVoucher} funcionário(s)
             </p>
@@ -52,12 +58,12 @@ const EmployeeListScreen = () => {
 
         {/* Employee Grid */}
         <div className="grid grid-cols-2 gap-3">
-          {employees.map((employee) => (
+          {employees?.map((employee) => (
             <EmployeeCard key={employee.id} employee={employee} />
           ))}
         </div>
 
-        {employees.length === 0 && (
+        {employees?.length === 0 && (
           <div className="text-center py-12">
             <Users className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
             <p className="text-muted-foreground">Nenhum funcionário cadastrado</p>
