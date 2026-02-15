@@ -4,6 +4,7 @@ import { Trash2 } from 'lucide-react';
 import { MoneyDisplay } from './MoneyDisplay';
 import { useEmployee } from '@/hooks/useEmployee';
 import { toast } from 'sonner';
+import { useEffect } from 'react';
 
 interface VoucherItemCardProps {
   item: Vale;
@@ -23,14 +24,19 @@ export const VoucherItemCard = ({
   const { removeVoucher } = useEmployee()
 
   const handleRemoveVoucher = async () => {
-    await removeVoucher.mutateAsync({props: {
-      employeeId,
-      voucher: item
-    }})
+    await removeVoucher.mutateAsync({
+      props: {
+        employeeId,
+        voucher: item
+      }
+    })
+  }
 
+  useEffect(() => {
+    if (removeVoucher.isPending) return;
     if (removeVoucher.isSuccess) toast.success('Item removido do vale');
     if (removeVoucher.isError) toast.error(`Erro ao remover item do vale: ${removeVoucher.error}`)
-  }
+  }, [removeVoucher.isPending])
 
   return (
     <div

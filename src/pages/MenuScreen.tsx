@@ -1,13 +1,14 @@
-import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { useEmployees } from '@/context/EmployeeContext';
-import { PageHeader } from '@/components/PageHeader';
 import { MenuItemCard } from '@/components/MenuItemCard';
 import { MoneyDisplay } from '@/components/MoneyDisplay';
+import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/ui/button';
-import { VoucherItem } from '@/types';
+import { useEmployee } from '@/hooks/useEmployee';
+import { useListMenu } from '@/hooks/useMenu';
+import { Vale } from '@/types/vale.type';
+import { Package, ShoppingCart } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
-import { ShoppingCart, Package } from 'lucide-react';
 
 interface SelectedItem {
   productId: string;
@@ -17,16 +18,9 @@ interface SelectedItem {
 const MenuScreen = () => {
   const { employeeId } = useParams<{ employeeId: string }>();
   const navigate = useNavigate();
-  const { state, getEmployee, dispatch } = useEmployees();
-  const { menuProducts } = state;
+  const { data: menuProducts } = useListMenu()
 
-  const employee = getEmployee(employeeId || '');
   const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([]);
-
-  if (!employee) {
-    navigate('/');
-    return null;
-  }
 
   const toggleItem = (productId: string) => {
     setSelectedItems((prev) => {
@@ -56,71 +50,72 @@ const MenuScreen = () => {
   };
 
   const totalItems = selectedItems.reduce((sum, item) => sum + item.quantity, 0);
-  
+
   const totalValue = selectedItems.reduce((sum, item) => {
-    const product = menuProducts.find((p) => p.id === item.productId);
-    return sum + (product?.price || 0) * item.quantity;
+    const product = menuProducts?.find((p) => p.id === item.productId);
+    return sum + (product?.preco || 0) * item.quantity;
   }, 0);
 
-  const handleAddToVoucher = () => {
+  const { addMultipleVouchers } = useEmployee()
+
+  const handleAddToVoucher = async () => {
     if (selectedItems.length === 0) return;
 
-    const voucherItems: VoucherItem[] = selectedItems.map((selected) => {
-      const product = menuProducts.find((p) => p.id === selected.productId)!;
+    const voucherItems: Vale[] = selectedItems.map((selected) => {
+      const product = menuProducts?.find((p) => p.id === selected.productId)!;
       return {
-        id: `vi-${Date.now()}-${selected.productId}`,
-        productId: selected.productId,
-        name: product.name,
-        unitPrice: product.price,
-        quantity: selected.quantity,
-        addedAt: new Date(),
+        id: `${crypto.randomUUID()}`,
+        produto_ref: selected.productId,
+        descricao: product.descricao,
+        preco_unit: product.preco,
+        quantidade: selected.quantity
       };
     });
 
-    dispatch({
-      type: 'ADD_VOUCHER_ITEMS',
-      payload: { employeeId: employee.id, items: voucherItems },
-    });
+    await addMultipleVouchers.mutateAsync({
+      props: {
+        employeeId,
+        vouchers: voucherItems
+      }
+    })
 
-    toast.success(`${totalItems} item(ns) adicionado(s) ao vale`);
-    navigate(`/employee/${employee.id}`);
   };
 
-  // Group by category
-  const categories = [...new Set(menuProducts.map((p) => p.category))];
+  useEffect(() => {
+    if (addMultipleVouchers.isPending) return;
+    if (addMultipleVouchers.isSuccess) {
+      toast.success(`${totalItems} item(ns) adicionado(s) ao vale`);
+      navigate(-1)
+      return
+    }
+    if (addMultipleVouchers.isError) {
+      toast.error(`Erro ao adicionar vales: ${addMultipleVouchers.error}`);
+    }
+  }, [addMultipleVouchers.isPending])
 
   return (
     <div className="min-h-screen bg-background pb-24">
       <PageHeader
         title="Cardápio"
-        subtitle={`Adicionar ao vale de ${employee.name}`}
+        subtitle={`Adicionar ao vale`}
         showBack
       />
 
       <div className="px-4 py-4 max-w-lg mx-auto">
-        {categories.map((category) => (
-          <div key={category} className="mb-6">
-            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
-              {category}
-            </h3>
-            <div className="space-y-2">
-              {menuProducts
-                .filter((p) => p.category === category && p.available)
-                .map((product) => (
-                  <MenuItemCard
-                    key={product.id}
-                    product={product}
-                    selected={isSelected(product.id)}
-                    quantity={getSelectedQuantity(product.id)}
-                    onToggle={() => toggleItem(product.id)}
-                    onQuantityChange={(qty) => updateQuantity(product.id, qty)}
-                  />
-                ))}
-            </div>
-          </div>
-        ))}
+        <div className="space-y-2">
+          {menuProducts?.map((product) => (
+            <MenuItemCard
+              key={product.id}
+              product={product}
+              selected={isSelected(product.id)}
+              quantity={getSelectedQuantity(product.id)}
+              onToggle={() => toggleItem(product.id)}
+              onQuantityChange={(qty) => updateQuantity(product.id, qty)}
+            />
+          ))}
+        </div>
 
-        {menuProducts.length === 0 && (
+        {menuProducts?.length === 0 && (
           <div className="text-center py-12">
             <Package className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
             <p className="text-muted-foreground">Nenhum produto no cardápio</p>

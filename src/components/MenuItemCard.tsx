@@ -1,13 +1,12 @@
-import { useState } from 'react';
-import { MenuProduct } from '@/types';
-import { MoneyDisplay } from './MoneyDisplay';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
-import { Minus, Plus } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
+import { ItemMenuResponseBody } from '@/types/menu.type';
+import { Minus, Plus } from 'lucide-react';
+import { MoneyDisplay } from './MoneyDisplay';
 
 interface MenuItemCardProps {
-  product: MenuProduct;
+  product: ItemMenuResponseBody;
   selected: boolean;
   quantity: number;
   onToggle: () => void;
@@ -32,6 +31,8 @@ export const MenuItemCard = ({
           : 'bg-card border border-border hover:border-primary/20',
         className
       )}
+      style={{cursor: 'pointer'}}
+      onClick={onToggle}
     >
       <Checkbox
         checked={selected}
@@ -40,12 +41,11 @@ export const MenuItemCard = ({
       />
 
       <div className="flex-1 min-w-0">
-        <p className="font-medium text-foreground">{product.name}</p>
-        <p className="text-sm text-muted-foreground">{product.category}</p>
+        <p className="font-medium text-foreground">{product.descricao}</p>
       </div>
 
       <div className="flex items-center gap-3">
-        <MoneyDisplay value={product.price} size="md" />
+        <MoneyDisplay value={product.preco} size="md" />
 
         {selected && (
           <div className="flex items-center gap-1 bg-secondary rounded-full">
