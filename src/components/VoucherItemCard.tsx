@@ -1,29 +1,15 @@
 import { cn } from '@/lib/utils';
 import { Vale } from '@/types/vale.type';
-import { VoucherItem } from '@/types';
 import { Trash2 } from 'lucide-react';
 import { MoneyDisplay } from './MoneyDisplay';
 import { useEmployee } from '@/hooks/useEmployee';
-import { message } from 'antd';
-
-type VoucherItemType = Vale | VoucherItem;
-
-function isVale(item: VoucherItemType): item is Vale {
-  return 'preco_unit' in item;
-}
-
-function getItemFields(item: VoucherItemType) {
-  if (isVale(item)) {
-    return { name: item.descricao, unitPrice: item.preco_unit, quantity: item.quantidade };
-  }
-  return { name: item.name, unitPrice: item.unitPrice, quantity: item.quantity };
-}
+import { toast } from 'sonner';
 
 interface VoucherItemCardProps {
-  item: VoucherItemType;
+  item: Vale;
   showControls?: boolean;
   className?: string;
-  employeeId?: string;
+  employeeId: string
 }
 
 export const VoucherItemCard = ({
@@ -32,18 +18,19 @@ export const VoucherItemCard = ({
   className,
   employeeId
 }: VoucherItemCardProps) => {
-  const { name, unitPrice, quantity } = getItemFields(item);
-  const totalValue = unitPrice * quantity;
+  const totalValue = item.preco_unit * item.quantidade;
 
-  const { removeVoucher } = useEmployee();
+  const { removeVoucher } = useEmployee()
 
   const handleRemoveVoucher = async () => {
-    if (!employeeId || !isVale(item)) return;
-    await removeVoucher.mutateAsync({ props: { employeeId, voucher: item } });
+    await removeVoucher.mutateAsync({props: {
+      employeeId,
+      voucher: item
+    }})
 
-    if (removeVoucher.isSuccess) message.success('Item removido do vale');
-    if (removeVoucher.isError) message.error(`Erro ao remover item do vale: ${removeVoucher.error}`);
-  };
+    if (removeVoucher.isSuccess) toast.success('Item removido do vale');
+    if (removeVoucher.isError) toast.error(`Erro ao remover item do vale: ${removeVoucher.error}`)
+  }
 
   return (
     <div
@@ -53,16 +40,16 @@ export const VoucherItemCard = ({
       )}
     >
       <div className="flex-1 min-w-0">
-        <p className="font-medium text-foreground truncate">{name}</p>
+        <p className="font-medium text-foreground truncate">{item.descricao}</p>
         <p className="text-sm text-muted-foreground">
-          {quantity}x <MoneyDisplay value={unitPrice} size="sm" />
+          {item.quantidade}x <MoneyDisplay value={item.preco_unit} size="sm" />
         </p>
       </div>
 
       <div className="flex items-center gap-3">
         <MoneyDisplay value={totalValue} size="md" className="font-semibold" />
 
-        {showControls && employeeId && (
+        {showControls && (
           <button
             onClick={handleRemoveVoucher}
             className="p-2 rounded-full bg-danger/10 text-danger hover:bg-danger/20 transition-colors tap-highlight-none"
