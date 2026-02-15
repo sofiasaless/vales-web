@@ -3,6 +3,7 @@ import { MoneyDisplay } from '@/components/MoneyDisplay';
 import { PageHeader } from '@/components/PageHeader';
 import { VoucherItemCard } from '@/components/VoucherItemCard';
 import { useEmployee, useFindEmployee } from '@/hooks/useEmployee';
+import { antdTheme } from '@/theme/antTheme';
 import { calculateTotalVauchers } from '@/utils/calculate';
 import { App, Button, Card, Input, InputNumber, Modal, Spin } from 'antd';
 import {

@@ -7,6 +7,11 @@ export interface VoucherMutation {
   voucher: Vale
 }
 
+export interface VouchersMutation {
+  employeeId: string,
+  vouchers: Vale[]
+}
+
 export const EmployeeService = {
   async list() {
     return (await api.get<FuncionarioResponseBody[]>(`/funcionario/listar`)).data
@@ -24,8 +29,8 @@ export const EmployeeService = {
     return await api.put(`/funcionario/vale/adicionar/${payload.employeeId}`, payload.voucher);
   },
 
-  async addMultipleVouchers(employeeId: string, vouchers: Vale[]) {
-    return await api.put(`/funcionario/vale/adicionar-multiplos/${employeeId}`, vouchers);
+  async addMultipleVouchers(payload: VouchersMutation) {
+    return await api.put(`/funcionario/vale/adicionar-multiplos/${payload.employeeId}`, payload.vouchers);
   }
 
 }

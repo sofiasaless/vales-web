@@ -1,4 +1,4 @@
-import { EmployeeService, VoucherMutation } from "@/services/employee.service";
+import { EmployeeService, VoucherMutation, VouchersMutation } from "@/services/employee.service";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export function useListEmployee() {
@@ -27,12 +27,12 @@ export function useEmployee() {
   const queryClient = useQueryClient();
 
   const removeVoucher = useMutation({
-    mutationFn: ({props}: {props: VoucherMutation}) => EmployeeService.removeVoucher(props),
+    mutationFn: ({ props }: { props: VoucherMutation }) => EmployeeService.removeVoucher(props),
 
     onSuccess: () => {
       console.info('voucher has success on remove')
-      queryClient.invalidateQueries({queryKey: ["employee"]}),
-      queryClient.invalidateQueries({queryKey: ["employees"]})
+      queryClient.invalidateQueries({ queryKey: ["employee"] }),
+        queryClient.invalidateQueries({ queryKey: ["employees"] })
     },
 
     onError: () => {
@@ -41,22 +41,37 @@ export function useEmployee() {
   })
 
   const addVoucher = useMutation({
-    mutationFn: ({props}: {props: VoucherMutation}) => EmployeeService.addVoucher(props),
+    mutationFn: ({ props }: { props: VoucherMutation }) => EmployeeService.addVoucher(props),
 
     onSuccess: () => {
       console.info('voucher has success on add')
-      queryClient.invalidateQueries({queryKey: ["employee"]}),
-      queryClient.invalidateQueries({queryKey: ["employees"]})
+      queryClient.invalidateQueries({ queryKey: ["employee"] }),
+      queryClient.invalidateQueries({ queryKey: ["employees"] })
     },
 
-    onError: () => {
-      console.error('error while trying add voucher')
+    onError: (error: any) => {
+      console.error('error while trying add voucher ', error)
+    }
+  })
+
+  const addMultipleVouchers = useMutation({
+    mutationFn: ({ props }: { props: VouchersMutation }) => EmployeeService.addMultipleVouchers(props),
+
+    onSuccess: () => {
+      console.info('voucher has success on add')
+      queryClient.invalidateQueries({ queryKey: ["employee"] }),
+      queryClient.invalidateQueries({ queryKey: ["employees"] })
+    },
+
+    onError: (error: any) => {
+      console.error('error while trying add multiples vochers ', error)
     }
   })
 
   return {
     removeVoucher,
-    addVoucher
+    addVoucher,
+    addMultipleVouchers
   }
 
 }
