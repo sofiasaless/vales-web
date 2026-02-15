@@ -110,7 +110,7 @@ const MenuScreen = () => {
         showBack
       />
 
-      <div style={{ padding: '16px', maxWidth: 512, margin: '0 auto' }}>
+      <div style={{ position: 'sticky', top: 57, zIndex: 20, background: 'var(--bg-primary)', padding: '12px 16px', maxWidth: 512, margin: '0 auto' }}>
         <Input
           prefix={<Search style={{ width: 16, height: 16, color: 'var(--text-secondary)' }} />}
           placeholder="Buscar produto..."
@@ -118,8 +118,9 @@ const MenuScreen = () => {
           onChange={(e) => setSearchQuery(e.target.value)}
           allowClear
           size="large"
-          style={{ marginBottom: 12 }}
         />
+      </div>
+      <div style={{ padding: '0 16px 16px', maxWidth: 512, margin: '0 auto' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {
           (isLoadingMenu || isPending)?
