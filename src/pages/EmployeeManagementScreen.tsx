@@ -1,106 +1,142 @@
 import { AvatarInitials } from '@/components/AvatarInitials';
 import { MoneyDisplay } from '@/components/MoneyDisplay';
 import { PageHeader } from '@/components/PageHeader';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { VoucherItemCard } from '@/components/VoucherItemCard';
-import { useFindEmployee } from '@/hooks/useEmployee';
+import { useEmployee, useFindEmployee } from '@/hooks/useEmployee';
 import { calculateTotalVauchers } from '@/utils/calculate';
-import { Spin } from 'antd';
+import { App, Button, Card, Input, InputNumber, Modal, Spin } from 'antd';
 import {
   AlertCircle,
   CreditCard,
+  DollarSign,
   History,
   Plus,
   ShoppingBag,
   User
 } from 'lucide-react';
+import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { toast } from 'sonner';
 
 const EmployeeManagementScreen = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { message } = App.useApp();
+  const { addVoucher } = useEmployee();
 
-  const { data: employee, isLoading } = useFindEmployee(id)
+  const { data: employee, isLoading } = useFindEmployee(id);
+
+  const [cashModalOpen, setCashModalOpen] = useState(false);
+  const [cashDescription, setCashDescription] = useState('');
+  const [cashValue, setCashValue] = useState<number | null>(null);
+  const [cashLoading, setCashLoading] = useState(false);
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <Spin />
-        </div>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Spin size="large" />
       </div>
     );
   }
 
   if (!employee) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <AlertCircle className="w-12 h-12 text-danger mx-auto mb-4" />
-          <p className="text-lg font-medium">Funcionário não encontrado</p>
-          <Button
-            variant="outline"
-            className="mt-4"
-            onClick={() => navigate('/')}
-          >
-            Voltar
-          </Button>
-        </div>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 16 }}>
+        <AlertCircle style={{ width: 48, height: 48, color: 'var(--danger)' }} />
+        <p style={{ fontSize: 18, fontWeight: 500 }}>Funcionário não encontrado</p>
+        <Button onClick={() => navigate('/')}>Voltar</Button>
       </div>
     );
   }
 
   const voucherTotal = calculateTotalVauchers(employee?.vales);
 
-  const handleRemoveItem = (itemId: string) => {
+  const handleCashVoucherSubmit = async () => {
+    if (!cashDescription.trim()) {
+      message.warning('Preencha a descrição');
+      return;
+    }
+    if (!cashValue || cashValue <= 0) {
+      message.warning('Informe um valor válido');
+      return;
+    }
 
-    toast.success('Item removido do vale');
+    setCashLoading(true);
+    try {
+      await addVoucher.mutateAsync({
+        props: {
+          employeeId: employee.id,
+          voucher: {
+            id: crypto.randomUUID(),
+            descricao: cashDescription.trim(),
+            preco_unit: cashValue,
+            quantidade: 1,
+          },
+        },
+      });
+      message.success('Vale em dinheiro adicionado');
+      setCashModalOpen(false);
+      setCashDescription('');
+      setCashValue(null);
+    } catch {
+      message.error('Erro ao adicionar vale em dinheiro');
+    } finally {
+      setCashLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-background pb-8">
+    <div style={{ minHeight: '100vh', paddingBottom: 32 }}>
       <PageHeader
         title={employee?.nome}
         subtitle={employee?.cargo}
         showBack
       />
 
-      <div className="px-4 py-4 max-w-lg mx-auto space-y-4">
+      <div style={{ padding: '16px', maxWidth: 512, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 16 }}>
         {/* Employee Header */}
-        <Card className="p-4 glass-card border-border">
-          <div className="flex items-center gap-4">
+        <Card className="glass-card">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
             <AvatarInitials name={employee?.nome} size="lg" />
-            <div className="flex-1">
-              <h2 className="text-xl font-bold">{employee?.nome}</h2>
-              <p className="text-muted-foreground">{employee?.cargo}</p>
-              <p className="text-sm text-muted-foreground">
+            <div style={{ flex: 1 }}>
+              <h2 style={{ fontSize: 20, fontWeight: 700, margin: 0 }}>{employee?.nome}</h2>
+              <p style={{ color: 'var(--text-secondary)', margin: 0 }}>{employee?.cargo}</p>
+              <p style={{ fontSize: 13, color: 'var(--text-secondary)', margin: 0 }}>
                 {employee?.tipo === 'DIARISTA' ? 'Diarista' : 'Fixo (Quinzenas)'}
               </p>
             </div>
           </div>
         </Card>
 
+        {/* Cash Voucher Button */}
+        <Button
+          block
+          size="large"
+          icon={<DollarSign style={{ width: 18, height: 18 }} />}
+          onClick={() => setCashModalOpen(true)}
+          style={{ height: 48 }}
+        >
+          Adicionar Vale em Dinheiro
+        </Button>
+
         {/* Current Voucher Section */}
         <div>
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-lg font-semibold flex items-center gap-2">
-              <ShoppingBag className="w-5 h-5 text-primary" />
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+            <h3 style={{ fontSize: 18, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8, margin: 0 }}>
+              <ShoppingBag style={{ width: 20, height: 20, color: 'var(--primary)' }} />
               Vale Atual
             </h3>
             <Button
-              size="sm"
+              type="primary"
+              size="small"
+              icon={<Plus style={{ width: 16, height: 16 }} />}
               onClick={() => navigate(`/menu/${employee?.id}`)}
-              className="bg-primary text-primary-foreground"
             >
-              <Plus className="w-4 h-4 mr-1" />
               Itens
             </Button>
           </div>
 
           {employee?.vales.length > 0 ? (
-            <div className="space-y-2">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {employee?.vales.map((item) => (
                 <VoucherItemCard
                   key={item.id}
@@ -110,19 +146,19 @@ const EmployeeManagementScreen = () => {
               ))}
             </div>
           ) : (
-            <Card className="p-6 glass-card border-border text-center">
-              <ShoppingBag className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-              <p className="text-muted-foreground">Nenhum item no vale</p>
-              <p className="text-sm text-muted-foreground">
+            <Card className="glass-card" style={{ textAlign: 'center' }}>
+              <ShoppingBag style={{ width: 32, height: 32, color: 'var(--text-secondary)', margin: '0 auto 8px' }} />
+              <p style={{ color: 'var(--text-secondary)', margin: 0 }}>Nenhum item no vale</p>
+              <p style={{ fontSize: 13, color: 'var(--text-secondary)', margin: 0 }}>
                 Toque em "+ Itens" para adicionar
               </p>
             </Card>
           )}
 
           {/* Voucher Total */}
-          <Card className="p-4 mt-3 bg-secondary/50 border-border">
-            <div className="flex items-center justify-between">
-              <span className="font-medium">Total do Vale</span>
+          <Card style={{ marginTop: 12 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <span style={{ fontWeight: 500 }}>Total do Vale</span>
               <MoneyDisplay
                 value={voucherTotal}
                 size="lg"
@@ -133,37 +169,81 @@ const EmployeeManagementScreen = () => {
         </div>
 
         {/* Action Buttons */}
-        <div className="space-y-3 pt-4">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, paddingTop: 16 }}>
           <Button
-            className="w-full h-12 text-base bg-primary hover:bg-primary/90"
+            type="primary"
+            block
+            size="large"
+            icon={<CreditCard style={{ width: 20, height: 20 }} />}
             onClick={() => navigate(`/payment/${employee?.id}`)}
             disabled={employee?.vales.length === 0 && voucherTotal === 0}
+            style={{ height: 48 }}
           >
-            <CreditCard className="w-5 h-5 mr-2" />
             Pagar Funcionário
           </Button>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <Button
-              variant="outline"
-              className="h-12"
+              size="large"
+              icon={<User style={{ width: 16, height: 16 }} />}
               onClick={() => navigate(`/employee/${employee?.id}/details`)}
+              style={{ height: 48 }}
             >
-              <User className="w-4 h-4 mr-2" />
               Ver Detalhes
             </Button>
 
             <Button
-              variant="outline"
-              className="h-12"
+              size="large"
+              icon={<History style={{ width: 16, height: 16 }} />}
               onClick={() => navigate(`/employee/${employee?.id}/history`)}
+              style={{ height: 48 }}
             >
-              <History className="w-4 h-4 mr-2" />
               Histórico
             </Button>
           </div>
         </div>
       </div>
+
+      {/* Cash Voucher Modal */}
+      <Modal
+        title="Adicionar Vale em Dinheiro"
+        open={cashModalOpen}
+        onCancel={() => {
+          setCashModalOpen(false);
+          setCashDescription('');
+          setCashValue(null);
+        }}
+        onOk={handleCashVoucherSubmit}
+        confirmLoading={cashLoading}
+        okText="Confirmar"
+        cancelText="Cancelar"
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16, paddingTop: 8 }}>
+          <div>
+            <label style={{ display: 'block', marginBottom: 4, fontWeight: 500 }}>Descrição</label>
+            <Input
+              placeholder="Ex: Adiantamento, empréstimo..."
+              value={cashDescription}
+              onChange={(e) => setCashDescription(e.target.value)}
+              maxLength={100}
+            />
+          </div>
+          <div>
+            <label style={{ display: 'block', marginBottom: 4, fontWeight: 500 }}>Valor (R$)</label>
+            <InputNumber
+              placeholder="0,00"
+              value={cashValue}
+              onChange={(val) => setCashValue(val)}
+              min={0.01}
+              step={0.5}
+              precision={2}
+              style={{ width: '100%' }}
+              formatter={(value) => `${value}`.replace('.', ',')}
+              parser={(value) => Number(value?.replace(',', '.') || 0)}
+            />
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };
