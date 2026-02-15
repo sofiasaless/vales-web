@@ -1,5 +1,6 @@
 import { ManagerService } from "@/services/manager.service";
 import { GerenteAutenticatedResponseBody, GerenteAutenticateRequestBody } from "@/types/gerente.type";
+import { Gerente } from "@/types/manager";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 export function useListManagers() {
@@ -10,6 +11,16 @@ export function useListManagers() {
       return result.data;
     },
     refetchOnWindowFocus: false
+  })
+}
+
+export function useCurrentManager() {
+  return useQuery({
+    queryKey: ["current_manager"],
+    queryFn: async () => {
+      const result = await JSON.parse(localStorage.getItem("usuario")) as Gerente
+      return result
+    }
   })
 }
 
@@ -27,7 +38,12 @@ export function useManagers() {
     }
   })
 
+  const logoutManager = useMutation({
+    mutationFn: () => ManagerService.logout()
+  })
+
   return {
-    autenticate
+    autenticate,
+    logoutManager
   }
 }
