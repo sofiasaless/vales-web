@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useEmployee } from '@/hooks/useEmployee';
-import { ClodinaryService } from '@/services/clodinary.service';
+import { CloudinaryService } from '@/services/clodinary.service';
 import { FuncionarioPostRequestBody } from '@/types/funcionario.type';
 import { parseCurrencyInput, validateCPF } from '@/utils/format';
 import { Button as ButtonAnt, DatePicker, DatePickerProps, Upload } from 'antd';
@@ -154,14 +154,12 @@ const NewEmployeeScreen = () => {
     }
 
     // se tiver uma foto anexada então envia para o cloudnary
-    if (uploadPicture) {
-      let url = null
-      if (pictureFile.length > 0) {
-        if (pictureFile[0].originFileObj) {
-          url = await ClodinaryService.sendPicture(pictureFile[0].originFileObj as File);
-        }
+    if (pictureFile.length > 0 && pictureFile[0].originFileObj) {
+      if (uploadPicture) {
+        form.foto_url = await CloudinaryService.sendPicture(pictureFile[0].originFileObj as File);
+      } else {
+        form.foto_url = pictureFile[0].thumbUrl
       }
-      form.foto_url = url
     }
 
     // removendo os espaços em branco
@@ -184,6 +182,12 @@ const NewEmployeeScreen = () => {
     const toSend = await prepareForm(true)
     await registerEmployee.mutateAsync({ body: toSend })
   };
+
+  const handleGoToContract = async () => {
+    if (!validate()) return;
+    const stateToSend = await prepareForm();
+    navigate(`/contract-employee`, { state: stateToSend })
+  }
 
   useEffect(() => {
     if (registerEmployee.isPending) return;
@@ -408,7 +412,7 @@ const NewEmployeeScreen = () => {
 
         <Button
           className="w-full h-12 text-base bg-primary hover:bg-primary/90"
-        // onClick={handleSubmit}
+          onClick={handleGoToContract}
         >
           <FileSignature className="w-5 h-5 mr-2" />
           Contratar funcionário

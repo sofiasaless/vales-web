@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const ClodinaryService = {
+export const CloudinaryService = {
   async sendPicture(imagem: string | File) {
     if (!imagem) return '';
 

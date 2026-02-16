@@ -78,3 +78,7 @@ export const validateCPF = (cpf: string): boolean => {
   
   return true;
 };
+
+export const getFirstWord = (value: string) => {
+  return value.trim().split(' ')[0]
+}

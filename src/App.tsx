@@ -33,6 +33,8 @@ import SubscriptionsScreen from "@/pages/SubscriptionsScreen";
 import { App as AntApp, ConfigProvider } from "antd";
 import ptBR from 'antd/locale/pt_BR';
 import { antdTheme } from "./theme/antTheme";
+import NewEmployeeContractScreen from "./pages/NewEmployeeContractScreen";
+import ContractSignatureScreen from "./pages/ContractSignatureScreen";
 
 const queryClient = new QueryClient();
 
@@ -73,6 +75,16 @@ const App = () => (
                       <Route path="/new-employee" element={
                         // <ProtectedRoute>
                           <NewEmployeeScreen />
+                        // </ProtectedRoute>
+                      } />
+                      <Route path="/contract-employee" element={
+                        // <ProtectedRoute>
+                          <NewEmployeeContractScreen />
+                        // </ProtectedRoute>
+                      } />
+                      <Route path="/contract-signature" element={
+                        // <ProtectedRoute>
+                          <ContractSignatureScreen />
                         // </ProtectedRoute>
                       } />
                       <Route path="/settings" element={
