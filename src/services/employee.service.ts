@@ -1,5 +1,5 @@
 import { api } from "@/config/axios";
-import { FuncionarioResponseBody } from "@/types/funcionario.type";
+import { FuncionarioPostRequestBody, FuncionarioResponseBody } from "@/types/funcionario.type";
 import { Vale } from "@/types/vale.type";
 
 export interface VoucherMutation {
@@ -13,6 +13,10 @@ export interface VouchersMutation {
 }
 
 export const EmployeeService = {
+  async register(body: FuncionarioPostRequestBody) {
+    return await api.post(`/funcionario/criar`, body)
+  },
+  
   async list() {
     return (await api.get<FuncionarioResponseBody[]>(`/funcionario/listar`)).data
   },
