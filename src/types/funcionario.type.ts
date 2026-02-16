@@ -10,8 +10,8 @@ export type FuncionarioResponseBody = {
   tipo: TipoFuncionario,
   dias_trabalhados_semanal?: number;
   foto_url?: string,
-  data_nascimento?: Date | null,
-  data_admissao: Date,
+  data_nascimento?: string | null,
+  data_admissao: string,
   vales: Vale[],
   incentivo: GanhosIncentivo[],
   primeiro_dia_pagamento: number,
@@ -21,13 +21,12 @@ export type FuncionarioResponseBody = {
   contrato?: ContratoFuncionario
 }
 
-export type FuncionarioPostRequestBody = Omit<FuncionarioResponseBody, "id" | "data_cadastro">
+export type FuncionarioPostRequestBody = Omit<FuncionarioResponseBody, "id" | "data_cadastro" | "restaurante_ref">
 
 export type FuncionarioUpdateRequestBody = Pick<
   FuncionarioResponseBody,
   "nome" | "cargo" | 'cpf' | 'data_admissao' | 'data_nascimento' | 'primeiro_dia_pagamento' | 'segundo_dia_pagamento' | 'tipo' | 'salario' | 'foto_url' | 'dias_trabalhados_semanal'
 >
-
 
 // tipo auxiliares
 export type TipoFuncionario = 'DIARISTA' | 'FIXO'

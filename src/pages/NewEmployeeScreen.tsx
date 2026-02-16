@@ -1,33 +1,79 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useEmployees } from '@/context/EmployeeContext';
+import { PlusOutlined } from "@ant-design/icons"
 import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Card } from '@/components/ui/card';
-import { Employee, EmployeeType } from '@/types';
+import { useEmployee } from '@/hooks/useEmployee';
+import { CloudinaryService } from '@/services/clodinary.service';
+import { FuncionarioPostRequestBody } from '@/types/funcionario.type';
+import { parseCurrencyInput, validateCPF } from '@/utils/format';
+import { Button as ButtonAnt, DatePicker, DatePickerProps, Upload } from 'antd';
+import { AlertCircle, FileSignature, UserPlus } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { validateCPF, formatCPF, parseCurrencyInput } from '@/utils/format';
-import { UserPlus, AlertCircle } from 'lucide-react';
+import { UploadFile } from "antd/lib/upload";
+
+const emptyEmployee: FuncionarioPostRequestBody = {
+  cargo: '',
+  nome: '',
+  incentivo: [],
+  vales: [],
+  primeiro_dia_pagamento: 0,
+  segundo_dia_pagamento: 0,
+  salario: 0,
+  cpf: '',
+  tipo: 'FIXO',
+  dias_trabalhados_semanal: 0,
+  data_admissao: ''
+}
 
 const NewEmployeeScreen = () => {
   const navigate = useNavigate();
-  const { dispatch } = useEmployees();
 
-  const [formData, setFormData] = useState({
-    name: '',
-    birthDate: '',
-    baseSalary: '',
-    type: 'FIXO' as EmployeeType,
-    cpf: '',
-    admissionDate: '',
-    payday: '5',
-    role: '',
-  });
+  const [formData, setFormData] = useState<FuncionarioPostRequestBody>(emptyEmployee);
+
+  const [inputSalario, setInputSalario] = useState('')
+  const [pictureFile, setPictureFile] = useState<UploadFile[]>([]);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const [admissionDate, setAdmissionDate] = useState<Date>(new Date())
+  const setAdmission: DatePickerProps['onChange'] = (date, dateString) => {
+    const converted = ((date as any).$d as Date)
+    setAdmissionDate(converted)
+    setFormData((prev) => ({
+      ...prev,
+      data_admissao: converted.toISOString()
+    }))
+  };
+
+  const setBirth: DatePickerProps['onChange'] = (date, dateString) => {
+    const converted = ((date as any).$d as Date).toISOString()
+    setFormData((prev) => ({
+      ...prev,
+      data_nascimento: converted
+    }))
+  };
+
+  const calculatePaydays = () => {
+    const dateOne = new Date(new Date().setDate(admissionDate.getDate() + 14));
+    const dateTwo = new Date(new Date().setDate(dateOne.getDate() + 14));
+
+    const dayOne = dateOne.getDate()
+    const dayTwo = dateTwo.getDate()
+
+    setFormData((prev) => (
+      {
+        ...prev,
+        primeiro_dia_pagamento: dayOne,
+        segundo_dia_pagamento: dayTwo
+      }
+    ))
+    return { dayOne, dayTwo }
+  }
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -53,24 +99,31 @@ const NewEmployeeScreen = () => {
 
   const handleSalaryChange = (value: string) => {
     // Allow only digits and comma
+    setInputSalario(value)
     const cleaned = value.replace(/[^\d,]/g, '');
-    handleInputChange('baseSalary', cleaned);
+    handleInputChange('salario', cleaned);
   };
 
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.name.trim()) {
+    if (!formData.nome.trim()) {
       newErrors.name = 'Nome é obrigatório';
     }
 
-    if (!formData.role.trim()) {
+    if (!formData.cargo.trim()) {
       newErrors.role = 'Cargo é obrigatório';
     }
 
-    if (!formData.baseSalary) {
+    if (formData.tipo === 'DIARISTA') {
+      if (formData.dias_trabalhados_semanal <= 0 || !formData.dias_trabalhados_semanal) {
+        newErrors.diasTrabalhados = 'Dias de trabalho deve ser maior que zero';
+      }
+    }
+
+    if (!formData.salario) {
       newErrors.baseSalary = 'Salário é obrigatório';
-    } else if (parseCurrencyInput(formData.baseSalary) <= 0) {
+    } else if (parseCurrencyInput(inputSalario) <= 0) {
       newErrors.baseSalary = 'Salário deve ser maior que zero';
     }
 
@@ -82,32 +135,76 @@ const NewEmployeeScreen = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
+  const prepareForm = async (uploadPicture: boolean = false) => {
+    const form = formData
+    if (form.tipo === 'DIARISTA') {
+      form.primeiro_dia_pagamento = 0
+      form.segundo_dia_pagamento = 0
+    } else {
+      form.dias_trabalhados_semanal = null
+      if (form.primeiro_dia_pagamento === 0 || form.segundo_dia_pagamento === 0) {
+        const days = calculatePaydays()
+        form.primeiro_dia_pagamento = days.dayOne
+        form.segundo_dia_pagamento = days.dayTwo
+      }
+    }
+
+    if (form.data_admissao === '') {
+      form.data_admissao = admissionDate.toISOString()
+    }
+
+    // se tiver uma foto anexada então envia para o cloudnary
+    if (pictureFile.length > 0 && pictureFile[0].originFileObj) {
+      if (uploadPicture) {
+        form.foto_url = await CloudinaryService.sendPicture(pictureFile[0].originFileObj as File);
+      } else {
+        form.foto_url = pictureFile[0].thumbUrl
+      }
+    }
+
+    // removendo os espaços em branco
+    form.nome = form.nome.trim()
+    form.cargo = form.cargo.trim()
+    // convertendo o salário para number
+    form.salario = parseCurrencyInput(inputSalario)
+
+    return form
+  }
+
+  const { registerEmployee } = useEmployee()
+
+  const handleSubmit = async () => {
     if (!validate()) {
       toast.error('Corrija os erros no formulário');
       return;
     }
 
-    const newEmployee: Employee = {
-      id: `emp-${Date.now()}`,
-      name: formData.name.trim(),
-      birthDate: formData.birthDate ? new Date(formData.birthDate) : new Date(),
-      baseSalary: parseCurrencyInput(formData.baseSalary),
-      type: formData.type,
-      cpf: formData.cpf,
-      admissionDate: formData.admissionDate
-        ? new Date(formData.admissionDate)
-        : new Date(),
-      payday: parseInt(formData.payday),
-      role: formData.role.trim(),
-      currentVoucher: [],
-      paymentHistory: [],
-    };
-
-    dispatch({ type: 'ADD_EMPLOYEE', payload: newEmployee });
-    toast.success('Funcionário cadastrado com sucesso!');
-    navigate('/');
+    const toSend = await prepareForm(true)
+    await registerEmployee.mutateAsync({ body: toSend })
   };
+
+  const handleGoToContract = async () => {
+    if (!validate()) return;
+    const stateToSend = await prepareForm();
+    navigate(`/contract-employee`, { state: stateToSend })
+  }
+
+  useEffect(() => {
+    if (registerEmployee.isPending) return;
+    if (registerEmployee.isSuccess) {
+      setFormData(emptyEmployee)
+      setInputSalario('')
+      setAdmissionDate(new Date())
+      setPictureFile([])
+
+      toast.success('Funcionário cadastrado com sucesso!');
+      navigate('/')
+    }
+    if (registerEmployee.isError) {
+      toast.error(`Erro ao cadastrar o funcionário: ${registerEmployee.error}`)
+    }
+
+  }, [registerEmployee.isPending])
 
   return (
     <div className="min-h-screen bg-background pb-20">
@@ -115,13 +212,31 @@ const NewEmployeeScreen = () => {
 
       <div className="px-4 py-4 max-w-lg mx-auto space-y-4">
         <Card className="p-4 glass-card border-border space-y-4">
+          {/* Upload Picture */}
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <Upload
+              listType="picture-circle"
+              fileList={pictureFile}
+              maxCount={1}
+              beforeUpload={() => false}
+              onChange={({ fileList }) => {
+                setPictureFile(fileList.slice(-1));
+              }}
+            >
+              <button style={{ border: 0, background: 'none' }} type="button">
+                <PlusOutlined />
+                <div style={{ marginTop: 8 }}>Imagem de perfil</div>
+              </button>
+            </Upload>
+          </div>
+
           {/* Name */}
           <div className="space-y-2">
             <Label htmlFor="name">Nome Completo *</Label>
             <Input
               id="name"
-              value={formData.name}
-              onChange={(e) => handleInputChange('name', e.target.value)}
+              value={formData.nome}
+              onChange={(e) => handleInputChange('nome', e.target.value)}
               placeholder="Ex: Maria Silva"
               className={errors.name ? 'border-danger' : ''}
             />
@@ -138,8 +253,8 @@ const NewEmployeeScreen = () => {
             <Label htmlFor="role">Cargo *</Label>
             <Input
               id="role"
-              value={formData.role}
-              onChange={(e) => handleInputChange('role', e.target.value)}
+              value={formData.cargo}
+              onChange={(e) => handleInputChange('cargo', e.target.value)}
               placeholder="Ex: Cozinheira"
               className={errors.role ? 'border-danger' : ''}
             />
@@ -155,8 +270,8 @@ const NewEmployeeScreen = () => {
           <div className="space-y-3">
             <Label>Tipo de Contrato</Label>
             <RadioGroup
-              value={formData.type}
-              onValueChange={(value) => handleInputChange('type', value)}
+              value={formData.tipo}
+              onValueChange={(value) => handleInputChange('tipo', value)}
               className="flex gap-4"
             >
               <div className="flex items-center space-x-2">
@@ -177,7 +292,7 @@ const NewEmployeeScreen = () => {
           {/* Salary */}
           <div className="space-y-2">
             <Label htmlFor="salary">
-              {formData.type === 'DIARISTA' ? 'Valor Diária' : 'Salário Base'} *
+              {formData.tipo === 'DIARISTA' ? 'Valor Diária' : 'Salário Base'} *
             </Label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
@@ -185,7 +300,7 @@ const NewEmployeeScreen = () => {
               </span>
               <Input
                 id="salary"
-                value={formData.baseSalary}
+                value={inputSalario}
                 onChange={(e) => handleSalaryChange(e.target.value)}
                 placeholder="0,00"
                 className={`pl-10 ${errors.baseSalary ? 'border-danger' : ''}`}
@@ -199,6 +314,31 @@ const NewEmployeeScreen = () => {
               </p>
             )}
           </div>
+
+          {
+            formData.tipo === 'DIARISTA' &&
+            <div className="space-y-2">
+              <Label htmlFor="daysForWork">Dias de trabalho p/ semana</Label>
+              <div className="relative">
+                <Input
+                  type='number'
+                  min={1}
+                  id="daysForWork"
+                  value={formData.dias_trabalhados_semanal.toString() || '0'}
+                  onChange={(e) => handleInputChange('dias_trabalhados_semanal', e.target.value)}
+                  placeholder="0"
+                  className={` ${errors.diasTrabalhados ? 'border-danger' : ''}`}
+                  inputMode="decimal"
+                />
+              </div>
+              {errors.diasTrabalhados && (
+                <p className="text-xs text-danger flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3" />
+                  {errors.diasTrabalhados}
+                </p>
+              )}
+            </div>
+          }
 
           {/* CPF */}
           <div className="space-y-2">
@@ -220,51 +360,71 @@ const NewEmployeeScreen = () => {
           </div>
 
           {/* Birth Date */}
-          <div className="space-y-2">
+          <div style={{ display: 'flex', flexDirection: 'column' }} className="space-y-2">
             <Label htmlFor="birthDate">Data de Nascimento</Label>
-            <Input
-              id="birthDate"
-              type="date"
-              value={formData.birthDate}
-              onChange={(e) => handleInputChange('birthDate', e.target.value)}
-            />
+            <DatePicker id="birthDate" format={'DD/MM/YYYY'} onChange={setBirth} />
           </div>
 
           {/* Admission Date */}
-          <div className="space-y-2">
+          <div style={{ display: 'flex', flexDirection: 'column' }} className="space-y-2">
             <Label htmlFor="admissionDate">Data de Admissão</Label>
-            <Input
-              id="admissionDate"
-              type="date"
-              value={formData.admissionDate}
-              onChange={(e) => handleInputChange('admissionDate', e.target.value)}
-            />
+            <DatePicker id="admissionDate" format={'DD/MM/YYYY'} onChange={setAdmission} />
           </div>
 
           {/* Payday */}
-          <div className="space-y-2">
-            <Label htmlFor="payday">Dia do Pagamento</Label>
-            <select
-              id="payday"
-              value={formData.payday}
-              onChange={(e) => handleInputChange('payday', e.target.value)}
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-            >
-              {[5, 10, 15, 20, 25, 30].map((day) => (
-                <option key={day} value={day}>
-                  Todo dia {day.toString().padStart(2, '0')}
-                </option>
-              ))}
-            </select>
-          </div>
+          {
+            formData.tipo === 'FIXO' &&
+            <>
+              <div className='flex flex-row gap-4'>
+                <div className="space-y-2">
+                  <Label htmlFor="payday">1° Dia do Pagamento</Label>
+                  <Input
+                    id="payday"
+                    value={formData.primeiro_dia_pagamento.toString()}
+                    onChange={(e) => {
+                      setFormData((prev) => ({ ...prev, primeiro_dia_pagamento: Number(e.target.value) }));
+                    }}
+                    className={`${errors.dia_pagamento ? 'border-danger' : ''}`}
+                    inputMode="decimal"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="payday">2° Dia do Pagamento</Label>
+                  <Input
+                    id="payday"
+                    value={formData.segundo_dia_pagamento.toString()}
+                    onChange={(e) => {
+                      setFormData((prev) => ({ ...prev, segundo_dia_pagamento: Number(e.target.value) }));
+                    }}
+                    className={`${errors.dia_pagamento ? 'border-danger' : ''}`}
+                    inputMode="decimal"
+                  />
+                </div>
+              </div>
+
+              <ButtonAnt style={{ flex: 1, width: '100%' }} variant='dashed' color='yellow' onClick={calculatePaydays}>
+                Calcular dias de pagamento
+              </ButtonAnt>
+            </>
+          }
         </Card>
 
         <Button
           className="w-full h-12 text-base bg-primary hover:bg-primary/90"
+          onClick={handleGoToContract}
+        >
+          <FileSignature className="w-5 h-5 mr-2" />
+          Contratar funcionário
+        </Button>
+
+        <Button
+          className="w-full h-12 text-base"
           onClick={handleSubmit}
+          variant='outline'
         >
           <UserPlus className="w-5 h-5 mr-2" />
-          Cadastrar Funcionário
+          Apenas cadastrar funcionário
         </Button>
       </div>
     </div>

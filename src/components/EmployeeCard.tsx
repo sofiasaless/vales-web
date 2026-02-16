@@ -3,6 +3,7 @@ import { FuncionarioResponseBody } from '@/types/funcionario.type';
 import { useNavigate } from 'react-router-dom';
 import { AvatarInitials } from './AvatarInitials';
 import { MoneyDisplay } from './MoneyDisplay';
+import { getFirstWord } from '@/utils/format';
 
 interface EmployeeCardProps {
   employee: FuncionarioResponseBody | undefined;
@@ -43,10 +44,10 @@ export const EmployeeCard = ({ employee, className }: EmployeeCardProps) => {
         <AvatarInitials name={employee?.nome} size="md" className="mb-3" />
         
         <h3 className="font-semibold text-foreground truncate w-full">
-          {employee?.nome}
+          {getFirstWord(employee?.nome)}
         </h3>
         
-        <p className="text-xs text-muted-foreground mb-2">{employee?.cargo}</p>
+        <p className="text-x text-muted-foreground mb-2">{employee?.cargo}</p>
         
         <div className="mb-2">
           <MoneyDisplay

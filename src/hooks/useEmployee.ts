@@ -1,4 +1,5 @@
 import { EmployeeService, VoucherMutation, VouchersMutation } from "@/services/employee.service";
+import { FuncionarioPostRequestBody } from "@/types/funcionario.type";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export function useListEmployee() {
@@ -26,13 +27,22 @@ export function useFindEmployee(id: string) {
 export function useEmployee() {
   const queryClient = useQueryClient();
 
+  const registerEmployee = useMutation({
+    mutationFn: ({ body }: { body: FuncionarioPostRequestBody }) => EmployeeService.register(body),
+
+    onSuccess: () => {
+      console.info('success while trying register employee')
+      queryClient.invalidateQueries({ queryKey: ["employees"] })
+    }
+  })
+
   const removeVoucher = useMutation({
     mutationFn: ({ props }: { props: VoucherMutation }) => EmployeeService.removeVoucher(props),
 
     onSuccess: () => {
       console.info('voucher has success on remove')
-      queryClient.invalidateQueries({ queryKey: ["employee"] }),
-        queryClient.invalidateQueries({ queryKey: ["employees"] })
+      queryClient.invalidateQueries({ queryKey: ["employee"] })
+      queryClient.invalidateQueries({ queryKey: ["employees"] })
     },
 
     onError: () => {
@@ -45,7 +55,7 @@ export function useEmployee() {
 
     onSuccess: () => {
       console.info('voucher has success on add')
-      queryClient.invalidateQueries({ queryKey: ["employee"] }),
+      queryClient.invalidateQueries({ queryKey: ["employee"] })
       queryClient.invalidateQueries({ queryKey: ["employees"] })
     },
 
@@ -59,7 +69,7 @@ export function useEmployee() {
 
     onSuccess: () => {
       console.info('voucher has success on add')
-      queryClient.invalidateQueries({ queryKey: ["employee"] }),
+      queryClient.invalidateQueries({ queryKey: ["employee"] })
       queryClient.invalidateQueries({ queryKey: ["employees"] })
     },
 
@@ -71,7 +81,8 @@ export function useEmployee() {
   return {
     removeVoucher,
     addVoucher,
-    addMultipleVouchers
+    addMultipleVouchers,
+    registerEmployee
   }
 
 }

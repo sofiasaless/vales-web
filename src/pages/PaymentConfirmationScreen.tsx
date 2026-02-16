@@ -1,25 +1,27 @@
-import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { useEmployees } from '@/context/EmployeeContext';
-import { PageHeader } from '@/components/PageHeader';
 import { MoneyDisplay } from '@/components/MoneyDisplay';
-import { App, Button, Card, Modal } from 'antd';
-import { Payment, VoucherItem } from '@/types';
-import { CheckCircle, AlertCircle, Wallet, Receipt, Banknote } from 'lucide-react';
+import { PageHeader } from '@/components/PageHeader';
+import { usePayment } from '@/hooks/usePayment';
+import { theme } from '@/theme/theme';
+import { FuncionarioResponseBody } from '@/types/funcionario.type';
+import { PagamentoPostRequestBody } from '@/types/pagamento.type';
+import { Vale } from '@/types/vale.type';
+import { calcularBaseSalary, calculateAmount, calculateTotalVauchers } from '@/utils/calculate';
+import { Button, Card, Modal, Typography } from 'antd';
+import { AlertCircle, Banknote, CheckCircle, Receipt, Wallet, FileSignature } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+
+const { Text } = Typography
 
 const PaymentConfirmationScreen = () => {
-  const { employeeId } = useParams<{ employeeId: string }>();
+  const location = useLocation()
+  const employee = location.state as FuncionarioResponseBody
   const navigate = useNavigate();
-  const { getEmployee, calculatePayment, dispatch } = useEmployees();
-  const { message } = App.useApp();
 
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
 
-  const employee = getEmployee(employeeId || '');
-  const paymentDetails = calculatePayment(employeeId || '');
-
-  if (!employee || !paymentDetails) {
+  if (!employee) {
     return (
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 16 }}>
         <AlertCircle style={{ width: 48, height: 48, color: 'var(--danger)' }} />
@@ -29,56 +31,63 @@ const PaymentConfirmationScreen = () => {
     );
   }
 
-  const handleConfirmPayment = async () => {
-    setIsProcessing(true);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+  const { pay } = usePayment()
 
-    const payment: Payment = {
-      id: `pay-${Date.now()}`,
-      employeeId: employee.id,
-      date: new Date(),
-      baseSalary: paymentDetails.baseSalary,
-      voucherTotal: paymentDetails.voucherTotal,
-      amountPaid: paymentDetails.amountPaid,
-      voucherItems: [...employee.currentVoucher],
+  const handleConfirmPayment = async () => {
+
+    const payment: PagamentoPostRequestBody = {
+      incentivo: employee.incentivo,
+      vales: employee.vales,
+      salario_atual: employee.salario,
+      valor_pago: calculateAmount(employee)
     };
 
-    dispatch({
-      type: 'CONFIRM_PAYMENT',
-      payload: { employeeId: employee.id, payment },
-    });
-
-    setIsProcessing(false);
-    setShowConfirmModal(false);
-    message.success('Pagamento confirmado com sucesso!');
-    navigate('/');
+    await pay.mutateAsync({ employeeId: employee.id, body: payment })
   };
 
-  const renderVoucherItem = (item: VoucherItem) => (
-    <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', borderRadius: 8, background: 'var(--bg-secondary)' }}>
+  useEffect(() => {
+    if (pay.isPending) return;
+    if (pay.isSuccess) {
+      setShowConfirmModal(false);
+      toast.success('Pagamento confirmado com sucesso!');
+      navigate('/', { replace: true });
+    }
+    if (pay.isError) {
+      toast.success(`Erro ao tentar realizar o pagamento: ${pay.error}`);
+    }
+  }, [pay.isPending])
+
+  const labelSalary = (employee.tipo === 'FIXO') ? 'Valor da quinzena' : 'Total das diárias'
+  const labelBaseSalary = (employee.tipo === 'FIXO') ? `Salário base R$ ${employee.salario.toFixed(2)}` : `Diária R$ ${employee.salario.toFixed(2)}`
+
+  const renderVoucherItem = (item: Vale) => (
+    <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', borderRadius: 8, backgroundColor: theme.colors.colorErrorTransparent }}>
       <div>
-        <p style={{ margin: 0, fontWeight: 500 }}>{item.name}</p>
+        <p style={{ margin: 0, fontWeight: 500 }}>{item.descricao}</p>
         <p style={{ margin: 0, fontSize: 13, color: 'var(--text-secondary)' }}>
-          {item.quantity}x <MoneyDisplay value={item.unitPrice} size="sm" />
+          {item.quantidade}x <MoneyDisplay value={item.preco_unit} size="sm" />
         </p>
       </div>
-      <MoneyDisplay value={item.unitPrice * item.quantity} size="md" />
+      <MoneyDisplay value={item.preco_unit * item.quantidade} size="md" />
     </div>
   );
 
   return (
     <div style={{ minHeight: '100vh', paddingBottom: 32 }}>
-      <PageHeader title="Confirmar Pagamento" subtitle={employee.name} showBack />
+      <PageHeader title="Confirmar Pagamento" subtitle={employee?.nome} showBack />
 
       <div style={{ padding: 16, maxWidth: 512, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 16 }}>
         <Card className="glass-card">
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
-            <div style={{ padding: 8, borderRadius: '50%', background: 'var(--primary-bg)' }}>
+            <div style={{ padding: 8, borderRadius: '50%', background: theme.colors.colorPrimaryTransparent }}>
               <Wallet style={{ width: 20, height: 20, color: 'var(--primary)' }} />
             </div>
-            <span style={{ color: 'var(--text-secondary)', fontWeight: 500 }}>Salário Base</span>
+            <span style={{ color: 'var(--text-secondary)', fontWeight: 500 }}>{labelSalary}</span>
           </div>
-          <MoneyDisplay value={paymentDetails.baseSalary} size="xl" />
+          <div className='mb-2'>
+            <Text style={{ color: theme.colors.colorTextSecondary }}>{labelBaseSalary}</Text>
+          </div>
+          <MoneyDisplay value={calcularBaseSalary(employee)} size="xl" />
         </Card>
 
         <Card className="glass-card">
@@ -88,11 +97,11 @@ const PaymentConfirmationScreen = () => {
             </div>
             <span style={{ color: 'var(--text-secondary)', fontWeight: 500 }}>Total do Vale a Descontar</span>
           </div>
-          <MoneyDisplay value={-paymentDetails.voucherTotal} size="xl" variant="negative" />
+          <MoneyDisplay value={-calculateTotalVauchers(employee.vales)} size="xl" variant="negative" />
 
-          {employee.currentVoucher.length > 0 && (
-            <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {employee.currentVoucher.map(renderVoucherItem)}
+          {employee?.vales.length > 0 && (
+            <div style={{ maxHeight: 200, overflowY: 'auto', marginTop: 16, paddingTop: 16, borderTop: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {employee?.vales.map(renderVoucherItem)}
             </div>
           )}
         </Card>
@@ -104,19 +113,32 @@ const PaymentConfirmationScreen = () => {
             </div>
             <span style={{ color: 'var(--success)', fontWeight: 600, fontSize: 18 }}>Total a Pagar</span>
           </div>
-          <MoneyDisplay value={paymentDetails.amountPaid} size="xl" variant="positive" />
+          <MoneyDisplay value={calculateAmount(employee)} size="xl" variant={calculateAmount(employee) < 0 ? 'negative' : 'positive'} />
         </Card>
 
-        <Button
-          type="primary"
-          block
-          size="large"
-          icon={<CheckCircle style={{ width: 20, height: 20 }} />}
-          onClick={() => setShowConfirmModal(true)}
-          style={{ height: 56, fontSize: 16, marginTop: 8, background: 'var(--success)' }}
-        >
-          Confirmar Pagamento
-        </Button>
+        <div style={{ gap: 5, display: 'flex', flexDirection: 'column' }}>
+          <Button
+            type="primary"
+            block
+            size="large"
+            icon={<FileSignature style={{ width: 20, height: 20 }} />}
+            // onClick={() => setShowConfirmModal(true)}
+            style={{ height: 56, fontSize: 16, marginTop: 8 }}
+          >
+            Ir para assinatura
+          </Button>
+
+          <Button
+            block
+            variant='outlined'
+            size="large"
+            icon={<CheckCircle style={{ width: 20, height: 20 }} />}
+            onClick={() => setShowConfirmModal(true)}
+            style={{ height: 56, fontSize: 16, marginTop: 8 }}
+          >
+            Pagar sem assinatura
+          </Button>
+        </div>
       </div>
 
       <Modal
@@ -124,20 +146,20 @@ const PaymentConfirmationScreen = () => {
         open={showConfirmModal}
         onCancel={() => setShowConfirmModal(false)}
         onOk={handleConfirmPayment}
-        confirmLoading={isProcessing}
+        confirmLoading={pay.isPending}
         okText="Confirmar"
         cancelText="Cancelar"
       >
         <p style={{ color: 'var(--text-secondary)' }}>
-          Você está prestes a confirmar o pagamento de <strong>{employee.name}</strong>.
+          Você está prestes a confirmar o pagamento de <strong>{employee?.nome}</strong>.
         </p>
         <div style={{ textAlign: 'center', padding: '16px 0' }}>
           <p style={{ color: 'var(--text-secondary)', marginBottom: 8 }}>Valor a ser pago:</p>
-          <MoneyDisplay value={paymentDetails.amountPaid} size="xl" variant="positive" />
+          <MoneyDisplay value={calculateAmount(employee)} size="xl" variant={calculateAmount(employee) < 0 ? 'negative' : 'positive'} />
         </div>
         <div style={{ padding: 12, background: 'rgba(234,179,8,0.1)', border: '1px solid rgba(234,179,8,0.3)', borderRadius: 8, textAlign: 'center' }}>
           <p style={{ fontSize: 13, color: 'var(--warning)', margin: 0 }}>
-            ⚠️ O vale será zerado após a confirmação
+            ⚠️ Os vales e incentivos serão zerados após a confirmação
           </p>
         </div>
       </Modal>
