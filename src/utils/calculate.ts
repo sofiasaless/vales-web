@@ -1,3 +1,4 @@
+import { FuncionarioResponseBody } from "@/types/funcionario.type";
 import { Vale } from "@/types/vale.type";
 
 export const calculateTotalVaucher = (item: Vale): number => {
@@ -8,3 +9,19 @@ export const calculateTotalVauchers = (items: Vale[] | undefined): number => {
   if (!items) return 0;
   return items.reduce((total, item) => total + calculateTotalVaucher(item), 0);
 };
+
+export const calculateAmount = (employee: FuncionarioResponseBody) => {
+  const totalVoucher = calculateTotalVauchers(employee.vales);
+  const amount = calcularBaseSalary(employee) - totalVoucher
+  return amount
+}
+
+export const calcularBaseSalary = (employee: FuncionarioResponseBody) => {
+  let salary = 0
+  if (employee.tipo === 'FIXO') {
+    salary = employee.salario / 2
+  } else {
+    salary = employee.salario * employee.dias_trabalhados_semanal
+  }
+  return salary
+}

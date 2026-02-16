@@ -118,7 +118,7 @@ const App = () => (
                       } />
 
                       {/* Payment Stack */}
-                      <Route path="/payment/:employeeId" element={
+                      <Route path="/payment" element={
                         // <ProtectedRoute>
                           <PaymentConfirmationScreen />
                         // </ProtectedRoute>

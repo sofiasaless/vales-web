@@ -176,7 +176,7 @@ const EmployeeManagementScreen = () => {
             block
             size="large"
             icon={<CreditCard style={{ width: 20, height: 20 }} />}
-            onClick={() => navigate(`/payment/${employee?.id}`)}
+            onClick={() => navigate(`/payment`, { state: employee })}
             disabled={employee?.vales.length === 0 && voucherTotal === 0}
             style={{ height: 48 }}
           >
