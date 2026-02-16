@@ -7,7 +7,7 @@ import { Button as ButtonAnt } from 'antd';
 import { CheckCircle, SignatureIcon, Trash2 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import SignatureCanvas from 'react-signature-canvas';
+import SignaturePad from 'react-signature-pad-wrapper';
 import { toast } from 'sonner';
 
 const ContractSignatureScreen = () => {
@@ -15,28 +15,28 @@ const ContractSignatureScreen = () => {
   const employeeBody = location.state as FuncionarioPostRequestBody;
   const navigate = useNavigate();
 
-  const sigPad = useRef<SignatureCanvas | null>(null);
-  const [signatureUrl, setSignatureUrl] = useState<string | null>(null)
+  const sigPad = useRef<SignaturePad | null>(null);
+  const [signatureUrl, setSignatureUrl] = useState<string | null>(null);
 
   const clear = useCallback(() => {
     sigPad.current?.clear();
-    setSignatureUrl(null)
+    setSignatureUrl(null);
   }, []);
 
-  const save = useCallback(async () => {
+  const save = useCallback(() => {
     if (sigPad.current) {
-      const dataURL = sigPad.current.getCanvas().toDataURL('image/png');
+      const dataURL = sigPad.current.toDataURL('image/png');
       setSignatureUrl(dataURL);
-      toast.success(`Assinatura salva com sucesso!`)
+      toast.success(`Assinatura salva com sucesso!`);
     }
   }, []);
 
-  const { registerEmployee } = useEmployee()
+  const { registerEmployee } = useEmployee();
 
-  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const handleFinalize = async () => {
     try {
-      setIsLoading(true)
+      setIsLoading(true);
       if (!signatureUrl) {
         return toast.error("A assinatura é obrigatória para finalizar o contrato.");
       }
@@ -46,30 +46,31 @@ const ContractSignatureScreen = () => {
         descricao_servicos: employeeBody.contrato.descricao_servicos,
         assinaturas: {
           contratado: await CloudinaryService.sendPicture(signatureUrl),
-          contratante: '' 
+          contratante: ''
         }
-      }
-      
+      };
+
       employeeBody.contrato = constractWithSignature;
       await registerEmployee.mutateAsync({ body: employeeBody });
     } catch (error) {
-      toast.error(`Erro ao realizar contratação: ${error}`)
+      toast.error(`Erro ao realizar contratação: ${error}`);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
     if (registerEmployee.isPending) return;
+
     if (registerEmployee.isSuccess) {
       toast.success('Funcionário contratado com sucesso!');
-      navigate('/', { replace: true })
-    }
-    if (registerEmployee.isError) {
-      toast.error(`Erro ao contratar o funcionário: ${registerEmployee.error}`)
+      navigate('/', { replace: true });
     }
 
-  }, [registerEmployee.isPending])
+    if (registerEmployee.isError) {
+      toast.error(`Erro ao contratar o funcionário: ${registerEmployee.error}`);
+    }
+  }, [registerEmployee.isPending]);
 
   return (
     <div style={{ minHeight: '100vh', paddingBottom: 32 }}>
@@ -81,14 +82,18 @@ const ContractSignatureScreen = () => {
 
       <div className="py-4 max-w-lg mx-auto space-y-6">
         <div className="border-2 border-dashed border-gray-300 rounded-lg bg-white overflow-hidden">
-          <SignatureCanvas
+          <SignaturePad
             ref={sigPad}
-            penColor='black'
-            maxWidth={2}
-            dotSize={2}
+            options={{
+              penColor: 'black',
+              minWidth: 1,
+              maxWidth: 2,
+            }}
             canvasProps={{
-              className: "signature-canvas",
-              style: { width: '100%', height: 200 }
+              style: {
+                width: '100%',
+                height: '500px',
+              },
             }}
           />
         </div>
@@ -102,6 +107,7 @@ const ContractSignatureScreen = () => {
           >
             Limpar
           </ButtonAnt>
+
           <ButtonAnt
             type="primary"
             onClick={save}
@@ -113,9 +119,9 @@ const ContractSignatureScreen = () => {
           </ButtonAnt>
         </div>
 
-        <div className='px-4'>
+        <div className="px-4">
           <Button
-            className={`w-full h-12 text-base`}
+            className="w-full h-12 text-base"
             onClick={handleFinalize}
             disabled={!signatureUrl || isLoading}
           >
