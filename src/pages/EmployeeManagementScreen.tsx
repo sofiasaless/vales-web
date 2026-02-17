@@ -3,7 +3,6 @@ import { MoneyDisplay } from '@/components/MoneyDisplay';
 import { PageHeader } from '@/components/PageHeader';
 import { VoucherItemCard } from '@/components/VoucherItemCard';
 import { useEmployee, useFindEmployee } from '@/hooks/useEmployee';
-import { antdTheme } from '@/theme/antTheme';
 import { calculateTotalVauchers } from '@/utils/calculate';
 import { App, Button, Card, Input, InputNumber, Modal, Spin } from 'antd';
 import {
@@ -177,7 +176,6 @@ const EmployeeManagementScreen = () => {
             size="large"
             icon={<CreditCard style={{ width: 20, height: 20 }} />}
             onClick={() => navigate(`/payment`, { state: employee })}
-            disabled={employee?.vales.length === 0 && voucherTotal === 0}
             style={{ height: 48 }}
           >
             Pagar Funcionário
