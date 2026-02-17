@@ -106,7 +106,7 @@ const App = () => (
                           <EmployeeDetailScreen />
                         // </ProtectedRoute>
                       } />
-                      <Route path="/employee/:id/edit" element={
+                      <Route path="/employee/edit" element={
                         // <ProtectedRoute>
                           <EditEmployeeScreen />
                         // </ProtectedRoute>
