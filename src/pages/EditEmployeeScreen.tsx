@@ -1,70 +1,35 @@
-import { PlusOutlined } from "@ant-design/icons";
 import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { useEmployee, useFindEmployee } from '@/hooks/useEmployee';
-import { FuncionarioUpdateRequestBody } from '@/types/funcionario.type';
+import { useEmployee } from '@/hooks/useEmployee';
+import { CloudinaryService } from '@/services/clodinary.service';
+import { FuncionarioResponseBody, FuncionarioUpdateRequestBody } from '@/types/funcionario.type';
 import { parseCurrencyInput, validateCPF } from '@/utils/format';
-import { Button as ButtonAnt, DatePicker, DatePickerProps, Spin, Upload } from 'antd';
+import { PlusOutlined } from "@ant-design/icons";
+import { DatePicker, DatePickerProps, Upload } from 'antd';
+import { UploadFile } from "antd/lib/upload";
+import dayjs from 'dayjs';
 import { AlertCircle, Save } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { UploadFile } from "antd/lib/upload";
-import { CloudinaryService } from '@/services/clodinary.service';
-import dayjs from 'dayjs';
 
 const EditEmployeeScreen = () => {
-  const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
-  const { data: employee, isLoading } = useFindEmployee(id);
-  const { updateEmployee } = useEmployee();
+  const location = useLocation()
+  const employee = location.state as FuncionarioResponseBody
+  const navigate = useNavigate()
 
-  const [formData, setFormData] = useState<FuncionarioUpdateRequestBody | null>(null);
+  const { updateEmployee } = useEmployee()
+
+  const [formData, setFormData] = useState<FuncionarioUpdateRequestBody>({
+    ...employee
+  });
   const [inputSalario, setInputSalario] = useState('');
   const [pictureFile, setPictureFile] = useState<UploadFile[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [initialized, setInitialized] = useState(false);
-
-  // Initialize form with employee data
-  useEffect(() => {
-    if (employee && !initialized) {
-      setFormData({
-        nome: employee.nome,
-        cargo: employee.cargo,
-        cpf: employee.cpf || '',
-        data_admissao: employee.data_admissao,
-        data_nascimento: employee.data_nascimento || null,
-        primeiro_dia_pagamento: employee.primeiro_dia_pagamento,
-        segundo_dia_pagamento: employee.segundo_dia_pagamento,
-        tipo: employee.tipo,
-        salario: employee.salario,
-        foto_url: employee.foto_url || '',
-        dias_trabalhados_semanal: employee.dias_trabalhados_semanal || 0,
-      });
-      setInputSalario(employee.salario.toString().replace('.', ','));
-      if (employee.foto_url) {
-        setPictureFile([{
-          uid: '-1',
-          name: 'foto',
-          status: 'done',
-          url: employee.foto_url,
-        }]);
-      }
-      setInitialized(true);
-    }
-  }, [employee, initialized]);
-
-  if (isLoading || !formData) {
-    return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Spin size="large" />
-      </div>
-    );
-  }
 
   const handleInputChange = (field: string, value: string | number) => {
     setFormData((prev) => prev ? { ...prev, [field]: value } : prev);
@@ -153,14 +118,43 @@ const EditEmployeeScreen = () => {
       toSend.foto_url = '';
     }
 
-    await updateEmployee.mutateAsync({ employeeId: id!, body: toSend });
+    console.info('form ', toSend)
+    
+    await updateEmployee.mutateAsync({ employeeId: employee.id, body: toSend });
   };
+
+  useEffect(() => {
+    if (employee) {
+      setFormData({
+        nome: employee.nome,
+        cargo: employee.cargo,
+        cpf: employee.cpf || '',
+        data_admissao: employee.data_admissao,
+        data_nascimento: employee.data_nascimento || null,
+        primeiro_dia_pagamento: employee.primeiro_dia_pagamento,
+        segundo_dia_pagamento: employee.segundo_dia_pagamento,
+        tipo: employee.tipo,
+        salario: employee.salario,
+        foto_url: employee.foto_url || '',
+        dias_trabalhados_semanal: employee.dias_trabalhados_semanal || 0,
+      });
+      setInputSalario(employee.salario.toString().replace('.', ','));
+      if (employee.foto_url) {
+        setPictureFile([{
+          uid: '-1',
+          name: 'foto',
+          status: 'done',
+          url: employee.foto_url,
+        }]);
+      }
+    }
+  }, [employee]);
 
   useEffect(() => {
     if (updateEmployee.isPending) return;
     if (updateEmployee.isSuccess) {
       toast.success('Funcionário atualizado com sucesso!');
-      navigate(`/employee/${id}/details`, { replace: true });
+      navigate(-1);
     }
     if (updateEmployee.isError) {
       toast.error(`Erro ao atualizar: ${updateEmployee.error}`);

@@ -10,7 +10,7 @@ import { Loader2, Lock, LogOut, Shield, UserCog, Users } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { Radio, Typography } from 'antd'
+import { Radio, Spin, Typography } from 'antd'
 import { antdTheme } from '@/theme/antTheme';
 
 const { Text } = Typography
@@ -28,7 +28,7 @@ const SelectManagerScreen = () => {
   const [selectedManagerId, setSelectedManagerId] = useState('');
   const [password, setPassword] = useState('');
 
-  const { data: activeManagers } = useListManagers()
+  const { data: activeManagers, isLoading, isPending } = useListManagers()
   const { autenticate } = useManagers()
 
   const { logout } = useAuthActions()
@@ -97,7 +97,13 @@ const SelectManagerScreen = () => {
               onChange={(e) => setSelectedManagerId(e.target.value)}
               style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 8 }}
             >
-              {activeManagers?.map((mgr) => {
+              {(isLoading || isPending)
+              ?
+              <>
+              <Spin />
+              </>
+              :
+              activeManagers?.map((mgr) => {
                 const TypeIcon = getTypeIcon(mgr.tipo);
                 return (
                   <div
@@ -140,6 +146,7 @@ const SelectManagerScreen = () => {
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
+                  inputMode="decimal"
                   id="password"
                   type="password"
                   placeholder="••••••••"

@@ -1,20 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useEmployees } from '@/context/EmployeeContext';
-import { PageHeader } from '@/components/PageHeader';
 import { MoneyDisplay } from '@/components/MoneyDisplay';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card } from '@/components/ui/card';
-import { Switch } from '@/components/ui/switch';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from '@/components/ui/dialog';
+import { PageHeader } from '@/components/PageHeader';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,29 +10,39 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { MenuProduct } from '@/types';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useListMenu, useMenu } from '@/hooks/useMenu';
+import { ItemMenuPostRequestBody, ItemMenuResponseBody } from '@/types/menu.type';
 import { parseCurrencyInput } from '@/utils/format';
+import { Edit, Package, Plus, Trash2 } from 'lucide-react';
+import { useState } from 'react';
 import { toast } from 'sonner';
-import { Plus, Edit, Trash2, Package, AlertCircle } from 'lucide-react';
 
 const MenuManagementScreen = () => {
-  const navigate = useNavigate();
-  const { state, dispatch } = useEmployees();
-  const { menuProducts } = state;
+  const { data: menuProducts, isLoading } = useListMenu()
+  const { add, remove, update } = useMenu()
 
   const [showAddDialog, setShowAddDialog] = useState(false);
-  const [editingProduct, setEditingProduct] = useState<MenuProduct | null>(null);
+  const [editingProduct, setEditingProduct] = useState<ItemMenuResponseBody | null>(null);
   const [deleteProductId, setDeleteProductId] = useState<string | null>(null);
 
-  const [formData, setFormData] = useState({
-    name: '',
-    category: '',
-    price: '',
-    available: true,
+  const [formData, setFormData] = useState<{descricao: string, preco: string}>({
+    descricao: '',
+    preco: ''
   });
 
   const resetForm = () => {
-    setFormData({ name: '', category: '', price: '', available: true });
+    setFormData({ descricao: '', preco: '' });
     setEditingProduct(null);
   };
 
@@ -56,52 +51,37 @@ const MenuManagementScreen = () => {
     setShowAddDialog(true);
   };
 
-  const openEditDialog = (product: MenuProduct) => {
+  const openEditDialog = (product: ItemMenuResponseBody) => {
     setFormData({
-      name: product.name,
-      category: product.category,
-      price: product.price.toString().replace('.', ','),
-      available: product.available,
+      descricao: product.descricao,
+      preco: product.preco.toFixed(2)
     });
     setEditingProduct(product);
     setShowAddDialog(true);
   };
 
-  const handleSave = () => {
-    if (!formData.name.trim() || !formData.category.trim() || !formData.price) {
+  const handleSave = async () => {
+    if (!formData.descricao.trim() || !formData.preco) {
       toast.error('Preencha todos os campos');
       return;
     }
 
-    const price = parseCurrencyInput(formData.price);
+    const price = parseCurrencyInput(formData.preco);
     if (price <= 0) {
       toast.error('Preço deve ser maior que zero');
       return;
     }
+    
+    const toSend: ItemMenuPostRequestBody = {
+      descricao: formData.descricao,
+      preco: parseCurrencyInput(formData.preco)
+    }
 
     if (editingProduct) {
-      dispatch({
-        type: 'UPDATE_MENU_PRODUCT',
-        payload: {
-          ...editingProduct,
-          name: formData.name.trim(),
-          category: formData.category.trim(),
-          price,
-          available: formData.available,
-        },
-      });
+      await update.mutateAsync({itemId: editingProduct.id, payload: toSend})
       toast.success('Produto atualizado');
     } else {
-      dispatch({
-        type: 'ADD_MENU_PRODUCT',
-        payload: {
-          id: `prod-${Date.now()}`,
-          name: formData.name.trim(),
-          category: formData.category.trim(),
-          price,
-          available: formData.available,
-        },
-      });
+      await add.mutateAsync({body: toSend})
       toast.success('Produto adicionado');
     }
 
@@ -109,15 +89,13 @@ const MenuManagementScreen = () => {
     resetForm();
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (deleteProductId) {
-      dispatch({ type: 'DELETE_MENU_PRODUCT', payload: deleteProductId });
+      await remove.mutateAsync({itemId: deleteProductId})
       toast.success('Produto removido');
       setDeleteProductId(null);
     }
   };
-
-  const categories = [...new Set(menuProducts.map((p) => p.category))];
 
   return (
     <div className="min-h-screen bg-background pb-8">
@@ -134,65 +112,49 @@ const MenuManagementScreen = () => {
       />
 
       <div className="px-4 py-4 max-w-lg mx-auto">
-        {categories.length > 0 ? (
-          categories.map((category) => (
-            <div key={category} className="mb-6">
-              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
-                {category}
-              </h3>
-              <div className="space-y-2">
-                {menuProducts
-                  .filter((p) => p.category === category)
-                  .map((product) => (
-                    <Card
-                      key={product.id}
-                      className={`p-4 glass-card border-border ${
-                        !product.available ? 'opacity-50' : ''
-                      }`}
+        {(menuProducts?.length > 0) ?
+          menuProducts?.map((product) => (
+            <div className="space-y-2 my-3">
+              <Card
+                key={product.id}
+                className={`p-4 glass-card border-border`}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <p className="font-medium">{product.descricao}</p>
+                    <MoneyDisplay value={product.preco} size="sm" />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => openEditDialog(product)}
                     >
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <p className="font-medium">{product.name}</p>
-                          <MoneyDisplay value={product.price} size="sm" />
-                          {!product.available && (
-                            <span className="text-xs text-warning">
-                              Indisponível
-                            </span>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => openEditDialog(product)}
-                          >
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="text-danger hover:text-danger"
-                            onClick={() => setDeleteProductId(product.id)}
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    </Card>
-                  ))}
-              </div>
+                      <Edit className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-danger hover:text-danger"
+                      onClick={() => setDeleteProductId(product.id)}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              </Card>
             </div>
           ))
-        ) : (
+          :
           <div className="text-center py-12">
             <Package className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
             <p className="text-muted-foreground">Nenhum produto cadastrado</p>
-            <Button className="mt-4" onClick={openAddDialog}>
+            <Button disabled={add.isPending} className="mt-4" onClick={openAddDialog}>
               <Plus className="w-4 h-4 mr-2" />
               Adicionar Produto
             </Button>
           </div>
-        )}
+        }
       </div>
 
       {/* Add/Edit Dialog */}
@@ -209,30 +171,12 @@ const MenuManagementScreen = () => {
               <Label htmlFor="productName">Nome do Produto</Label>
               <Input
                 id="productName"
-                value={formData.name}
+                value={formData.descricao}
                 onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
+                  setFormData({ ...formData, descricao: e.target.value })
                 }
                 placeholder="Ex: Marmita Grande"
               />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="productCategory">Categoria</Label>
-              <Input
-                id="productCategory"
-                value={formData.category}
-                onChange={(e) =>
-                  setFormData({ ...formData, category: e.target.value })
-                }
-                placeholder="Ex: Refeições"
-                list="categories"
-              />
-              <datalist id="categories">
-                {categories.map((cat) => (
-                  <option key={cat} value={cat} />
-                ))}
-              </datalist>
             </div>
 
             <div className="space-y-2">
@@ -243,11 +187,11 @@ const MenuManagementScreen = () => {
                 </span>
                 <Input
                   id="productPrice"
-                  value={formData.price}
+                  value={formData.preco}
                   onChange={(e) =>
                     setFormData({
                       ...formData,
-                      price: e.target.value.replace(/[^\d,]/g, ''),
+                      preco: e.target.value.replace(/[^\d,]/g, ''),
                     })
                   }
                   placeholder="0,00"
@@ -255,17 +199,6 @@ const MenuManagementScreen = () => {
                   inputMode="decimal"
                 />
               </div>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <Label htmlFor="productAvailable">Disponível no cardápio</Label>
-              <Switch
-                id="productAvailable"
-                checked={formData.available}
-                onCheckedChange={(checked) =>
-                  setFormData({ ...formData, available: checked })
-                }
-              />
             </div>
           </div>
 

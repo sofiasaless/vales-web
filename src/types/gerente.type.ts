@@ -19,3 +19,9 @@ export type GerenteAutenticatedResponseBody = {
   mensagem: string,
   usuario?: GerenteResponseBody
 }
+
+export type GerentePostRequestBody = Pick<GerenteResponseBody, "nome" | "tipo" | "senha">
+
+export type GerenteUpdateRequestBody = Partial<GerentePostRequestBody> & {
+  ativo?: boolean
+}

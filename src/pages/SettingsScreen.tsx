@@ -122,11 +122,11 @@ const SettingsScreen = () => {
             label="Gerentes e Auxiliares"
             onClick={() => navigate('/settings/managers')}
           />
-          <MenuItem
+          {/* <MenuItem
             icon={Bell}
             label="Notificações"
             onClick={() => {}}
-          />
+          /> */}
         </Card>
 
         {/* Logout Options */}

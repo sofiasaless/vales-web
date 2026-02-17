@@ -79,8 +79,7 @@ export function useEmployee() {
   })
 
   const updateEmployee = useMutation({
-    mutationFn: ({ employeeId, body }: { employeeId: string; body: FuncionarioUpdateRequestBody }) =>
-      EmployeeService.update(employeeId, body),
+    mutationFn: ({ employeeId, body }: { employeeId: string; body: FuncionarioUpdateRequestBody }) => EmployeeService.update(employeeId, body),
 
     onSuccess: () => {
       console.info('employee updated successfully');

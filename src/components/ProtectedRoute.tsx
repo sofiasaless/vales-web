@@ -1,6 +1,8 @@
+import { useAuth } from '@/context/AuthContext';
+import { useCurrentManager } from '@/hooks/useManager';
+import { Spin } from 'antd';
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '@/context/AuthContext';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -11,13 +13,17 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   children, 
   requireManager = true 
 }) => {
-  const { isRestaurantAuthenticated, isManagerAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
   const location = useLocation();
 
+  const { data: isManagerAuthenticated, isLoading: isLoadingManager } = useCurrentManager()
+
   // If restaurant is not authenticated, redirect to login
-  if (!isRestaurantAuthenticated) {
+  if (!isAuthenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
+
+  if (isLoadingManager) return <Spin />
 
   // If manager is required but not authenticated, redirect to select manager
   if (requireManager && !isManagerAuthenticated) {
