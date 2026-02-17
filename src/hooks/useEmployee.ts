@@ -1,5 +1,5 @@
 import { EmployeeService, VoucherMutation, VouchersMutation } from "@/services/employee.service";
-import { FuncionarioPostRequestBody } from "@/types/funcionario.type";
+import { FuncionarioPostRequestBody, FuncionarioUpdateRequestBody } from "@/types/funcionario.type";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export function useListEmployee() {
@@ -78,6 +78,21 @@ export function useEmployee() {
     }
   })
 
+  const updateEmployee = useMutation({
+    mutationFn: ({ employeeId, body }: { employeeId: string; body: FuncionarioUpdateRequestBody }) =>
+      EmployeeService.update(employeeId, body),
+
+    onSuccess: () => {
+      console.info('employee updated successfully');
+      queryClient.invalidateQueries({ queryKey: ["employees"] });
+      queryClient.invalidateQueries({ queryKey: ["employee"] });
+    },
+
+    onError: () => {
+      console.error('error trying update employee');
+    },
+  });
+
   const deleteEmployee = useMutation({
     mutationFn: ({employeeId}: {employeeId: string}) => EmployeeService.delete(employeeId),
 
@@ -96,6 +111,7 @@ export function useEmployee() {
     addVoucher,
     addMultipleVouchers,
     registerEmployee,
+    updateEmployee,
     deleteEmployee
   }
 
