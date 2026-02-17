@@ -1,7 +1,7 @@
 import { ManagerService } from "@/services/manager.service";
-import { GerenteAutenticatedResponseBody, GerenteAutenticateRequestBody } from "@/types/gerente.type";
+import { GerenteAutenticatedResponseBody, GerenteAutenticateRequestBody, GerentePostRequestBody, GerenteUpdateRequestBody } from "@/types/gerente.type";
 import { Gerente } from "@/types/manager";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export function useListManagers() {
   return useQuery({
@@ -35,8 +35,10 @@ export function useIsManagerAuthenticated() {
 }
 
 export function useManagers() {
+  const queryClient = useQueryClient();
+
   const autenticate = useMutation({
-    mutationFn: ({body}: {body: GerenteAutenticateRequestBody}) => ManagerService.autenticate(body),
+    mutationFn: ({ body }: { body: GerenteAutenticateRequestBody }) => ManagerService.autenticate(body),
 
     onSuccess: (value: GerenteAutenticatedResponseBody) => {
       console.info('autenticado com sucesso')
@@ -52,8 +54,40 @@ export function useManagers() {
     mutationFn: () => ManagerService.logout()
   })
 
+  const create = useMutation({
+    mutationFn: ({ body }: { body: GerentePostRequestBody }) => ManagerService.create(body),
+
+    onSuccess: () => {
+      console.info('manager created successfully')
+      queryClient.invalidateQueries({ queryKey: ["managers"] })
+    },
+
+    onError: () => {
+      console.error('error while trying to create new manager')
+    }
+  })
+
+  const remove = useMutation({
+    mutationFn: ({managerId}: {managerId: string}) => ManagerService.delete(managerId),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["managers"] })
+    }
+  })
+
+  const update = useMutation({
+    mutationFn: ({managerId, payload}: {managerId: string, payload: GerenteUpdateRequestBody}) => ManagerService.update(managerId, payload),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["managers"] })
+    }
+  })
+
   return {
     autenticate,
-    logoutManager
+    logoutManager,
+    create,
+    remove,
+    update
   }
 }

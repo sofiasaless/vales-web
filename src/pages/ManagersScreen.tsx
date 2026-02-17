@@ -1,22 +1,3 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, UserCog, MoreVertical, Pencil, Trash2, Power } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from '@/components/ui/dialog';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -27,6 +8,22 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -36,56 +33,28 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { toast } from 'sonner';
-import { Gerente, TiposGerente } from '@/types/manager';
+import { useCurrentManager, useListManagers, useManagers } from '@/hooks/useManager';
+import { GerentePostRequestBody, GerenteResponseBody, GerenteUpdateRequestBody } from '@/types/gerente.type';
+import { TiposGerente } from '@/types/manager';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-
-const mockGerentes: Gerente[] = [
-  {
-    id: 'ger-1',
-    nome: 'Carlos Oliveira',
-    tipo: 'GERENTE',
-    senha: '******',
-    restaurante_ref: 'rest-1',
-    ativo: true,
-    data_ultimo_acesso: new Date('2024-01-10'),
-    data_criacao: new Date('2022-01-15'),
-  },
-  {
-    id: 'ger-2',
-    nome: 'Fernanda Costa',
-    tipo: 'AUXILIAR',
-    senha: '******',
-    restaurante_ref: 'rest-1',
-    ativo: true,
-    data_ultimo_acesso: new Date('2024-01-12'),
-    data_criacao: new Date('2023-06-20'),
-  },
-  {
-    id: 'ger-3',
-    nome: 'Roberto Lima',
-    tipo: 'AUXILIAR',
-    senha: '******',
-    restaurante_ref: 'rest-1',
-    ativo: false,
-    data_criacao: new Date('2023-09-10'),
-  },
-];
+import { ArrowLeft, MoreVertical, Pencil, Plus, Power, Trash2, UserCog } from 'lucide-react';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 const ManagersScreen = () => {
   const navigate = useNavigate();
-  const [gerentes, setGerentes] = useState<Gerente[]>(mockGerentes);
+  const { data: managers, isLoading, isPending } = useListManagers()
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [selectedGerente, setSelectedGerente] = useState<Gerente | null>(null);
+  const [selectedGerente, setSelectedGerente] = useState<GerenteResponseBody | null>(null);
   const [isEditing, setIsEditing] = useState(false);
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<GerentePostRequestBody>({
     nome: '',
     tipo: 'AUXILIAR' as TiposGerente,
     senha: '',
-    confirmarSenha: '',
   });
 
   const resetForm = () => {
@@ -93,13 +62,15 @@ const ManagersScreen = () => {
       nome: '',
       tipo: 'AUXILIAR',
       senha: '',
-      confirmarSenha: '',
     });
     setSelectedGerente(null);
     setIsEditing(false);
   };
 
-  const handleOpenDialog = (gerente?: Gerente) => {
+  const { data: currentManager } = useCurrentManager()
+  const { create, remove, update } = useManagers()
+
+  const handleOpenDialog = (gerente?: GerenteResponseBody) => {
     if (gerente) {
       setSelectedGerente(gerente);
       setIsEditing(true);
@@ -107,7 +78,6 @@ const ManagersScreen = () => {
         nome: gerente.nome,
         tipo: gerente.tipo,
         senha: '',
-        confirmarSenha: '',
       });
     } else {
       resetForm();
@@ -120,7 +90,7 @@ const ManagersScreen = () => {
     resetForm();
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!formData.nome.trim()) {
       toast.error('Nome é obrigatório');
       return;
@@ -131,68 +101,48 @@ const ManagersScreen = () => {
       return;
     }
 
-    if (formData.senha && formData.senha !== formData.confirmarSenha) {
-      toast.error('As senhas não coincidem');
-      return;
-    }
-
     if (formData.senha && formData.senha.length < 6) {
       toast.error('A senha deve ter pelo menos 6 caracteres');
       return;
     }
 
+    // editing
     if (isEditing && selectedGerente) {
-      setGerentes(prev =>
-        prev.map(g =>
-          g.id === selectedGerente.id
-            ? {
-                ...g,
-                nome: formData.nome,
-                tipo: formData.tipo,
-                ...(formData.senha && { senha: formData.senha }),
-              }
-            : g
-        )
-      );
+      const toSend: GerenteUpdateRequestBody = {
+        nome: formData.nome,
+        tipo: formData.tipo
+      }
+
+      if (formData.senha) toSend.senha = formData.senha
+
+      await update.mutateAsync({managerId: selectedGerente.id, payload: toSend})
       toast.success('Usuário atualizado com sucesso!');
     } else {
-      const newGerente: Gerente = {
-        id: `ger-${Date.now()}`,
-        nome: formData.nome,
-        tipo: formData.tipo,
-        senha: formData.senha,
-        restaurante_ref: 'rest-1',
-        ativo: true,
-        data_criacao: new Date(),
-      };
-      setGerentes(prev => [...prev, newGerente]);
+      await create.mutateAsync({body: formData})        
       toast.success('Usuário cadastrado com sucesso!');
     }
 
     handleCloseDialog();
   };
 
-  const handleToggleAtivo = (gerente: Gerente) => {
-    setGerentes(prev =>
-      prev.map(g =>
-        g.id === gerente.id ? { ...g, ativo: !g.ativo } : g
-      )
-    );
-    toast.success(
-      gerente.ativo ? 'Usuário desativado' : 'Usuário ativado'
-    );
+  const handleToggleAtivo = async (gerente: GerenteResponseBody) => {
+    const toSend: GerenteUpdateRequestBody = {
+      ativo: !gerente.ativo
+    }
+
+    await update.mutateAsync({managerId: gerente.id, payload: toSend})
   };
 
-  const handleDeleteConfirm = () => {
+  const handleDeleteConfirm = async () => {
     if (selectedGerente) {
-      setGerentes(prev => prev.filter(g => g.id !== selectedGerente.id));
+      await remove.mutateAsync({managerId: selectedGerente.id})
       toast.success('Usuário excluído com sucesso!');
       setSelectedGerente(null);
     }
     setIsDeleteDialogOpen(false);
   };
 
-  const handleDeleteClick = (gerente: Gerente) => {
+  const handleDeleteClick = (gerente: GerenteResponseBody) => {
     setSelectedGerente(gerente);
     setIsDeleteDialogOpen(true);
   };
@@ -232,7 +182,7 @@ const ManagersScreen = () => {
 
         {/* Users List */}
         <div className="space-y-3">
-          {gerentes.map(gerente => (
+          {managers?.map(gerente => (
             <Card
               key={gerente.id}
               className={`${!gerente.ativo ? 'opacity-60' : ''}`}
@@ -281,11 +231,12 @@ const ManagersScreen = () => {
                         <Pencil className="h-4 w-4 mr-2" />
                         Editar
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleToggleAtivo(gerente)}>
+                      <DropdownMenuItem disabled={currentManager.id === gerente.id} onClick={() => handleToggleAtivo(gerente)}>
                         <Power className="h-4 w-4 mr-2" />
                         {gerente.ativo ? 'Desativar' : 'Ativar'}
                       </DropdownMenuItem>
                       <DropdownMenuItem
+                        disabled={currentManager.id === gerente.id}
                         onClick={() => handleDeleteClick(gerente)}
                         className="text-destructive focus:text-destructive"
                       >
@@ -299,7 +250,7 @@ const ManagersScreen = () => {
             </Card>
           ))}
 
-          {gerentes.length === 0 && (
+          {managers?.length === 0 && (
             <div className="text-center py-8 text-muted-foreground">
               <UserCog className="h-12 w-12 mx-auto mb-2 opacity-50" />
               <p>Nenhum usuário cadastrado</p>
@@ -359,19 +310,6 @@ const ManagersScreen = () => {
                 value={formData.senha}
                 onChange={e =>
                   setFormData(prev => ({ ...prev, senha: e.target.value }))
-                }
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="confirmarSenha">Confirmar Senha</Label>
-              <Input
-                id="confirmarSenha"
-                type="password"
-                placeholder="******"
-                value={formData.confirmarSenha}
-                onChange={e =>
-                  setFormData(prev => ({ ...prev, confirmarSenha: e.target.value }))
                 }
               />
             </div>
