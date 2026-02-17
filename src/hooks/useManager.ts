@@ -24,6 +24,16 @@ export function useCurrentManager() {
   })
 }
 
+export function useIsManagerAuthenticated() {
+  return useQuery({
+    queryKey: ["manager_authenticated"],
+    queryFn: async () => {
+      const result = await ManagerService.isManagerAuthenticated()
+      return result
+    }
+  })
+}
+
 export function useManagers() {
   const autenticate = useMutation({
     mutationFn: ({body}: {body: GerenteAutenticateRequestBody}) => ManagerService.autenticate(body),

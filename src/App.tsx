@@ -70,108 +70,108 @@ const App = () => (
 
                       {/* Protected Routes */}
                       <Route path="/" element={
-                        // <ProtectedRoute>
+                        <ProtectedRoute>
                           <EmployeeListScreen />
                         // </ProtectedRoute>
                       } />
                       <Route path="/new-employee" element={
-                        // <ProtectedRoute>
+                        <ProtectedRoute>
                           <NewEmployeeScreen />
                         // </ProtectedRoute>
                       } />
                       <Route path="/contract-employee" element={
-                        // <ProtectedRoute>
+                        <ProtectedRoute>
                           <NewEmployeeContractScreen />
                         // </ProtectedRoute>
                       } />
                       <Route path="/contract-signature" element={
-                        // <ProtectedRoute>
+                        <ProtectedRoute>
                           <ContractSignatureScreen />
                         // </ProtectedRoute>
                       } />
                       <Route path="/settings" element={
-                        // <ProtectedRoute>
+                        <ProtectedRoute>
                           <SettingsScreen />
                         // </ProtectedRoute>
                       } />
 
                       {/* Employee Stack */}
                       <Route path="/employee/:id" element={
-                        // <ProtectedRoute>
+                        <ProtectedRoute>
                           <EmployeeManagementScreen />
                         // </ProtectedRoute>
                       } />
                       <Route path="/employee/:id/details" element={
-                        // <ProtectedRoute>
+                        <ProtectedRoute>
                           <EmployeeDetailScreen />
                         // </ProtectedRoute>
                       } />
                       <Route path="/employee/edit" element={
-                        // <ProtectedRoute>
+                        <ProtectedRoute>
                           <EditEmployeeScreen />
                         // </ProtectedRoute>
                       } />
                       <Route path="/employee/:id/history" element={
-                        // <ProtectedRoute>
+                        <ProtectedRoute>
                           <PaymentHistoryScreen />
                         // </ProtectedRoute>
                       } />
 
                       {/* Menu Stack */}
                       <Route path="/menu/:employeeId" element={
-                        // <ProtectedRoute>
+                        <ProtectedRoute>
                           <MenuScreen />
                         // </ProtectedRoute>
                       } />
 
                       {/* Payment Stack */}
                       <Route path="/payment" element={
-                        // <ProtectedRoute>
+                        <ProtectedRoute>
                           <PaymentConfirmationScreen />
                         // </ProtectedRoute>
                       } />
 
                       <Route path="/payment-signature/:id" element={
-                        // <ProtectedRoute>
+                        <ProtectedRoute>
                           <PaymentSignatureScreen />
                         // </ProtectedRoute>
                       } />
 
                       {/* Settings Stack */}
                       <Route path="/settings/menu" element={
-                        // <ProtectedRoute>
+                        <ProtectedRoute>
                           <MenuManagementScreen />
                         // </ProtectedRoute>
                       } />
                       <Route path="/settings/subscriptions" element={
-                        // <ProtectedRoute>
+                        <ProtectedRoute>
                           <SubscriptionsScreen />
                         // </ProtectedRoute>
                       } />
                       <Route path="/settings/finances" element={
-                        // <ProtectedRoute>
+                        <ProtectedRoute>
                           <FinancesScreen />
                         // </ProtectedRoute>
                       } />
                       <Route path="/settings/finances/:categoryId" element={
-                        // <ProtectedRoute>
+                        <ProtectedRoute>
                           <CategoryExpensesScreen />
                         // </ProtectedRoute>
                       } />
                       <Route path="/settings/incentives" element={
-                        // <ProtectedRoute>
+                        <ProtectedRoute>
                           <IncentiveHistoryScreen />
                         // </ProtectedRoute>
                       } />
                       <Route path="/settings/managers" element={
-                        // <ProtectedRoute>
+                        <ProtectedRoute>
                           <ManagersScreen />
                         // </ProtectedRoute>
                       } />
 
                       {/* Incentive Stack */}
                       <Route path="/incentive/sales" element={
-                        // <ProtectedRoute>
+                        <ProtectedRoute>
                           <IncentiveSalesScreen />
                         // </ProtectedRoute>
                       } />

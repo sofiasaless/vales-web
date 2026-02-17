@@ -12,6 +12,11 @@ export const ManagerService = {
 
   async logout() {
     localStorage.removeItem("usuario");
+  },
+
+  async isManagerAuthenticated() {
+    const saved = localStorage.getItem("usuario")
+    return (saved != null)
   }
 
 }
