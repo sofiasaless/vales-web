@@ -1,7 +1,9 @@
 import { cn } from '@/lib/utils';
+import { Avatar } from 'antd';
 
 interface AvatarInitialsProps {
   name: string;
+  photoUrl?: string
   size?: 'sm' | 'md' | 'lg';
   className?: string;
 }
@@ -12,7 +14,7 @@ const sizeClasses = {
   lg: 'w-20 h-20 text-2xl',
 };
 
-export const AvatarInitials = ({ name, size = 'md', className }: AvatarInitialsProps) => {
+export const AvatarInitials = ({ name, size = 'md', className, photoUrl }: AvatarInitialsProps) => {
   const getInitials = (name: string): string => {
     const parts = name.trim().split(' ');
     if (parts.length >= 2) {
@@ -38,7 +40,23 @@ export const AvatarInitials = ({ name, size = 'md', className }: AvatarInitialsP
     'bg-secondary text-secondary-foreground',
   ];
 
+  const getSize = (size: 'sm' | 'md' | 'lg') => {
+    switch (size) {
+      case 'lg':
+        return {width: 80, height: 80}
+      case 'md':
+        return {width: 55, height: 55}
+      case 'sm':
+        return {width: 30, height: 30}
+      default:
+        return {width: 50, height: 50}
+    }
+  }
+
   return (
+    (photoUrl)?
+    <Avatar className='my-2' style={getSize(size)} size={'large'} src={photoUrl} />
+    :
     <div
       className={cn(
         'rounded-full flex items-center justify-center font-semibold',

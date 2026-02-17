@@ -96,7 +96,7 @@ const EmployeeManagementScreen = () => {
         {/* Employee Header */}
         <Card className="glass-card">
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-            <AvatarInitials name={employee?.nome} size="lg" />
+            <AvatarInitials photoUrl={employee?.foto_url} name={employee?.nome} size="lg" />
             <div style={{ flex: 1 }}>
               <h2 style={{ fontSize: 20, fontWeight: 700, margin: 0 }}>{employee?.nome}</h2>
               <p style={{ color: 'var(--text-secondary)', margin: 0 }}>{employee?.cargo}</p>

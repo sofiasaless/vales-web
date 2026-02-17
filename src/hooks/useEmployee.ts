@@ -78,11 +78,25 @@ export function useEmployee() {
     }
   })
 
+  const deleteEmployee = useMutation({
+    mutationFn: ({employeeId}: {employeeId: string}) => EmployeeService.delete(employeeId),
+
+    onSuccess: () => {
+      console.info('employee deleted successfully')
+      queryClient.invalidateQueries({ queryKey: ["employees"] })
+    },
+
+    onError: () => {
+      console.error('error trying delete employee')
+    }
+  })
+
   return {
     removeVoucher,
     addVoucher,
     addMultipleVouchers,
-    registerEmployee
+    registerEmployee,
+    deleteEmployee
   }
 
 }
