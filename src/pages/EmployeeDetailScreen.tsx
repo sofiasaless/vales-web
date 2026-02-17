@@ -158,7 +158,7 @@ const EmployeeDetailScreen = () => {
 
         {/* Action Buttons */}
         <div className="flex gap-3 pt-4">
-          <Button variant="outline" className="flex-1 h-12" disabled>
+          <Button variant="outline" className="flex-1 h-12" onClick={() => navigate(`/employee/${id}/edit`)}>
             <Edit className="w-4 h-4 mr-2" />
             Editar
           </Button>

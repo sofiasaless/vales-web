@@ -1,5 +1,5 @@
 import { api } from "@/config/axios";
-import { FuncionarioPostRequestBody, FuncionarioResponseBody } from "@/types/funcionario.type";
+import { FuncionarioPostRequestBody, FuncionarioResponseBody, FuncionarioUpdateRequestBody } from "@/types/funcionario.type";
 import { Vale } from "@/types/vale.type";
 
 export interface VoucherMutation {
@@ -35,6 +35,10 @@ export const EmployeeService = {
 
   async addMultipleVouchers(payload: VouchersMutation) {
     return await api.put(`/funcionario/vale/adicionar-multiplos/${payload.employeeId}`, payload.vouchers);
+  },
+
+  async update(employeeId: string, body: FuncionarioUpdateRequestBody) {
+    return await api.put(`/funcionario/atualizar/${employeeId}`, body);
   },
 
   async delete(employeeId: string) {

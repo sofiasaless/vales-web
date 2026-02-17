@@ -15,6 +15,7 @@ import SelectManagerScreen from "@/pages/SelectManagerScreen";
 
 // Pages
 import CategoryExpensesScreen from "@/pages/CategoryExpensesScreen";
+import EditEmployeeScreen from "@/pages/EditEmployeeScreen";
 import EmployeeDetailScreen from "@/pages/EmployeeDetailScreen";
 import EmployeeListScreen from "@/pages/EmployeeListScreen";
 import EmployeeManagementScreen from "@/pages/EmployeeManagementScreen";
@@ -103,6 +104,11 @@ const App = () => (
                       <Route path="/employee/:id/details" element={
                         // <ProtectedRoute>
                           <EmployeeDetailScreen />
+                        // </ProtectedRoute>
+                      } />
+                      <Route path="/employee/:id/edit" element={
+                        // <ProtectedRoute>
+                          <EditEmployeeScreen />
                         // </ProtectedRoute>
                       } />
                       <Route path="/employee/:id/history" element={
