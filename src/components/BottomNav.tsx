@@ -13,7 +13,7 @@ export const BottomNav = () => {
   const location = useLocation();
 
   // Hide on certain screens (including auth screens)
-  const hiddenPaths = ['/menu/', '/payment', '/employee/', '/login', '/select-manager', '/contract-employee', '/contract-signature'];
+  const hiddenPaths = ['/menu/', '/payment', '/employee/', '/login', '/select-manager', '/contract-employee', '/contract-signature', '/settings/'];
   const shouldHide = hiddenPaths.some((path) => location.pathname.includes(path));
 
   if (shouldHide) return null;
