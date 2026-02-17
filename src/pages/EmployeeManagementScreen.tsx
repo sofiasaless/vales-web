@@ -3,7 +3,6 @@ import { MoneyDisplay } from '@/components/MoneyDisplay';
 import { PageHeader } from '@/components/PageHeader';
 import { VoucherItemCard } from '@/components/VoucherItemCard';
 import { useEmployee, useFindEmployee } from '@/hooks/useEmployee';
-import { antdTheme } from '@/theme/antTheme';
 import { calculateTotalVauchers } from '@/utils/calculate';
 import { App, Button, Card, Input, InputNumber, Modal, Spin } from 'antd';
 import {
@@ -97,7 +96,7 @@ const EmployeeManagementScreen = () => {
         {/* Employee Header */}
         <Card className="glass-card">
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-            <AvatarInitials name={employee?.nome} size="lg" />
+            <AvatarInitials photoUrl={employee?.foto_url} name={employee?.nome} size="lg" />
             <div style={{ flex: 1 }}>
               <h2 style={{ fontSize: 20, fontWeight: 700, margin: 0 }}>{employee?.nome}</h2>
               <p style={{ color: 'var(--text-secondary)', margin: 0 }}>{employee?.cargo}</p>
@@ -177,7 +176,6 @@ const EmployeeManagementScreen = () => {
             size="large"
             icon={<CreditCard style={{ width: 20, height: 20 }} />}
             onClick={() => navigate(`/payment`, { state: employee })}
-            disabled={employee?.vales.length === 0 && voucherTotal === 0}
             style={{ height: 48 }}
           >
             Pagar Funcionário

@@ -1,10 +1,6 @@
-import { useParams, useNavigate } from 'react-router-dom';
-import { useEmployees } from '@/context/EmployeeContext';
-import { PageHeader } from '@/components/PageHeader';
 import { AvatarInitials } from '@/components/AvatarInitials';
 import { MoneyDisplay } from '@/components/MoneyDisplay';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { PageHeader } from '@/components/PageHeader';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,27 +12,31 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { toast } from 'sonner';
-import { formatDate, formatCPF, getPaydayText } from '@/utils/format';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { useEmployee, useFindEmployee } from '@/hooks/useEmployee';
+import { formatCPF, formatDate, getPaydayText } from '@/utils/format';
 import {
-  User,
-  Calendar,
-  Wallet,
-  Briefcase,
-  CreditCard,
-  Trash2,
-  Edit,
   AlertCircle,
+  Briefcase,
+  Calendar,
+  CreditCard,
+  Edit,
+  Trash2,
+  User,
+  Wallet,
 } from 'lucide-react';
+import { useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'sonner';
 
 const EmployeeDetailScreen = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { getEmployee, dispatch } = useEmployees();
 
-  const employee = getEmployee(id || '');
+  const { data: employee, isLoading } = useFindEmployee(id);
 
-  if (!employee) {
+  if (!employee && isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
@@ -54,11 +54,23 @@ const EmployeeDetailScreen = () => {
     );
   }
 
-  const handleDelete = () => {
-    dispatch({ type: 'DELETE_EMPLOYEE', payload: employee.id });
-    toast.success('Funcionário excluído');
-    navigate('/');
+  const { deleteEmployee } = useEmployee()
+
+  const handleDelete = async () => {
+    await deleteEmployee.mutateAsync({employeeId: employee.id})
   };
+
+  useEffect(() => {
+    if (deleteEmployee.isPending) return;
+    if (deleteEmployee.isSuccess) {
+      toast.success('Funcionário demitido e excluído com sucesso!');
+      navigate('/', { replace: true });
+    }
+    if (deleteEmployee.isError) {
+      toast.error(`Erro ao tentar demitir funcionário: ${deleteEmployee.error}`);
+    }
+
+  }, [deleteEmployee.isPending])
 
   const InfoRow = ({
     icon: Icon,
@@ -82,16 +94,16 @@ const EmployeeDetailScreen = () => {
 
   return (
     <div className="min-h-screen bg-background pb-8">
-      <PageHeader title="Detalhes" subtitle={employee.name} showBack />
+      <PageHeader title="Detalhes" subtitle={employee?.nome} showBack />
 
       <div className="px-4 py-4 max-w-lg mx-auto space-y-4">
         {/* Header Card */}
         <Card className="p-6 glass-card border-border text-center">
-          <AvatarInitials name={employee.name} size="lg" className="mx-auto mb-4" />
-          <h2 className="text-2xl font-bold">{employee.name}</h2>
-          <p className="text-muted-foreground">{employee.role}</p>
+          <AvatarInitials name={employee?.nome} photoUrl={employee?.foto_url} size="lg" className="mx-auto mb-4" />
+          <h2 className="text-2xl font-bold">{employee?.nome}</h2>
+          <p className="text-muted-foreground">{employee?.cargo}</p>
           <div className="mt-2 inline-flex px-3 py-1 rounded-full bg-primary/10 text-primary text-sm">
-            {employee.type === 'DIARISTA' ? 'Diarista' : 'Fixo (Quinzenas)'}
+            {employee?.tipo === 'DIARISTA' ? 'Diarista' : 'Fixo (Quinzenas)'}
           </div>
         </Card>
 
@@ -101,14 +113,14 @@ const EmployeeDetailScreen = () => {
             <h3 className="font-semibold">Informações Pessoais</h3>
           </div>
           <div className="px-4">
-            {employee.cpf && (
-              <InfoRow icon={User} label="CPF" value={formatCPF(employee.cpf)} />
+            {employee?.cpf && (
+              <InfoRow icon={User} label="CPF" value={formatCPF(employee?.cpf)} />
             )}
-            {employee.birthDate && (
+            {employee?.data_nascimento && (
               <InfoRow
                 icon={Calendar}
                 label="Data de Nascimento"
-                value={formatDate(employee.birthDate)}
+                value={formatDate(new Date(employee?.data_nascimento))}
               />
             )}
           </div>
@@ -120,21 +132,26 @@ const EmployeeDetailScreen = () => {
             <h3 className="font-semibold">Dados Funcionais</h3>
           </div>
           <div className="px-4">
-            <InfoRow icon={Briefcase} label="Cargo" value={employee.role} />
+            <InfoRow icon={Briefcase} label="Cargo" value={employee?.cargo} />
             <InfoRow
               icon={Wallet}
-              label={employee.type === 'DIARISTA' ? 'Valor Diária' : 'Salário Base'}
-              value={<MoneyDisplay value={employee.baseSalary} size="md" />}
+              label={employee?.tipo === 'DIARISTA' ? 'Valor Diária' : 'Salário Base'}
+              value={<MoneyDisplay value={employee?.salario} size="md" />}
             />
             <InfoRow
               icon={Calendar}
               label="Data de Admissão"
-              value={formatDate(employee.admissionDate)}
+              value={formatDate(new Date(employee?.data_admissao))}
             />
             <InfoRow
               icon={CreditCard}
-              label="Dia do Pagamento"
-              value={getPaydayText(employee.payday)}
+              label="1° Dia do Pagamento"
+              value={getPaydayText(employee?.primeiro_dia_pagamento)}
+            />
+            <InfoRow
+              icon={CreditCard}
+              label="2° Dia do Pagamento"
+              value={getPaydayText(employee?.segundo_dia_pagamento)}
             />
           </div>
         </Card>
@@ -150,20 +167,21 @@ const EmployeeDetailScreen = () => {
             <AlertDialogTrigger asChild>
               <Button variant="destructive" className="flex-1 h-12">
                 <Trash2 className="w-4 h-4 mr-2" />
-                Excluir
+                Demitir
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent className="bg-card border-border">
               <AlertDialogHeader>
                 <AlertDialogTitle>Excluir Funcionário</AlertDialogTitle>
                 <AlertDialogDescription>
-                  Tem certeza que deseja excluir <strong>{employee.name}</strong>?
-                  Esta ação não pode ser desfeita.
+                  Tem certeza que deseja demitir/excluir <strong>{employee?.nome}</strong>?
+                  Esta ação não poderá ser desfeita.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancelar</AlertDialogCancel>
                 <AlertDialogAction
+                  disabled={deleteEmployee.isPending}
                   onClick={handleDelete}
                   className="bg-danger hover:bg-danger/90"
                 >

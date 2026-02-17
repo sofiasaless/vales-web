@@ -35,6 +35,7 @@ import ptBR from 'antd/locale/pt_BR';
 import { antdTheme } from "./theme/antTheme";
 import NewEmployeeContractScreen from "./pages/NewEmployeeContractScreen";
 import ContractSignatureScreen from "./pages/ContractSignatureScreen";
+import PaymentSignatureScreen from "./pages/PaymentSignature";
 
 const queryClient = new QueryClient();
 
@@ -121,6 +122,12 @@ const App = () => (
                       <Route path="/payment" element={
                         // <ProtectedRoute>
                           <PaymentConfirmationScreen />
+                        // </ProtectedRoute>
+                      } />
+
+                      <Route path="/payment-signature/:id" element={
+                        // <ProtectedRoute>
+                          <PaymentSignatureScreen />
                         // </ProtectedRoute>
                       } />
 

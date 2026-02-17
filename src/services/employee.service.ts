@@ -35,6 +35,10 @@ export const EmployeeService = {
 
   async addMultipleVouchers(payload: VouchersMutation) {
     return await api.put(`/funcionario/vale/adicionar-multiplos/${payload.employeeId}`, payload.vouchers);
+  },
+
+  async delete(employeeId: string) {
+    return await api.delete(`/funcionario/excluir/${employeeId}`)
   }
 
 }

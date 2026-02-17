@@ -41,7 +41,7 @@ export const EmployeeCard = ({ employee, className }: EmployeeCardProps) => {
       )}
     >
       <div className="flex flex-col items-center text-center">
-        <AvatarInitials name={employee?.nome} size="md" className="mb-3" />
+        <AvatarInitials photoUrl={employee?.foto_url} name={employee?.nome} size="md" className="mb-3" />
         
         <h3 className="font-semibold text-foreground truncate w-full">
           {getFirstWord(employee?.nome)}

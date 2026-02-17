@@ -33,17 +33,20 @@ const PaymentConfirmationScreen = () => {
 
   const { pay } = usePayment()
 
-  const handleConfirmPayment = async () => {
-
-    const payment: PagamentoPostRequestBody = {
-      incentivo: employee.incentivo,
-      vales: employee.vales,
-      salario_atual: employee.salario,
-      valor_pago: calculateAmount(employee)
-    };
-
-    await pay.mutateAsync({ employeeId: employee.id, body: payment })
+  const preparedPayment: PagamentoPostRequestBody = {
+    incentivo: employee.incentivo,
+    vales: employee.vales,
+    salario_atual: employee.salario,
+    valor_pago: calculateAmount(employee)
   };
+
+  const handleConfirmPayment = async () => {
+    await pay.mutateAsync({ employeeId: employee.id, body: preparedPayment })
+  };
+
+  const handleGoToSignature = () => {
+    navigate(`/payment-signature/${employee.id}`, { state: preparedPayment })
+  }
 
   useEffect(() => {
     if (pay.isPending) return;
@@ -122,7 +125,7 @@ const PaymentConfirmationScreen = () => {
             block
             size="large"
             icon={<FileSignature style={{ width: 20, height: 20 }} />}
-            // onClick={() => setShowConfirmModal(true)}
+            onClick={handleGoToSignature}
             style={{ height: 56, fontSize: 16, marginTop: 8 }}
           >
             Ir para assinatura
