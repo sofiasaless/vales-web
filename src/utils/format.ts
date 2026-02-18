@@ -82,3 +82,10 @@ export const validateCPF = (cpf: string): boolean => {
 export const getFirstWord = (value: string) => {
   return value.trim().split(' ')[0]
 }
+
+export function formatMoney(value: number) {
+  return value.toLocaleString('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  });
+}

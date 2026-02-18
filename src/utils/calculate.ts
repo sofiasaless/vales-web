@@ -1,4 +1,5 @@
 import { FuncionarioResponseBody } from "@/types/funcionario.type";
+import { GanhosIncentivo } from "@/types/incentivo.type";
 import { Vale } from "@/types/vale.type";
 
 export const calculateTotalVaucher = (item: Vale): number => {
@@ -24,4 +25,8 @@ export const calcularBaseSalary = (employee: FuncionarioResponseBody) => {
     salary = employee.salario * employee.dias_trabalhados_semanal
   }
   return salary
+}
+
+export const calculateTotalIncentive = (items: GanhosIncentivo[]) => {
+  return items.reduce((total, item) => total + item.valor, 0);
 }

@@ -194,7 +194,7 @@ const EmployeeManagementScreen = () => {
             <Button
               size="large"
               icon={<History style={{ width: 16, height: 16 }} />}
-              onClick={() => navigate(`/employee/${employee?.id}/history`)}
+              onClick={() => navigate(`/employee/${employee?.id}/history`, { state: employee })}
               style={{ height: 48 }}
             >
               Histórico
