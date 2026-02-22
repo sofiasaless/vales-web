@@ -29,6 +29,8 @@ import {
 import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
+import { Button as ButtonAnt } from 'antd'
+import { PdfService } from '@/services/pdf.service';
 
 const EmployeeDetailScreen = () => {
   const { id } = useParams<{ id: string }>();
@@ -57,7 +59,7 @@ const EmployeeDetailScreen = () => {
   const { deleteEmployee } = useEmployee()
 
   const handleDelete = async () => {
-    await deleteEmployee.mutateAsync({employeeId: employee.id})
+    await deleteEmployee.mutateAsync({ employeeId: employee.id })
   };
 
   useEffect(() => {
@@ -105,6 +107,10 @@ const EmployeeDetailScreen = () => {
           <div className="mt-2 inline-flex px-3 py-1 rounded-full bg-primary/10 text-primary text-sm">
             {employee?.tipo === 'DIARISTA' ? 'Diarista' : 'Fixo (Quinzenas)'}
           </div>
+        </Card>
+        <Card style={{display: 'flex', gap: 8, flexDirection: 'column'}} className="p-6 glass-card border-border text-center">
+          <ButtonAnt disabled={!employee.contrato?.assinaturas?.contratado} onClick={() => { PdfService.generateContract(employee, true) }} type='primary'>Ver contrato (Assinado digitalmente)</ButtonAnt>
+          <ButtonAnt disabled={!employee.contrato} onClick={() => { PdfService.generateContract(employee) }} variant='outlined'>Ver contrato (Para assinar)</ButtonAnt>
         </Card>
 
         {/* Details Card */}
