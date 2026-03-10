@@ -1,13 +1,13 @@
+import { useListPayments } from "@/hooks/usePayment";
 import { cn } from "@/lib/utils";
 import { FuncionarioResponseBody } from "@/types/funcionario.type";
+import { getToday } from "@/utils/date";
 import { getFirstWord } from "@/utils/format";
+import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { AvatarInitials } from "./AvatarInitials";
 import { MoneyDisplay } from "./MoneyDisplay";
 import { StatusBadge } from "./StatusBadge";
-import { useListPayments } from "@/hooks/usePayment";
-import { getToday } from "@/utils/date";
-import { useMemo } from "react";
 
 interface EmployeeCardProps {
   employee: FuncionarioResponseBody | undefined;
@@ -22,9 +22,16 @@ export const EmployeeCard = ({ employee, className }: EmployeeCardProps) => {
     0,
   );
 
-  const { data: payments, isRefetching, isPending } = useListPayments(employee.id);
+  const {
+    data: payments,
+    isRefetching,
+    isPending,
+  } = useListPayments(employee.id);
 
-  const paymentStatus = useMemo((): {status: 'pending' | 'paid' | 'today' | 'due'; label?: string;} => {
+  const paymentStatus = useMemo((): {
+    status: "pending" | "paid" | "today" | "due";
+    label?: string;
+  } => {
     const today = new Date().getDate();
     const firstDueDay = Number(employee.primeiro_dia_pagamento);
     const secondDueDay = Number(employee.segundo_dia_pagamento);
@@ -53,6 +60,12 @@ export const EmployeeCard = ({ employee, className }: EmployeeCardProps) => {
           label: `Pagar hoje`,
         };
       }
+      if (today === firstDueDay - 1 || today === firstDueDay - 2) {
+        return {
+          status: "pending",
+          label: `Pagar amanhã`,
+        };
+      }
       if (today < firstDueDay) {
         const missedDays = firstDueDay - today;
         return {
@@ -72,7 +85,12 @@ export const EmployeeCard = ({ employee, className }: EmployeeCardProps) => {
       status: "pending",
       label: "Diarista",
     };
-  }, [payments, isRefetching, isPending]);
+  }, [
+    employee.primeiro_dia_pagamento,
+    employee.segundo_dia_pagamento,
+    employee.tipo,
+    payments,
+  ]);
 
   return (
     <button

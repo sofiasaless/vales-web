@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { AvatarInitials } from '@/components/AvatarInitials';
+import { Loading } from '@/components/Loading';
 import { PageHeader } from '@/components/PageHeader';
 import { Card } from '@/components/ui/card';
 import { useAuth } from '@/context/AuthContext';
-import { mockManager } from '@/data/mockData';
 import { useAuthActions } from '@/hooks/useAuth';
 import { useCurrentEnterprise } from '@/hooks/useEnterprise';
 import { useCurrentManager, useManagers } from '@/hooks/useManager';
@@ -24,7 +25,7 @@ const SettingsScreen = () => {
   const navigate = useNavigate();
 
   const { data: enterprise } = useCurrentEnterprise()
-  const { data: manager } = useCurrentManager()
+  const { data: manager, isLoading } = useCurrentManager()
 
   const { logout } = useAuthActions()
   const { logoutManager } = useManagers()
@@ -58,6 +59,8 @@ const SettingsScreen = () => {
     </button>
   );
 
+  if (isLoading) return <Loading />
+
   return (
     <div className="min-h-screen bg-background pb-20">
       <PageHeader title="Configurações" subtitle={enterprise?.nome_fantasia} />
@@ -66,9 +69,9 @@ const SettingsScreen = () => {
         {/* Profile Card */}
         <Card className="p-6 glass-card border-border">
           <div className="flex items-center gap-4">
-            <AvatarInitials name={manager?.nome || mockManager.name} size="lg" />
+            <AvatarInitials name={manager?.nome} size="lg" />
             <div>
-              <h2 className="text-xl font-bold">{manager?.nome || mockManager.name}</h2>
+              <h2 className="text-xl font-bold">{manager?.nome}</h2>
               <p className="text-muted-foreground">{enterprise?.email}</p>
               <div className="flex items-center gap-1 mt-1 text-primary text-sm">
                 {manager?.tipo === 'GERENTE' ? (

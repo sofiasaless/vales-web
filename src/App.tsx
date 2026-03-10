@@ -37,6 +37,7 @@ import NewEmployeeContractScreen from "./pages/NewEmployeeContractScreen";
 import PaymentSignatureScreen from "./pages/PaymentSignature";
 import { antdTheme } from "./theme/antTheme";
 import { EmpresaGuard } from "./guards/EmpresaGuard";
+import { ManagerGuard } from "./guards/ManagerGuard";
 
 const queryClient = new QueryClient();
 
@@ -83,7 +84,9 @@ const App = () => (
                         path="/"
                         element={
                           <EmpresaGuard>
-                            <EmployeeListScreen />
+                            <ManagerGuard>
+                              <EmployeeListScreen />
+                            </ManagerGuard>
                           </EmpresaGuard>
                         }
                       />
@@ -91,7 +94,9 @@ const App = () => (
                         path="/new-employee"
                         element={
                           <EmpresaGuard>
-                            <NewEmployeeScreen />
+                            <ManagerGuard>
+                              <NewEmployeeScreen />
+                            </ManagerGuard>
                           </EmpresaGuard>
                         }
                       />
@@ -99,7 +104,9 @@ const App = () => (
                         path="/contract-employee"
                         element={
                           <EmpresaGuard>
-                            <NewEmployeeContractScreen />
+                            <ManagerGuard>
+                              <NewEmployeeContractScreen />
+                            </ManagerGuard>
                           </EmpresaGuard>
                         }
                       />
@@ -107,7 +114,9 @@ const App = () => (
                         path="/contract-signature"
                         element={
                           <EmpresaGuard>
-                            <ContractSignatureScreen />
+                            <ManagerGuard>
+                              <ContractSignatureScreen />
+                            </ManagerGuard>
                           </EmpresaGuard>
                         }
                       />
@@ -115,7 +124,9 @@ const App = () => (
                         path="/settings"
                         element={
                           <EmpresaGuard>
-                            <SettingsScreen />
+                            <ManagerGuard>
+                              <SettingsScreen />
+                            </ManagerGuard>
                           </EmpresaGuard>
                         }
                       />
@@ -125,7 +136,9 @@ const App = () => (
                         path="/employee/:id"
                         element={
                           <EmpresaGuard>
-                            <EmployeeManagementScreen />
+                            <ManagerGuard>
+                              <EmployeeManagementScreen />
+                            </ManagerGuard>
                           </EmpresaGuard>
                         }
                       />
@@ -133,7 +146,9 @@ const App = () => (
                         path="/employee/:id/details"
                         element={
                           <EmpresaGuard>
-                            <EmployeeDetailScreen />
+                            <ManagerGuard>
+                              <EmployeeDetailScreen />
+                            </ManagerGuard>
                           </EmpresaGuard>
                         }
                       />
@@ -141,7 +156,9 @@ const App = () => (
                         path="/employee/edit"
                         element={
                           <EmpresaGuard>
-                            <EditEmployeeScreen />
+                            <ManagerGuard>
+                              <EditEmployeeScreen />
+                            </ManagerGuard>
                           </EmpresaGuard>
                         }
                       />
@@ -149,7 +166,9 @@ const App = () => (
                         path="/employee/:id/history"
                         element={
                           <EmpresaGuard>
-                            <PaymentHistoryScreen />
+                            <ManagerGuard>
+                              <PaymentHistoryScreen />
+                            </ManagerGuard>
                           </EmpresaGuard>
                         }
                       />
@@ -159,7 +178,9 @@ const App = () => (
                         path="/menu/:employeeId"
                         element={
                           <EmpresaGuard>
-                            <MenuScreen />
+                            <ManagerGuard>
+                              <MenuScreen />
+                            </ManagerGuard>
                           </EmpresaGuard>
                         }
                       />
@@ -169,7 +190,9 @@ const App = () => (
                         path="/payment"
                         element={
                           <EmpresaGuard>
-                            <PaymentConfirmationScreen />
+                            <ManagerGuard>
+                              <PaymentConfirmationScreen />
+                            </ManagerGuard>
                           </EmpresaGuard>
                         }
                       />
@@ -178,7 +201,9 @@ const App = () => (
                         path="/payment-signature/:id"
                         element={
                           <EmpresaGuard>
-                            <PaymentSignatureScreen />
+                            <ManagerGuard>
+                              <PaymentSignatureScreen />
+                            </ManagerGuard>
                           </EmpresaGuard>
                         }
                       />
@@ -188,7 +213,9 @@ const App = () => (
                         path="/settings/menu"
                         element={
                           <EmpresaGuard>
-                            <MenuManagementScreen />
+                            <ManagerGuard>
+                              <MenuManagementScreen />
+                            </ManagerGuard>
                           </EmpresaGuard>
                         }
                       />
@@ -196,7 +223,9 @@ const App = () => (
                         path="/settings/subscriptions"
                         element={
                           <EmpresaGuard>
-                            <SubscriptionsScreen />
+                            <ManagerGuard>
+                              <SubscriptionsScreen />
+                            </ManagerGuard>
                           </EmpresaGuard>
                         }
                       />
@@ -204,7 +233,9 @@ const App = () => (
                         path="/settings/finances"
                         element={
                           <EmpresaGuard>
-                            <FinancesScreen />
+                            <ManagerGuard>
+                              <FinancesScreen />
+                            </ManagerGuard>
                           </EmpresaGuard>
                         }
                       />
@@ -212,7 +243,9 @@ const App = () => (
                         path="/settings/finances/:categoryId"
                         element={
                           <EmpresaGuard>
-                            <CategoryExpensesScreen />
+                            <ManagerGuard>
+                              <CategoryExpensesScreen />
+                            </ManagerGuard>
                           </EmpresaGuard>
                         }
                       />
@@ -220,7 +253,9 @@ const App = () => (
                         path="/settings/incentives"
                         element={
                           <EmpresaGuard>
-                            <IncentiveHistoryScreen />
+                            <ManagerGuard>
+                              <IncentiveHistoryScreen />
+                            </ManagerGuard>
                           </EmpresaGuard>
                         }
                       />
@@ -228,7 +263,9 @@ const App = () => (
                         path="/settings/managers"
                         element={
                           <EmpresaGuard>
-                            <ManagersScreen />
+                            <ManagerGuard>
+                              <ManagersScreen />
+                            </ManagerGuard>
                           </EmpresaGuard>
                         }
                       />
@@ -238,7 +275,9 @@ const App = () => (
                         path="/incentive/sales"
                         element={
                           <EmpresaGuard>
-                            <IncentiveSalesScreen />
+                            <ManagerGuard>
+                              <IncentiveSalesScreen />
+                            </ManagerGuard>
                           </EmpresaGuard>
                         }
                       />

@@ -41,7 +41,6 @@ export function useManagers() {
     mutationFn: ({ body }: { body: GerenteAutenticateRequestBody }) => ManagerService.autenticate(body),
 
     onSuccess: (value: GerenteAutenticatedResponseBody) => {
-      console.info('autenticado com sucesso')
       if (value.usuario) localStorage.setItem("usuario", JSON.stringify(value.usuario));
     },
 
