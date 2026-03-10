@@ -1,5 +1,4 @@
 import { BottomNav } from "@/components/BottomNav";
-import ProtectedRoute from "@/components/ProtectedRoute";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -32,11 +31,12 @@ import PaymentHistoryScreen from "@/pages/PaymentHistoryScreen";
 import SettingsScreen from "@/pages/SettingsScreen";
 import SubscriptionsScreen from "@/pages/SubscriptionsScreen";
 import { App as AntApp, ConfigProvider } from "antd";
-import ptBR from 'antd/locale/pt_BR';
-import { antdTheme } from "./theme/antTheme";
-import NewEmployeeContractScreen from "./pages/NewEmployeeContractScreen";
+import ptBR from "antd/locale/pt_BR";
 import ContractSignatureScreen from "./pages/ContractSignatureScreen";
+import NewEmployeeContractScreen from "./pages/NewEmployeeContractScreen";
 import PaymentSignatureScreen from "./pages/PaymentSignature";
+import { antdTheme } from "./theme/antTheme";
+import { EmpresaGuard } from "./guards/EmpresaGuard";
 
 const queryClient = new QueryClient();
 
@@ -58,123 +58,190 @@ const App = () => (
                       description: "text-muted-foreground",
                       success: "border-success/30",
                       error: "border-danger/30",
-                    }
+                    },
                   }}
                 />
                 <BrowserRouter>
                   <div className="min-h-screen bg-background">
                     <Routes>
-                      {/* Auth Routes */}
-                      <Route path="/login" element={<RestaurantLoginScreen />} />
-                      <Route path="/select-manager" element={<SelectManagerScreen />} />
+                      <Route
+                        path="/login"
+                        element={<RestaurantLoginScreen />}
+                      />
+
+                      <Route
+                        path="/select-manager"
+                        element={
+                          <EmpresaGuard>
+                            <SelectManagerScreen />
+                          </EmpresaGuard>
+                        }
+                      />
 
                       {/* Protected Routes */}
-                      <Route path="/" element={
-                        <ProtectedRoute>
-                          <EmployeeListScreen />
-                        </ProtectedRoute>
-                      } />
-                      <Route path="/new-employee" element={
-                        <ProtectedRoute>
-                          <NewEmployeeScreen />
-                        </ProtectedRoute>
-                      } />
-                      <Route path="/contract-employee" element={
-                        <ProtectedRoute>
-                          <NewEmployeeContractScreen />
-                        </ProtectedRoute>
-                      } />
-                      <Route path="/contract-signature" element={
-                        <ProtectedRoute>
-                          <ContractSignatureScreen />
-                        </ProtectedRoute>
-                      } />
-                      <Route path="/settings" element={
-                        <ProtectedRoute>
-                          <SettingsScreen />
-                        </ProtectedRoute>
-                      } />
+                      <Route
+                        path="/"
+                        element={
+                          <EmpresaGuard>
+                            <EmployeeListScreen />
+                          </EmpresaGuard>
+                        }
+                      />
+                      <Route
+                        path="/new-employee"
+                        element={
+                          <EmpresaGuard>
+                            <NewEmployeeScreen />
+                          </EmpresaGuard>
+                        }
+                      />
+                      <Route
+                        path="/contract-employee"
+                        element={
+                          <EmpresaGuard>
+                            <NewEmployeeContractScreen />
+                          </EmpresaGuard>
+                        }
+                      />
+                      <Route
+                        path="/contract-signature"
+                        element={
+                          <EmpresaGuard>
+                            <ContractSignatureScreen />
+                          </EmpresaGuard>
+                        }
+                      />
+                      <Route
+                        path="/settings"
+                        element={
+                          <EmpresaGuard>
+                            <SettingsScreen />
+                          </EmpresaGuard>
+                        }
+                      />
 
                       {/* Employee Stack */}
-                      <Route path="/employee/:id" element={
-                        <ProtectedRoute>
-                          <EmployeeManagementScreen />
-                        </ProtectedRoute>
-                      } />
-                      <Route path="/employee/:id/details" element={
-                        <ProtectedRoute>
-                          <EmployeeDetailScreen />
-                        </ProtectedRoute>
-                      } />
-                      <Route path="/employee/edit" element={
-                        <ProtectedRoute>
-                          <EditEmployeeScreen />
-                        </ProtectedRoute>
-                      } />
-                      <Route path="/employee/:id/history" element={
-                        <ProtectedRoute>
-                          <PaymentHistoryScreen />
-                        </ProtectedRoute>
-                      } />
+                      <Route
+                        path="/employee/:id"
+                        element={
+                          <EmpresaGuard>
+                            <EmployeeManagementScreen />
+                          </EmpresaGuard>
+                        }
+                      />
+                      <Route
+                        path="/employee/:id/details"
+                        element={
+                          <EmpresaGuard>
+                            <EmployeeDetailScreen />
+                          </EmpresaGuard>
+                        }
+                      />
+                      <Route
+                        path="/employee/edit"
+                        element={
+                          <EmpresaGuard>
+                            <EditEmployeeScreen />
+                          </EmpresaGuard>
+                        }
+                      />
+                      <Route
+                        path="/employee/:id/history"
+                        element={
+                          <EmpresaGuard>
+                            <PaymentHistoryScreen />
+                          </EmpresaGuard>
+                        }
+                      />
 
                       {/* Menu Stack */}
-                      <Route path="/menu/:employeeId" element={
-                        <ProtectedRoute>
-                          <MenuScreen />
-                        </ProtectedRoute>
-                      } />
+                      <Route
+                        path="/menu/:employeeId"
+                        element={
+                          <EmpresaGuard>
+                            <MenuScreen />
+                          </EmpresaGuard>
+                        }
+                      />
 
                       {/* Payment Stack */}
-                      <Route path="/payment" element={
-                        <ProtectedRoute>
-                          <PaymentConfirmationScreen />
-                        </ProtectedRoute>
-                      } />
+                      <Route
+                        path="/payment"
+                        element={
+                          <EmpresaGuard>
+                            <PaymentConfirmationScreen />
+                          </EmpresaGuard>
+                        }
+                      />
 
-                      <Route path="/payment-signature/:id" element={
-                        <ProtectedRoute>
-                          <PaymentSignatureScreen />
-                        </ProtectedRoute>
-                      } />
+                      <Route
+                        path="/payment-signature/:id"
+                        element={
+                          <EmpresaGuard>
+                            <PaymentSignatureScreen />
+                          </EmpresaGuard>
+                        }
+                      />
 
                       {/* Settings Stack */}
-                      <Route path="/settings/menu" element={
-                        <ProtectedRoute>
-                          <MenuManagementScreen />
-                        </ProtectedRoute>
-                      } />
-                      <Route path="/settings/subscriptions" element={
-                        <ProtectedRoute>
-                          <SubscriptionsScreen />
-                        </ProtectedRoute>
-                      } />
-                      <Route path="/settings/finances" element={
-                        <ProtectedRoute>
-                          <FinancesScreen />
-                        </ProtectedRoute>
-                      } />
-                      <Route path="/settings/finances/:categoryId" element={
-                        <ProtectedRoute>
-                          <CategoryExpensesScreen />
-                        </ProtectedRoute>
-                      } />
-                      <Route path="/settings/incentives" element={
-                        <ProtectedRoute>
-                          <IncentiveHistoryScreen />
-                        </ProtectedRoute>
-                      } />
-                      <Route path="/settings/managers" element={
-                        <ProtectedRoute>
-                          <ManagersScreen />
-                        </ProtectedRoute>
-                      } />
+                      <Route
+                        path="/settings/menu"
+                        element={
+                          <EmpresaGuard>
+                            <MenuManagementScreen />
+                          </EmpresaGuard>
+                        }
+                      />
+                      <Route
+                        path="/settings/subscriptions"
+                        element={
+                          <EmpresaGuard>
+                            <SubscriptionsScreen />
+                          </EmpresaGuard>
+                        }
+                      />
+                      <Route
+                        path="/settings/finances"
+                        element={
+                          <EmpresaGuard>
+                            <FinancesScreen />
+                          </EmpresaGuard>
+                        }
+                      />
+                      <Route
+                        path="/settings/finances/:categoryId"
+                        element={
+                          <EmpresaGuard>
+                            <CategoryExpensesScreen />
+                          </EmpresaGuard>
+                        }
+                      />
+                      <Route
+                        path="/settings/incentives"
+                        element={
+                          <EmpresaGuard>
+                            <IncentiveHistoryScreen />
+                          </EmpresaGuard>
+                        }
+                      />
+                      <Route
+                        path="/settings/managers"
+                        element={
+                          <EmpresaGuard>
+                            <ManagersScreen />
+                          </EmpresaGuard>
+                        }
+                      />
 
                       {/* Incentive Stack */}
-                      <Route path="/incentive/sales" element={
-                        <ProtectedRoute>
-                          <IncentiveSalesScreen />
-                        </ProtectedRoute>
-                      } />
+                      <Route
+                        path="/incentive/sales"
+                        element={
+                          <EmpresaGuard>
+                            <IncentiveSalesScreen />
+                          </EmpresaGuard>
+                        }
+                      />
 
                       {/* Catch-all */}
                       <Route path="*" element={<NotFound />} />
