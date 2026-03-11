@@ -101,8 +101,8 @@ const ManagersScreen = () => {
       return;
     }
 
-    if (formData.senha && formData.senha.length < 6) {
-      toast.error('A senha deve ter pelo menos 6 caracteres');
+    if (formData.senha && formData.senha.length < 4) {
+      toast.error('A senha deve ter pelo menos 4 caracteres');
       return;
     }
 
