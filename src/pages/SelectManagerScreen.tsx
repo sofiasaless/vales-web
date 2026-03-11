@@ -1,56 +1,61 @@
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useAuthActions } from '@/hooks/useAuth';
-import { useCurrentEnterprise } from '@/hooks/useEnterprise';
-import { useListManagers, useManagers } from '@/hooks/useManager';
-import { GerenteResponseBody } from '@/types/gerente.type';
-import { Loader2, Lock, LogOut, Shield, UserCog, Users } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
-import { Radio, Spin, Typography } from 'antd'
-import { antdTheme } from '@/theme/antTheme';
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useAuthActions } from "@/hooks/useAuth";
+import { useCurrentEnterprise } from "@/hooks/useEnterprise";
+import { useListManagers, useManagers } from "@/hooks/useManager";
+import { GerenteResponseBody } from "@/types/gerente.type";
+import { Loader2, Lock, LogOut, Shield, UserCog, Users } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { Radio, Spin, Typography } from "antd";
+import { antdTheme } from "@/theme/antTheme";
 
-const { Text } = Typography
+const { Text } = Typography;
 
-const getTypeIcon = (tipo: GerenteResponseBody['tipo']) => {
-  return tipo === 'GERENTE' ? Shield : UserCog;
+const getTypeIcon = (tipo: GerenteResponseBody["tipo"]) => {
+  return tipo === "GERENTE" ? Shield : UserCog;
 };
 
-const getTypeLabel = (tipo: GerenteResponseBody['tipo']) => {
-  return tipo === 'GERENTE' ? 'Gerente' : 'Auxiliar';
+const getTypeLabel = (tipo: GerenteResponseBody["tipo"]) => {
+  return tipo === "GERENTE" ? "Gerente" : "Auxiliar";
 };
 
 const SelectManagerScreen = () => {
   const navigate = useNavigate();
-  const [selectedManagerId, setSelectedManagerId] = useState('');
-  const [password, setPassword] = useState('');
+  const [selectedManagerId, setSelectedManagerId] = useState("");
+  const [password, setPassword] = useState("");
 
-  const { data: activeManagers, isLoading, isPending } = useListManagers()
-  const { autenticate } = useManagers()
+  const { data: activeManagers, isLoading, isPending } = useListManagers();
+  const { autenticate } = useManagers();
 
-  const { logout } = useAuthActions()
-  const { data: restaurant } = useCurrentEnterprise()
+  const { logout } = useAuthActions();
+  const { data: restaurant } = useCurrentEnterprise();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!selectedManagerId) {
-      toast.error('Selecione um usuário');
+      toast.error("Selecione um usuário");
       return;
     }
 
     if (!password.trim()) {
-      toast.error('Digite a senha');
+      toast.error("Digite a senha");
       return;
     }
 
-    autenticate.mutate({
-      body: { id: selectedManagerId, senha: password }
-    })
-
+    autenticate.mutateAsync({
+      body: { id: selectedManagerId, senha: password },
+    });
   };
 
   const handleLogout = () => {
@@ -60,18 +65,31 @@ const SelectManagerScreen = () => {
   useEffect(() => {
     if (logout.isPending || autenticate.isPending) return;
 
-    if (logout.isSuccess) navigate('/login');
-
-    if (autenticate.isSuccess) {
-      toast.success('Login realizado com sucesso!')
-      navigate('/')
-      return
-    }
+    if (logout.isSuccess) navigate("/login");
 
     if (autenticate.isError) {
-      toast.error(`Erro ao autenticar ${autenticate.error}`)
+      toast.error(`Erro ao autenticar ${autenticate.error}`);
     }
-  }, [logout.isPending, autenticate.isPending])
+
+    if (autenticate.data) {
+      if (autenticate.data.usuario) {
+        toast.success("Login realizado com sucesso!");
+        navigate("/");
+      } else {
+        toast.error(autenticate.data.mensagem);
+      }
+    }
+
+  }, [
+    logout.isPending,
+    autenticate.isPending,
+    logout.isSuccess,
+    autenticate.isSuccess,
+    autenticate.isError,
+    autenticate.error,
+    navigate,
+    autenticate.data,
+  ]);
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -93,46 +111,82 @@ const SelectManagerScreen = () => {
             <div className="space-y-3">
               <Label>Operadores</Label>
               <Radio.Group
-              value={selectedManagerId}
-              onChange={(e) => setSelectedManagerId(e.target.value)}
-              style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 8 }}
-            >
-              {(isLoading || isPending)
-              ?
-              <>
-              <Spin />
-              </>
-              :
-              activeManagers?.map((mgr) => {
-                const TypeIcon = getTypeIcon(mgr.tipo);
-                return (
-                  <div
-                    key={mgr.id}
-                    onClick={() => setSelectedManagerId(mgr.id)}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 12,
-                      padding: 12,
-                      borderRadius: 8,
-                      border: `1px solid ${selectedManagerId === mgr.id ? antdTheme.token.colorPrimary : antdTheme.token.colorBorder}`,
-                      background: selectedManagerId === mgr.id ? 'rgba(45, 184, 164, 0.05)' : 'transparent',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s',
-                    }}
-                  >
-                    <Radio value={mgr.id} />
-                    <div style={{ flex: 1 }}>
-                      <Text style={{ fontWeight: 500, margin: 0, color: 'var(--color-text)' }}>{mgr.nome}</Text>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
-                        <TypeIcon style={{ width: 12, height: 12, color: 'var(--color-text-secondary)' }} />
-                        <span style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>{getTypeLabel(mgr.tipo)}</span>
+                value={selectedManagerId}
+                onChange={(e) => setSelectedManagerId(e.target.value)}
+                style={{
+                  width: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 8,
+                }}
+              >
+                {isLoading || isPending ? (
+                  <>
+                    <Spin />
+                  </>
+                ) : (
+                  activeManagers?.map((mgr) => {
+                    const TypeIcon = getTypeIcon(mgr.tipo);
+                    return (
+                      <div
+                        key={mgr.id}
+                        onClick={() => setSelectedManagerId(mgr.id)}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 12,
+                          padding: 12,
+                          borderRadius: 8,
+                          border: `1px solid ${selectedManagerId === mgr.id ? antdTheme.token.colorPrimary : antdTheme.token.colorBorder}`,
+                          background:
+                            selectedManagerId === mgr.id
+                              ? "rgba(45, 184, 164, 0.05)"
+                              : "transparent",
+                          cursor: "pointer",
+                          transition: "all 0.2s",
+                        }}
+                      >
+                        <Radio value={mgr.id} />
+                        <div style={{ flex: 1 }}>
+                          <Text
+                            style={{
+                              fontWeight: 500,
+                              margin: 0,
+                              color: "var(--color-text)",
+                            }}
+                          >
+                            {mgr.nome}
+                          </Text>
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 6,
+                              marginTop: 2,
+                            }}
+                          >
+                            <TypeIcon
+                              style={{
+                                width: 12,
+                                height: 12,
+                                color: "var(--color-text-secondary)",
+                              }}
+                            />
+                            <span
+                              style={{
+                                fontSize: 12,
+                                color: "var(--color-text-secondary)",
+                              }}
+                            >
+                              {getTypeLabel(mgr.tipo)}
+                            </span>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </Radio.Group>
+                    );
+                  })
+                )}
+              </Radio.Group>
 
               {activeManagers?.length === 0 && (
                 <p className="text-sm text-muted-foreground text-center py-4">
@@ -170,7 +224,7 @@ const SelectManagerScreen = () => {
                     Entrando...
                   </>
                 ) : (
-                  'Entrar'
+                  "Entrar"
                 )}
               </Button>
 

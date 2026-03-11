@@ -1,7 +1,8 @@
 import { cn } from '@/lib/utils';
 
 interface StatusBadgeProps {
-  status: 'pending' | 'paid' | 'today';
+  label?: string;
+  status: 'pending' | 'paid' | 'today' | 'due';
   className?: string;
 }
 
@@ -9,6 +10,10 @@ const statusConfig = {
   pending: {
     label: 'A receber',
     classes: 'bg-warning/15 text-warning border border-warning/30',
+  },
+  due: {
+    label: 'A receber',
+    classes: 'bg-danger/15 text-danger border border-danger/30',
   },
   paid: {
     label: 'Pago',
@@ -20,18 +25,19 @@ const statusConfig = {
   },
 };
 
-export const StatusBadge = ({ status, className }: StatusBadgeProps) => {
+export const StatusBadge = ({ status, className, label }: StatusBadgeProps) => {
   const config = statusConfig[status];
 
   return (
     <span
+      style={{ fontSize: 14 }}
       className={cn(
         'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium',
         config.classes,
         className
       )}
     >
-      {config.label}
+      {label}
     </span>
   );
 };

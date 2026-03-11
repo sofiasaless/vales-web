@@ -1,10 +1,12 @@
 import { AvatarInitials } from '@/components/AvatarInitials';
+import { Loading } from '@/components/Loading';
 import { MoneyDisplay } from '@/components/MoneyDisplay';
 import { PageHeader } from '@/components/PageHeader';
 import { VoucherItemCard } from '@/components/VoucherItemCard';
 import { useEmployee, useFindEmployee } from '@/hooks/useEmployee';
+import { useCurrentManager } from '@/hooks/useManager';
 import { calculateTotalVauchers } from '@/utils/calculate';
-import { App, Button, Card, Input, InputNumber, Modal, Spin } from 'antd';
+import { App, Button, Card, Input, InputNumber, Modal } from 'antd';
 import {
   AlertCircle,
   CreditCard,
@@ -30,12 +32,10 @@ const EmployeeManagementScreen = () => {
   const [cashValue, setCashValue] = useState<number | null>(null);
   const [cashLoading, setCashLoading] = useState(false);
 
-  if (isLoading) {
-    return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Spin size="large" />
-      </div>
-    );
+  const { data: manager, isLoading: loadingManager } = useCurrentManager();
+  
+  if (isLoading || loadingManager) {
+    return <Loading />
   }
 
   if (!employee) {
@@ -169,7 +169,7 @@ const EmployeeManagementScreen = () => {
         </div>
 
         {/* Action Buttons */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, paddingTop: 16 }}>
+        <div style={{ display: manager.tipo === "AUXILIAR" ? "none" : "flex", flexDirection: 'column', gap: 12, paddingTop: 16 }}>
           <Button
             type="primary"
             block
