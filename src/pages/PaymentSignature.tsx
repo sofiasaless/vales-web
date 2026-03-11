@@ -65,7 +65,7 @@ const PaymentSignatureScreen = () => {
     if (pay.isError) {
       toast.error(`Erro ao pagar funcionário: ${pay.error}`);
     }
-  }, [pay.isPending]);
+  }, [navigate, pay.error, pay.isError, pay.isPending, pay.isSuccess]);
 
   return (
     <div style={{ minHeight: '100vh', paddingBottom: 32 }}>

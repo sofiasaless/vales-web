@@ -17,7 +17,6 @@ export function useListPayments(
       return result;
     },
     refetchOnWindowFocus: false,
-    refetchOnMount: false,
   });
 }
 
