@@ -191,3 +191,8 @@
     background-clip: text;
   }
 }
+
+.ant-picker-dropdown .ant-picker-panel-container {
+  transform: scale(0.8);
+  transform-origin: top right;
+}

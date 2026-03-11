@@ -1,6 +1,6 @@
-import { AvatarInitials } from '@/components/AvatarInitials';
-import { MoneyDisplay } from '@/components/MoneyDisplay';
-import { PageHeader } from '@/components/PageHeader';
+import { AvatarInitials } from "@/components/AvatarInitials";
+import { MoneyDisplay } from "@/components/MoneyDisplay";
+import { PageHeader } from "@/components/PageHeader";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -11,11 +11,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { useEmployee, useFindEmployee } from '@/hooks/useEmployee';
-import { formatCPF, formatDate, getPaydayText } from '@/utils/format';
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { useEmployee, useFindEmployee } from "@/hooks/useEmployee";
+import { formatCPF, formatDate, getPaydayText } from "@/utils/format";
 import {
   AlertCircle,
   Briefcase,
@@ -25,18 +25,20 @@ import {
   Trash2,
   User,
   Wallet,
-} from 'lucide-react';
-import { useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { toast } from 'sonner';
-import { Button as ButtonAnt } from 'antd'
-import { PdfService } from '@/services/pdf.service';
+} from "lucide-react";
+import { useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "sonner";
+import { Button as ButtonAnt } from "antd";
+import { PdfService } from "@/services/pdf.service";
 
 const EmployeeDetailScreen = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
   const { data: employee, isLoading } = useFindEmployee(id);
+
+  const { deleteEmployee } = useEmployee();
 
   if (!employee && isLoading) {
     return (
@@ -47,7 +49,7 @@ const EmployeeDetailScreen = () => {
           <Button
             variant="outline"
             className="mt-4"
-            onClick={() => navigate('/')}
+            onClick={() => navigate("/")}
           >
             Voltar
           </Button>
@@ -56,23 +58,22 @@ const EmployeeDetailScreen = () => {
     );
   }
 
-  const { deleteEmployee } = useEmployee()
-
   const handleDelete = async () => {
-    await deleteEmployee.mutateAsync({ employeeId: employee.id })
+    await deleteEmployee.mutateAsync({ employeeId: employee.id });
   };
 
   useEffect(() => {
     if (deleteEmployee.isPending) return;
     if (deleteEmployee.isSuccess) {
-      toast.success('Funcionário demitido e excluído com sucesso!');
-      navigate('/', { replace: true });
+      toast.success("Funcionário demitido e excluído com sucesso!");
+      navigate("/", { replace: true });
     }
     if (deleteEmployee.isError) {
-      toast.error(`Erro ao tentar demitir funcionário: ${deleteEmployee.error}`);
+      toast.error(
+        `Erro ao tentar demitir funcionário: ${deleteEmployee.error}`,
+      );
     }
-
-  }, [deleteEmployee.isPending])
+  }, [deleteEmployee.isPending]);
 
   const InfoRow = ({
     icon: Icon,
@@ -101,16 +102,40 @@ const EmployeeDetailScreen = () => {
       <div className="px-4 py-4 max-w-lg mx-auto space-y-4">
         {/* Header Card */}
         <Card className="p-6 glass-card border-border text-center">
-          <AvatarInitials name={employee?.nome} photoUrl={employee?.foto_url} size="lg" className="mx-auto mb-4" />
+          <AvatarInitials
+            name={employee?.nome}
+            photoUrl={employee?.foto_url}
+            size="lg"
+            className="mx-auto mb-4"
+          />
           <h2 className="text-2xl font-bold">{employee?.nome}</h2>
           <p className="text-muted-foreground">{employee?.cargo}</p>
           <div className="mt-2 inline-flex px-3 py-1 rounded-full bg-primary/10 text-primary text-sm">
-            {employee?.tipo === 'DIARISTA' ? 'Diarista' : 'Fixo (Quinzenas)'}
+            {employee?.tipo === "DIARISTA" ? "Diarista" : "Fixo (Quinzenas)"}
           </div>
         </Card>
-        <Card style={{display: 'flex', gap: 8, flexDirection: 'column'}} className="p-6 glass-card border-border text-center">
-          <ButtonAnt disabled={!employee.contrato?.assinaturas?.contratado} onClick={() => { PdfService.generateContract(employee, true) }} type='primary'>Ver contrato (Assinado digitalmente)</ButtonAnt>
-          <ButtonAnt disabled={!employee.contrato} onClick={() => { PdfService.generateContract(employee) }} variant='outlined'>Ver contrato (Para assinar)</ButtonAnt>
+        <Card
+          style={{ display: "flex", gap: 8, flexDirection: "column" }}
+          className="p-6 glass-card border-border text-center"
+        >
+          <ButtonAnt
+            disabled={!employee.contrato?.assinaturas?.contratado}
+            onClick={() => {
+              PdfService.generateContract(employee, true);
+            }}
+            type="primary"
+          >
+            Ver contrato (Assinado digitalmente)
+          </ButtonAnt>
+          <ButtonAnt
+            disabled={!employee.contrato}
+            onClick={() => {
+              PdfService.generateContract(employee);
+            }}
+            variant="outlined"
+          >
+            Ver contrato (Para assinar)
+          </ButtonAnt>
         </Card>
 
         {/* Details Card */}
@@ -120,7 +145,11 @@ const EmployeeDetailScreen = () => {
           </div>
           <div className="px-4">
             {employee?.cpf && (
-              <InfoRow icon={User} label="CPF" value={formatCPF(employee?.cpf)} />
+              <InfoRow
+                icon={User}
+                label="CPF"
+                value={formatCPF(employee?.cpf)}
+              />
             )}
             {employee?.data_nascimento && (
               <InfoRow
@@ -141,7 +170,9 @@ const EmployeeDetailScreen = () => {
             <InfoRow icon={Briefcase} label="Cargo" value={employee?.cargo} />
             <InfoRow
               icon={Wallet}
-              label={employee?.tipo === 'DIARISTA' ? 'Valor Diária' : 'Salário Base'}
+              label={
+                employee?.tipo === "DIARISTA" ? "Valor Diária" : "Salário Base"
+              }
               value={<MoneyDisplay value={employee?.salario} size="md" />}
             />
             <InfoRow
@@ -164,7 +195,11 @@ const EmployeeDetailScreen = () => {
 
         {/* Action Buttons */}
         <div className="flex gap-3 pt-4">
-          <Button variant="outline" className="flex-1 h-12" onClick={() => navigate(`/employee/edit`, { state: employee })}>
+          <Button
+            variant="outline"
+            className="flex-1 h-12"
+            onClick={() => navigate(`/employee/edit`, { state: employee })}
+          >
             <Edit className="w-4 h-4 mr-2" />
             Editar
           </Button>
@@ -180,8 +215,9 @@ const EmployeeDetailScreen = () => {
               <AlertDialogHeader>
                 <AlertDialogTitle>Excluir Funcionário</AlertDialogTitle>
                 <AlertDialogDescription>
-                  Tem certeza que deseja demitir/excluir <strong>{employee?.nome}</strong>?
-                  Esta ação não poderá ser desfeita.
+                  Tem certeza que deseja demitir/excluir{" "}
+                  <strong>{employee?.nome}</strong>? Esta ação não poderá ser
+                  desfeita.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>

@@ -10,7 +10,7 @@ import { CloudinaryService } from "@/services/clodinary.service";
 import { FuncionarioPostRequestBody } from "@/types/funcionario.type";
 import { parseCurrencyInput, validateCPF } from "@/utils/format";
 import { PlusOutlined } from "@ant-design/icons";
-import { Button as ButtonAnt, Upload } from "antd";
+import { Button as ButtonAnt, DatePicker, DatePickerProps, Upload } from "antd";
 import { UploadFile } from "antd/lib/upload";
 import { AlertCircle, FileSignature, UserPlus } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -43,6 +43,23 @@ const NewEmployeeScreen = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const [admissionDate, setAdmissionDate] = useState<Date>(new Date());
+
+  const setAdmission: DatePickerProps['onChange'] = (date, dateString) => {
+    const converted = ((date as any).$d as Date)
+    setAdmissionDate(converted)
+    setFormData((prev) => ({
+      ...prev,
+      data_admissao: converted.toISOString()
+    }))
+  };
+
+  const setBirth: DatePickerProps['onChange'] = (date, dateString) => {
+    const converted = ((date as any).$d as Date).toISOString()
+    setFormData((prev) => ({
+      ...prev,
+      data_nascimento: converted
+    }))
+  };
 
   const calculatePaydays = () => {
     const dateOne = new Date(new Date().setDate(admissionDate.getDate() + 15));
@@ -314,19 +331,18 @@ const NewEmployeeScreen = () => {
               <Label htmlFor="daysForWork">Dias de trabalho p/ semana</Label>
               <div className="relative">
                 <Input
-                  type="number"
                   min={1}
                   id="daysForWork"
                   value={formData.dias_trabalhados_semanal.toString() || "0"}
                   onChange={(e) =>
-                    handleInputChange(
-                      "dias_trabalhados_semanal",
-                      e.target.value,
-                    )
+                    setFormData((prev) => ({
+                      ...prev,
+                      dias_trabalhados_semanal: Number(e.target.value),
+                    }))
                   }
-                  placeholder="0"
-                  className={` ${errors.diasTrabalhados ? "border-danger" : ""}`}
-                  inputMode="decimal"
+                placeholder="0"
+                className={` ${errors.diasTrabalhados ? "border-danger" : ""}`}
+                inputMode="decimal"
                 />
               </div>
               {errors.diasTrabalhados && (
@@ -358,23 +374,14 @@ const NewEmployeeScreen = () => {
           </div>
 
           {/* Birth Date */}
-          <div className="space-y-2">
-            <Label htmlFor="cpf">Data de nascimento</Label>
-            <Input
-              onChange={(e) => {
-                const converted =
-                  e.target.value === ""
-                    ? null
-                    : new Date(e.target.value).toISOString();
+          <div style={{ display: 'flex', flexDirection: 'column' }} className="space-y-2">
+            <Label htmlFor="birthDate">Data de Nascimento</Label>
+            <DatePicker id="birthDate" format={'DD/MM/YYYY'} onChange={setBirth} />
+          </div>
 
-                setFormData((prev) => ({
-                  ...prev,
-                  data_nascimento: converted,
-                }));
-              }}
-              placeholder="Selecionar data"
-              type="date"
-            />
+          <div style={{ display: 'flex', flexDirection: 'column' }} className="space-y-2">
+            <Label htmlFor="admissionDate">Data de Admissão</Label>
+            <DatePicker id="admissionDate" format={'DD/MM/YYYY'} onChange={setAdmission} />
           </div>
 
           <div className="space-y-2">
