@@ -85,7 +85,7 @@ const App = () => (
                         path="/"
                         element={
                           <EmpresaGuard>
-                            <ManagerGuard>
+                            <ManagerGuard permission="AUXILIAR">
                               <EmployeeListScreen />
                             </ManagerGuard>
                           </EmpresaGuard>
@@ -125,7 +125,7 @@ const App = () => (
                         path="/settings"
                         element={
                           <EmpresaGuard>
-                            <ManagerGuard>
+                            <ManagerGuard permission="AUXILIAR">
                               <SettingsScreen />
                             </ManagerGuard>
                           </EmpresaGuard>
@@ -137,7 +137,7 @@ const App = () => (
                         path="/employee/:id"
                         element={
                           <EmpresaGuard>
-                            <ManagerGuard>
+                            <ManagerGuard permission="AUXILIAR">
                               <EmployeeManagementScreen />
                             </ManagerGuard>
                           </EmpresaGuard>
@@ -179,7 +179,7 @@ const App = () => (
                         path="/menu/:employeeId"
                         element={
                           <EmpresaGuard>
-                            <ManagerGuard>
+                            <ManagerGuard permission="AUXILIAR">
                               <MenuScreen />
                             </ManagerGuard>
                           </EmpresaGuard>

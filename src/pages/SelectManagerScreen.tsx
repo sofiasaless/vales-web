@@ -56,12 +56,6 @@ const SelectManagerScreen = () => {
     autenticate.mutateAsync({
       body: { id: selectedManagerId, senha: password },
     });
-    if (autenticate.data.usuario) {
-      toast.success("Login realizado com sucesso!");
-      navigate("/");
-    } else {
-      toast.error(autenticate.data.mensagem);
-    }
   };
 
   const handleLogout = () => {
@@ -76,6 +70,16 @@ const SelectManagerScreen = () => {
     if (autenticate.isError) {
       toast.error(`Erro ao autenticar ${autenticate.error}`);
     }
+
+    if (autenticate.data) {
+      if (autenticate.data.usuario) {
+        toast.success("Login realizado com sucesso!");
+        navigate("/");
+      } else {
+        toast.error(autenticate.data.mensagem);
+      }
+    }
+
   }, [
     logout.isPending,
     autenticate.isPending,
@@ -84,6 +88,7 @@ const SelectManagerScreen = () => {
     autenticate.isError,
     autenticate.error,
     navigate,
+    autenticate.data,
   ]);
 
   return (
