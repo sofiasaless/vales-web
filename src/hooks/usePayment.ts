@@ -36,6 +36,7 @@ export function usePayment() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["employees"] });
       queryClient.invalidateQueries({ queryKey: ["payments"] });
+      queryClient.invalidateQueries({ queryKey: ["employee"] });
     },
 
     onError: () => {

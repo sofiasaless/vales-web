@@ -38,6 +38,7 @@ import PaymentSignatureScreen from "./pages/PaymentSignature";
 import { antdTheme } from "./theme/antTheme";
 import { EmpresaGuard } from "./guards/EmpresaGuard";
 import { ManagerGuard } from "./guards/ManagerGuard";
+import { BuildingPage } from "./components/BuildingPage";
 
 const queryClient = new QueryClient();
 
@@ -234,7 +235,8 @@ const App = () => (
                         element={
                           <EmpresaGuard>
                             <ManagerGuard>
-                              <FinancesScreen />
+                              <BuildingPage pageName="Finanças" />
+                              {/* <FinancesScreen /> */}
                             </ManagerGuard>
                           </EmpresaGuard>
                         }
@@ -254,7 +256,8 @@ const App = () => (
                         element={
                           <EmpresaGuard>
                             <ManagerGuard>
-                              <IncentiveHistoryScreen />
+                              <BuildingPage pageName="Incentivos" />
+                              {/* <IncentiveHistoryScreen /> */}
                             </ManagerGuard>
                           </EmpresaGuard>
                         }
