@@ -6,7 +6,9 @@ import { Card } from "@/components/ui/card";
 import { useAuthActions } from "@/hooks/useAuth";
 import { useCurrentEnterprise } from "@/hooks/useEnterprise";
 import { useCurrentManager, useManagers } from "@/hooks/useManager";
+import { CloudinaryService } from "@/services/clodinary.service";
 import {
+  Camera,
   ChefHat,
   ChevronRight,
   CreditCard,
@@ -17,7 +19,9 @@ import {
   UtensilsCrossed,
   Wallet
 } from "lucide-react";
+import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 const SettingsScreen = () => {
   const navigate = useNavigate();
@@ -26,7 +30,22 @@ const SettingsScreen = () => {
   const { data: manager, isLoading } = useCurrentManager();
 
   const { logout } = useAuthActions();
-  const { logoutManager } = useManagers();
+  const { logoutManager, update } = useManagers();
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleSendImage = async (file: any) => {
+    const url = await CloudinaryService.sendPicture(file);
+    await update.mutateAsync({
+      managerId: manager.id,
+      payload: { img_perfil: url }
+    });
+    localStorage.setItem("usuario", JSON.stringify({
+      ...manager,
+      img_perfil: url,
+    }))
+    toast.success('Recarregue a página para sua foto aparecer!')
+  };
 
   const MenuItem = ({
     icon: Icon,
@@ -41,14 +60,12 @@ const SettingsScreen = () => {
   }) => (
     <button
       onClick={onClick}
-      className={`flex items-center w-full p-4 tap-highlight-none transition-colors ${
-        danger ? "text-danger" : "text-foreground"
-      }`}
+      className={`flex items-center w-full p-4 tap-highlight-none transition-colors ${danger ? "text-danger" : "text-foreground"
+        }`}
     >
       <div
-        className={`p-2 rounded-lg mr-3 ${
-          danger ? "bg-danger/10" : "bg-secondary"
-        }`}
+        className={`p-2 rounded-lg mr-3 ${danger ? "bg-danger/10" : "bg-secondary"
+          }`}
       >
         <Icon
           className={`w-5 h-5 ${danger ? "text-danger" : "text-muted-foreground"}`}
@@ -69,7 +86,41 @@ const SettingsScreen = () => {
         {/* Profile Card */}
         <Card className="p-6 glass-card border-border">
           <div className="flex items-center gap-4">
-            <AvatarInitials name={manager?.nome} size="lg" />
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              style={{ display: 'none' }}
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleSendImage(file);
+              }}
+            />
+            <div
+              style={{ cursor: 'pointer', position: 'relative' }}
+              onClick={() => fileInputRef.current?.click()}
+            >
+
+              <AvatarInitials photoUrl={manager.img_perfil} name={manager?.nome} size="lg" />
+
+              {/* Overlay de edição */}
+              <div style={{
+                position: 'absolute',
+                inset: 0,
+                borderRadius: '50%',
+                background: 'rgba(0,0,0,0.35)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                opacity: 0,
+                transition: 'opacity 0.2s',
+              }}
+                onMouseEnter={e => (e.currentTarget.style.opacity = '1')}
+                onMouseLeave={e => (e.currentTarget.style.opacity = '0')}
+              >
+                <Camera className="w-5 h-5 text-white" />
+              </div>
+            </div>
             <div>
               <h2 className="text-xl font-bold">{manager?.nome}</h2>
               <p className="text-muted-foreground">{enterprise?.email}</p>

@@ -1,6 +1,5 @@
 import { ManagerService } from "@/services/manager.service";
-import { GerenteAutenticatedResponseBody, GerenteAutenticateRequestBody, GerentePostRequestBody, GerenteUpdateRequestBody } from "@/types/gerente.type";
-import { Gerente } from "@/types/manager";
+import { GerenteAutenticatedResponseBody, GerenteAutenticateRequestBody, GerentePostRequestBody, GerenteResponseBody, GerenteUpdateRequestBody } from "@/types/gerente.type";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export function useListManagers() {
@@ -18,7 +17,7 @@ export function useCurrentManager() {
   return useQuery({
     queryKey: ["current_manager"],
     queryFn: async () => {
-      const result = await JSON.parse(localStorage.getItem("usuario")) as Gerente
+      const result = await JSON.parse(localStorage.getItem("usuario")) as GerenteResponseBody
       return result
     }
   })
