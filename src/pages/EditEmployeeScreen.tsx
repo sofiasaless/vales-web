@@ -7,7 +7,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useEmployee } from '@/hooks/useEmployee';
 import { CloudinaryService } from '@/services/clodinary.service';
 import { FuncionarioResponseBody, FuncionarioUpdateRequestBody } from '@/types/funcionario.type';
-import { parseCurrencyInput, validateCPF } from '@/utils/format';
+import { onChangeNumberInput, onKeyDownNumberInput, parseCurrencyInput, validateCPF } from '@/utils/format';
 import { PlusOutlined } from "@ant-design/icons";
 import { DatePicker, DatePickerProps, Upload } from 'antd';
 import { UploadFile } from "antd/lib/upload";
@@ -119,7 +119,7 @@ const EditEmployeeScreen = () => {
     }
 
     console.info('form ', toSend)
-    
+
     await updateEmployee.mutateAsync({ employeeId: employee.id, body: toSend });
   };
 
@@ -245,9 +245,14 @@ const EditEmployeeScreen = () => {
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">R$</span>
               <Input
                 id="salary"
-                value={inputSalario}
-                onChange={(e) => handleSalaryChange(e.target.value)}
-                placeholder="0,00"
+                value={formData.salario.toFixed(2)}
+                onKeyDown={onKeyDownNumberInput}
+                onChange={(val) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    salario: onChangeNumberInput(val) 
+                  }))
+                }}
                 className={`pl-10 ${errors.baseSalary ? 'border-danger' : ''}`}
                 inputMode="decimal"
               />

@@ -8,7 +8,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useEmployee } from "@/hooks/useEmployee";
 import { CloudinaryService } from "@/services/clodinary.service";
 import { FuncionarioPostRequestBody } from "@/types/funcionario.type";
-import { parseCurrencyInput, validateCPF } from "@/utils/format";
+import { onChangeNumberInput, onKeyDownNumberInput, parseCurrencyInput, validateCPF } from "@/utils/format";
 import { PlusOutlined } from "@ant-design/icons";
 import { Button as ButtonAnt, DatePicker, DatePickerProps, Upload } from "antd";
 import { UploadFile } from "antd/lib/upload";
@@ -311,8 +311,14 @@ const NewEmployeeScreen = () => {
               </span>
               <Input
                 id="salary"
-                value={inputSalario}
-                onChange={(e) => handleSalaryChange(e.target.value)}
+                value={formData.salario.toFixed(2)}
+                onKeyDown={onKeyDownNumberInput}
+                onChange={(e) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    salario: onChangeNumberInput(e),
+                  }))
+                }}
                 placeholder="0,00"
                 className={`pl-10 ${errors.baseSalary ? "border-danger" : ""}`}
                 inputMode="decimal"
@@ -340,9 +346,9 @@ const NewEmployeeScreen = () => {
                       dias_trabalhados_semanal: Number(e.target.value),
                     }))
                   }
-                placeholder="0"
-                className={` ${errors.diasTrabalhados ? "border-danger" : ""}`}
-                inputMode="decimal"
+                  placeholder="0"
+                  className={` ${errors.diasTrabalhados ? "border-danger" : ""}`}
+                  inputMode="decimal"
                 />
               </div>
               {errors.diasTrabalhados && (

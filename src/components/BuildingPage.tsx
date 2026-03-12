@@ -20,10 +20,10 @@ export const BuildingPage = ({pageName}: {pageName: string}) => {
           style={{ fontSize: 22 }}
           className="font-semibold text-foreground truncate"
         >
-          Página em construção 🚧
+          Sem acesso 🚧
         </h1>
-        <p className="text-x text-muted-foreground mb-2">
-          Estará disponível em breve...
+        <p className="text-x text-center text-muted-foreground mb-2">
+          Esta funcionalidade não está disponível no seu plano.
         </p>
       </div>
     </div>
