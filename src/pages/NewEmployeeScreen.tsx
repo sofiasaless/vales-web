@@ -1,46 +1,49 @@
-import { PlusOutlined } from "@ant-design/icons"
-import { PageHeader } from '@/components/PageHeader';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { useEmployee } from '@/hooks/useEmployee';
-import { CloudinaryService } from '@/services/clodinary.service';
-import { FuncionarioPostRequestBody } from '@/types/funcionario.type';
-import { parseCurrencyInput, validateCPF } from '@/utils/format';
-import { Button as ButtonAnt, DatePicker, DatePickerProps, Upload } from 'antd';
-import { AlertCircle, FileSignature, UserPlus } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { PageHeader } from "@/components/PageHeader";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { useEmployee } from "@/hooks/useEmployee";
+import { CloudinaryService } from "@/services/clodinary.service";
+import { FuncionarioPostRequestBody } from "@/types/funcionario.type";
+import { parseCurrencyInput, validateCPF } from "@/utils/format";
+import { PlusOutlined } from "@ant-design/icons";
+import { Button as ButtonAnt, DatePicker, DatePickerProps, Upload } from "antd";
 import { UploadFile } from "antd/lib/upload";
+import { AlertCircle, FileSignature, UserPlus } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 const emptyEmployee: FuncionarioPostRequestBody = {
-  cargo: '',
-  nome: '',
+  cargo: "",
+  nome: "",
   incentivo: [],
   vales: [],
   primeiro_dia_pagamento: 0,
   segundo_dia_pagamento: 0,
   salario: 0,
-  cpf: '',
-  tipo: 'FIXO',
+  cpf: "",
+  tipo: "FIXO",
   dias_trabalhados_semanal: 0,
-  data_admissao: ''
-}
+  data_admissao: "",
+};
 
 const NewEmployeeScreen = () => {
   const navigate = useNavigate();
 
-  const [formData, setFormData] = useState<FuncionarioPostRequestBody>(emptyEmployee);
+  const [formData, setFormData] =
+    useState<FuncionarioPostRequestBody>(emptyEmployee);
 
-  const [inputSalario, setInputSalario] = useState('')
+  const [inputSalario, setInputSalario] = useState("");
   const [pictureFile, setPictureFile] = useState<UploadFile[]>([]);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const [admissionDate, setAdmissionDate] = useState<Date>(new Date())
+  const [admissionDate, setAdmissionDate] = useState<Date>(new Date());
+
   const setAdmission: DatePickerProps['onChange'] = (date, dateString) => {
     const converted = ((date as any).$d as Date)
     setAdmissionDate(converted)
@@ -59,33 +62,31 @@ const NewEmployeeScreen = () => {
   };
 
   const calculatePaydays = () => {
-    const dateOne = new Date(new Date().setDate(admissionDate.getDate() + 14));
-    const dateTwo = new Date(new Date().setDate(dateOne.getDate() + 14));
+    const dateOne = new Date(new Date().setDate(admissionDate.getDate() + 15));
+    const dateTwo = new Date(new Date().setDate(dateOne.getDate() + 17));
 
-    const dayOne = dateOne.getDate()
-    const dayTwo = dateTwo.getDate()
+    const dayOne = dateOne.getDate();
+    const dayTwo = dateTwo.getDate();
 
-    setFormData((prev) => (
-      {
-        ...prev,
-        primeiro_dia_pagamento: dayOne,
-        segundo_dia_pagamento: dayTwo
-      }
-    ))
-    return { dayOne, dayTwo }
-  }
+    setFormData((prev) => ({
+      ...prev,
+      primeiro_dia_pagamento: dayOne,
+      segundo_dia_pagamento: dayTwo,
+    }));
+    return { dayOne, dayTwo };
+  };
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     // Clear error when user starts typing
     if (errors[field]) {
-      setErrors((prev) => ({ ...prev, [field]: '' }));
+      setErrors((prev) => ({ ...prev, [field]: "" }));
     }
   };
 
   const handleCPFChange = (value: string) => {
     // Remove non-digits and format
-    const digits = value.replace(/\D/g, '').slice(0, 11);
+    const digits = value.replace(/\D/g, "").slice(0, 11);
     let formatted = digits;
     if (digits.length > 9) {
       formatted = `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6, 9)}-${digits.slice(9)}`;
@@ -94,41 +95,44 @@ const NewEmployeeScreen = () => {
     } else if (digits.length > 3) {
       formatted = `${digits.slice(0, 3)}.${digits.slice(3)}`;
     }
-    handleInputChange('cpf', formatted);
+    handleInputChange("cpf", formatted);
   };
 
   const handleSalaryChange = (value: string) => {
     // Allow only digits and comma
-    setInputSalario(value)
-    const cleaned = value.replace(/[^\d,]/g, '');
-    handleInputChange('salario', cleaned);
+    setInputSalario(value);
+    const cleaned = value.replace(/[^\d,]/g, "");
+    handleInputChange("salario", cleaned);
   };
 
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {};
 
     if (!formData.nome.trim()) {
-      newErrors.name = 'Nome é obrigatório';
+      newErrors.name = "Nome é obrigatório";
     }
 
     if (!formData.cargo.trim()) {
-      newErrors.role = 'Cargo é obrigatório';
+      newErrors.role = "Cargo é obrigatório";
     }
 
-    if (formData.tipo === 'DIARISTA') {
-      if (formData.dias_trabalhados_semanal <= 0 || !formData.dias_trabalhados_semanal) {
-        newErrors.diasTrabalhados = 'Dias de trabalho deve ser maior que zero';
+    if (formData.tipo === "DIARISTA") {
+      if (
+        formData.dias_trabalhados_semanal <= 0 ||
+        !formData.dias_trabalhados_semanal
+      ) {
+        newErrors.diasTrabalhados = "Dias de trabalho deve ser maior que zero";
       }
     }
 
     if (!formData.salario) {
-      newErrors.baseSalary = 'Salário é obrigatório';
+      newErrors.baseSalary = "Salário é obrigatório";
     } else if (parseCurrencyInput(inputSalario) <= 0) {
-      newErrors.baseSalary = 'Salário deve ser maior que zero';
+      newErrors.baseSalary = "Salário deve ser maior que zero";
     }
 
     if (formData.cpf && !validateCPF(formData.cpf)) {
-      newErrors.cpf = 'CPF inválido';
+      newErrors.cpf = "CPF inválido";
     }
 
     setErrors(newErrors);
@@ -136,75 +140,79 @@ const NewEmployeeScreen = () => {
   };
 
   const prepareForm = async (uploadPicture: boolean = false) => {
-    const form = formData
-    if (form.tipo === 'DIARISTA') {
-      form.primeiro_dia_pagamento = 0
-      form.segundo_dia_pagamento = 0
+    const form = formData;
+    if (form.tipo === "DIARISTA") {
+      form.primeiro_dia_pagamento = 0;
+      form.segundo_dia_pagamento = 0;
     } else {
-      form.dias_trabalhados_semanal = null
-      if (form.primeiro_dia_pagamento === 0 || form.segundo_dia_pagamento === 0) {
-        const days = calculatePaydays()
-        form.primeiro_dia_pagamento = days.dayOne
-        form.segundo_dia_pagamento = days.dayTwo
+      form.dias_trabalhados_semanal = null;
+      if (
+        form.primeiro_dia_pagamento === 0 ||
+        form.segundo_dia_pagamento === 0
+      ) {
+        const days = calculatePaydays();
+        form.primeiro_dia_pagamento = days.dayOne;
+        form.segundo_dia_pagamento = days.dayTwo;
       }
     }
 
-    if (form.data_admissao === '') {
-      form.data_admissao = admissionDate.toISOString()
+    if (form.data_admissao === "") {
+      form.data_admissao = admissionDate.toISOString();
     }
 
     // se tiver uma foto anexada então envia para o cloudnary
     if (pictureFile.length > 0 && pictureFile[0].originFileObj) {
       if (uploadPicture) {
-        form.foto_url = await CloudinaryService.sendPicture(pictureFile[0].originFileObj as File);
+        form.foto_url = await CloudinaryService.sendPicture(
+          pictureFile[0].originFileObj as File,
+        );
       } else {
-        form.foto_url = pictureFile[0].thumbUrl
+        form.foto_url = pictureFile[0].thumbUrl;
       }
     }
 
     // removendo os espaços em branco
-    form.nome = form.nome.trim()
-    form.cargo = form.cargo.trim()
+    form.nome = form.nome.trim();
+    form.cargo = form.cargo.trim();
     // convertendo o salário para number
-    form.salario = parseCurrencyInput(inputSalario)
+    form.salario = parseCurrencyInput(inputSalario);
 
-    return form
-  }
+    return form;
+  };
 
-  const { registerEmployee } = useEmployee()
+  const { registerEmployee } = useEmployee();
 
   const handleSubmit = async () => {
     if (!validate()) {
-      toast.error('Corrija os erros no formulário');
+      toast.error("Corrija os erros no formulário");
       return;
     }
 
-    const toSend = await prepareForm(true)
-    await registerEmployee.mutateAsync({ body: toSend })
+    const toSend = await prepareForm(true);
+    await registerEmployee.mutateAsync({ body: toSend });
   };
 
   const handleGoToContract = async () => {
     if (!validate()) return;
     const stateToSend = await prepareForm();
-    navigate(`/contract-employee`, { state: stateToSend })
-  }
+    navigate(`/contract-employee`, { state: stateToSend });
+  };
 
   useEffect(() => {
     if (registerEmployee.isPending) return;
     if (registerEmployee.isSuccess) {
-      setFormData(emptyEmployee)
-      setInputSalario('')
-      setAdmissionDate(new Date())
-      setPictureFile([])
+      setFormData(emptyEmployee);
+      setInputSalario("");
+      setAdmissionDate(new Date());
+      setPictureFile([]);
 
-      toast.success('Funcionário cadastrado com sucesso!');
-      navigate('/')
+      toast.success("Funcionário cadastrado com sucesso!");
+      navigate("/");
     }
     if (registerEmployee.isError) {
-      toast.error(`Erro ao cadastrar o funcionário: ${registerEmployee.error}`)
+      toast.error(`Erro ao cadastrar o funcionário: ${registerEmployee.error}`);
     }
-
-  }, [registerEmployee.isPending])
+  }, [registerEmployee.isPending]);
 
   return (
     <div className="min-h-screen bg-background pb-20">
@@ -213,7 +221,7 @@ const NewEmployeeScreen = () => {
       <div className="px-4 py-4 max-w-lg mx-auto space-y-4">
         <Card className="p-4 glass-card border-border space-y-4">
           {/* Upload Picture */}
-          <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <div style={{ display: "flex", justifyContent: "center" }}>
             <Upload
               listType="picture-circle"
               fileList={pictureFile}
@@ -223,7 +231,7 @@ const NewEmployeeScreen = () => {
                 setPictureFile(fileList.slice(-1));
               }}
             >
-              <button style={{ border: 0, background: 'none' }} type="button">
+              <button style={{ border: 0, background: "none" }} type="button">
                 <PlusOutlined />
                 <div style={{ marginTop: 8 }}>Imagem de perfil</div>
               </button>
@@ -236,9 +244,9 @@ const NewEmployeeScreen = () => {
             <Input
               id="name"
               value={formData.nome}
-              onChange={(e) => handleInputChange('nome', e.target.value)}
+              onChange={(e) => handleInputChange("nome", e.target.value)}
               placeholder="Ex: Maria Silva"
-              className={errors.name ? 'border-danger' : ''}
+              className={errors.name ? "border-danger" : ""}
             />
             {errors.name && (
               <p className="text-xs text-danger flex items-center gap-1">
@@ -254,9 +262,9 @@ const NewEmployeeScreen = () => {
             <Input
               id="role"
               value={formData.cargo}
-              onChange={(e) => handleInputChange('cargo', e.target.value)}
+              onChange={(e) => handleInputChange("cargo", e.target.value)}
               placeholder="Ex: Cozinheira"
-              className={errors.role ? 'border-danger' : ''}
+              className={errors.role ? "border-danger" : ""}
             />
             {errors.role && (
               <p className="text-xs text-danger flex items-center gap-1">
@@ -271,7 +279,7 @@ const NewEmployeeScreen = () => {
             <Label>Tipo de Contrato</Label>
             <RadioGroup
               value={formData.tipo}
-              onValueChange={(value) => handleInputChange('tipo', value)}
+              onValueChange={(value) => handleInputChange("tipo", value)}
               className="flex gap-4"
             >
               <div className="flex items-center space-x-2">
@@ -282,7 +290,10 @@ const NewEmployeeScreen = () => {
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="DIARISTA" id="diarista" />
-                <Label htmlFor="diarista" className="font-normal cursor-pointer">
+                <Label
+                  htmlFor="diarista"
+                  className="font-normal cursor-pointer"
+                >
                   Diarista
                 </Label>
               </div>
@@ -292,7 +303,7 @@ const NewEmployeeScreen = () => {
           {/* Salary */}
           <div className="space-y-2">
             <Label htmlFor="salary">
-              {formData.tipo === 'DIARISTA' ? 'Valor Diária' : 'Salário Base'} *
+              {formData.tipo === "DIARISTA" ? "Valor Diária" : "Salário Base"} *
             </Label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
@@ -303,7 +314,7 @@ const NewEmployeeScreen = () => {
                 value={inputSalario}
                 onChange={(e) => handleSalaryChange(e.target.value)}
                 placeholder="0,00"
-                className={`pl-10 ${errors.baseSalary ? 'border-danger' : ''}`}
+                className={`pl-10 ${errors.baseSalary ? "border-danger" : ""}`}
                 inputMode="decimal"
               />
             </div>
@@ -315,20 +326,23 @@ const NewEmployeeScreen = () => {
             )}
           </div>
 
-          {
-            formData.tipo === 'DIARISTA' &&
+          {formData.tipo === "DIARISTA" && (
             <div className="space-y-2">
               <Label htmlFor="daysForWork">Dias de trabalho p/ semana</Label>
               <div className="relative">
                 <Input
-                  type='number'
                   min={1}
                   id="daysForWork"
-                  value={formData.dias_trabalhados_semanal.toString() || '0'}
-                  onChange={(e) => handleInputChange('dias_trabalhados_semanal', e.target.value)}
-                  placeholder="0"
-                  className={` ${errors.diasTrabalhados ? 'border-danger' : ''}`}
-                  inputMode="decimal"
+                  value={formData.dias_trabalhados_semanal.toString() || "0"}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      dias_trabalhados_semanal: Number(e.target.value),
+                    }))
+                  }
+                placeholder="0"
+                className={` ${errors.diasTrabalhados ? "border-danger" : ""}`}
+                inputMode="decimal"
                 />
               </div>
               {errors.diasTrabalhados && (
@@ -338,7 +352,7 @@ const NewEmployeeScreen = () => {
                 </p>
               )}
             </div>
-          }
+          )}
 
           {/* CPF */}
           <div className="space-y-2">
@@ -348,7 +362,7 @@ const NewEmployeeScreen = () => {
               value={formData.cpf}
               onChange={(e) => handleCPFChange(e.target.value)}
               placeholder="000.000.000-00"
-              className={errors.cpf ? 'border-danger' : ''}
+              className={errors.cpf ? "border-danger" : ""}
               inputMode="numeric"
             />
             {errors.cpf && (
@@ -365,26 +379,46 @@ const NewEmployeeScreen = () => {
             <DatePicker id="birthDate" format={'DD/MM/YYYY'} onChange={setBirth} />
           </div>
 
-          {/* Admission Date */}
           <div style={{ display: 'flex', flexDirection: 'column' }} className="space-y-2">
             <Label htmlFor="admissionDate">Data de Admissão</Label>
             <DatePicker id="admissionDate" format={'DD/MM/YYYY'} onChange={setAdmission} />
           </div>
 
+          <div className="space-y-2">
+            <Label htmlFor="cpf">Data de admissão</Label>
+            <Input
+              onChange={(e) => {
+                const converted =
+                  e.target.value === ""
+                    ? null
+                    : new Date(e.target.value).toISOString();
+                if (converted) setAdmissionDate(new Date(converted));
+                setFormData((prev) => ({
+                  ...prev,
+                  data_admissao: converted,
+                }));
+              }}
+              placeholder="Selecionar data"
+              type="date"
+            />
+          </div>
+
           {/* Payday */}
-          {
-            formData.tipo === 'FIXO' &&
+          {formData.tipo === "FIXO" && (
             <>
-              <div className='flex flex-row gap-4'>
+              <div className="flex flex-row gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="payday">1° Dia do Pagamento</Label>
                   <Input
                     id="payday"
                     value={formData.primeiro_dia_pagamento.toString()}
                     onChange={(e) => {
-                      setFormData((prev) => ({ ...prev, primeiro_dia_pagamento: Number(e.target.value) }));
+                      setFormData((prev) => ({
+                        ...prev,
+                        primeiro_dia_pagamento: Number(e.target.value),
+                      }));
                     }}
-                    className={`${errors.dia_pagamento ? 'border-danger' : ''}`}
+                    className={`${errors.dia_pagamento ? "border-danger" : ""}`}
                     inputMode="decimal"
                   />
                 </div>
@@ -395,19 +429,27 @@ const NewEmployeeScreen = () => {
                     id="payday"
                     value={formData.segundo_dia_pagamento.toString()}
                     onChange={(e) => {
-                      setFormData((prev) => ({ ...prev, segundo_dia_pagamento: Number(e.target.value) }));
+                      setFormData((prev) => ({
+                        ...prev,
+                        segundo_dia_pagamento: Number(e.target.value),
+                      }));
                     }}
-                    className={`${errors.dia_pagamento ? 'border-danger' : ''}`}
+                    className={`${errors.dia_pagamento ? "border-danger" : ""}`}
                     inputMode="decimal"
                   />
                 </div>
               </div>
 
-              <ButtonAnt style={{ flex: 1, width: '100%' }} variant='dashed' color='yellow' onClick={calculatePaydays}>
+              <ButtonAnt
+                style={{ flex: 1, width: "100%" }}
+                variant="dashed"
+                color="yellow"
+                onClick={calculatePaydays}
+              >
                 Calcular dias de pagamento
               </ButtonAnt>
             </>
-          }
+          )}
         </Card>
 
         <Button
@@ -421,7 +463,7 @@ const NewEmployeeScreen = () => {
         <Button
           className="w-full h-12 text-base"
           onClick={handleSubmit}
-          variant='outline'
+          variant="outline"
         >
           <UserPlus className="w-5 h-5 mr-2" />
           Apenas cadastrar funcionário

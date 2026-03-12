@@ -30,9 +30,9 @@ export const StatusBadge = ({ status, className, label }: StatusBadgeProps) => {
 
   return (
     <span
-      style={{ fontSize: 14 }}
+      style={{ fontSize: 10, borderRadius: 6 }}
       className={cn(
-        'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium',
+        'inline-flex items-center px-2 py-0.5 text-xs font-medium',
         config.classes,
         className
       )}

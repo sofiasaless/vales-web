@@ -91,7 +91,6 @@ const SubscriptionsScreen = () => {
               <div className="flex items-center justify-between">
                 <div className="flex-1">
                   <h3 className="font-semibold text-foreground">
-                    MENSALIDADE -{" "}
                     {format(subscription.data_vencimento, "MMMM 'de' yyyy", {
                       locale: ptBR,
                     }).toUpperCase()}

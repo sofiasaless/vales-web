@@ -24,4 +24,5 @@ export type GerentePostRequestBody = Pick<GerenteResponseBody, "nome" | "tipo" |
 
 export type GerenteUpdateRequestBody = Partial<GerentePostRequestBody> & {
   ativo?: boolean
+  img_perfil?: string
 }

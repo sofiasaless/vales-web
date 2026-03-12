@@ -11,13 +11,12 @@ export function useListPayments(
   },
 ) {
   return useQuery({
-    queryKey: ["payments", employeeId],
+    queryKey: ["payments", employeeId, filter],
     queryFn: async () => {
       const result = await PaymentService.list(employeeId, filter);
       return result;
     },
     refetchOnWindowFocus: false,
-    refetchOnMount: false,
   });
 }
 

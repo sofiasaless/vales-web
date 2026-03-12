@@ -105,7 +105,7 @@ export const EmployeeCard = ({ employee, className }: EmployeeCardProps) => {
         <AvatarInitials
           photoUrl={employee?.foto_url}
           name={employee?.nome}
-          size="md"
+          size="lg"
           className="mb-3"
         />
 
@@ -121,7 +121,7 @@ export const EmployeeCard = ({ employee, className }: EmployeeCardProps) => {
         <div className="mb-2">
           <MoneyDisplay
             value={voucherTotal}
-            size="lg"
+            size="md"
             variant={voucherTotal > 0 ? "negative" : "default"}
           />
         </div>
