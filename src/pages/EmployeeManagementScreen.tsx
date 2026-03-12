@@ -6,7 +6,8 @@ import { VoucherItemCard } from '@/components/VoucherItemCard';
 import { useEmployee, useFindEmployee } from '@/hooks/useEmployee';
 import { useCurrentManager } from '@/hooks/useManager';
 import { calculateTotalVauchers } from '@/utils/calculate';
-import { App, Button, Card, Input, InputNumber, Modal } from 'antd';
+import { onChangeNumberInput, onKeyDownNumberInput } from '@/utils/format';
+import { App, Button, Card, Input, Modal } from 'antd';
 import {
   AlertCircle,
   CreditCard,
@@ -229,16 +230,14 @@ const EmployeeManagementScreen = () => {
           </div>
           <div>
             <label style={{ display: 'block', marginBottom: 4, fontWeight: 500 }}>Valor (R$)</label>
-            <InputNumber
+            <Input
               placeholder="0,00"
-              value={cashValue}
-              onChange={(val) => setCashValue(val)}
-              min={0.01}
-              step={0.5}
-              precision={2}
+              value={cashValue?.toFixed(2) || (0).toFixed(2)}
+              onKeyDown={onKeyDownNumberInput}
+              onChange={(val) => {
+                setCashValue(onChangeNumberInput(val));
+              }}
               style={{ width: '100%' }}
-              formatter={(value) => `${value}`.replace('.', ',')}
-              parser={(value) => Number(value?.replace(',', '.') || 0)}
             />
           </div>
         </div>

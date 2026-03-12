@@ -126,10 +126,10 @@ export const EmployeeCard = ({ employee, className }: EmployeeCardProps) => {
           />
         </div>
 
-        <StatusBadge
+        {/* <StatusBadge
           status={paymentStatus.status}
           label={paymentStatus.label}
-        />
+        /> */}
       </div>
     </button>
   );

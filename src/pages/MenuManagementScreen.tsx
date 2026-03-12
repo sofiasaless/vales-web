@@ -23,7 +23,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useListMenu, useMenu } from '@/hooks/useMenu';
 import { ItemMenuPostRequestBody, ItemMenuResponseBody } from '@/types/menu.type';
-import { parseCurrencyInput } from '@/utils/format';
+import { onChangeNumberInput, onKeyDownNumberInput, parseCurrencyInput } from '@/utils/format';
 import { Edit, Package, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -36,13 +36,13 @@ const MenuManagementScreen = () => {
   const [editingProduct, setEditingProduct] = useState<ItemMenuResponseBody | null>(null);
   const [deleteProductId, setDeleteProductId] = useState<string | null>(null);
 
-  const [formData, setFormData] = useState<{descricao: string, preco: string}>({
+  const [formData, setFormData] = useState<{descricao: string, preco: number}>({
     descricao: '',
-    preco: ''
+    preco: 0
   });
 
   const resetForm = () => {
-    setFormData({ descricao: '', preco: '' });
+    setFormData({ descricao: '', preco: 0 });
     setEditingProduct(null);
   };
 
@@ -54,7 +54,7 @@ const MenuManagementScreen = () => {
   const openEditDialog = (product: ItemMenuResponseBody) => {
     setFormData({
       descricao: product.descricao,
-      preco: product.preco.toFixed(2)
+      preco: product.preco
     });
     setEditingProduct(product);
     setShowAddDialog(true);
@@ -66,15 +66,14 @@ const MenuManagementScreen = () => {
       return;
     }
 
-    const price = parseCurrencyInput(formData.preco);
-    if (price <= 0) {
+    if (formData.preco <= 0) {
       toast.error('Preço deve ser maior que zero');
       return;
     }
     
     const toSend: ItemMenuPostRequestBody = {
       descricao: formData.descricao,
-      preco: parseCurrencyInput(formData.preco)
+      preco: formData.preco
     }
 
     if (editingProduct) {
@@ -188,10 +187,11 @@ const MenuManagementScreen = () => {
                 <Input
                   id="productPrice"
                   value={formData.preco}
+                  onKeyDown={onKeyDownNumberInput}
                   onChange={(e) =>
                     setFormData({
                       ...formData,
-                      preco: e.target.value.replace(/[^\d,]/g, ''),
+                      preco: onChangeNumberInput(e),
                     })
                   }
                   placeholder="0,00"
