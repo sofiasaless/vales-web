@@ -384,25 +384,6 @@ const NewEmployeeScreen = () => {
             <DatePicker id="admissionDate" format={'DD/MM/YYYY'} onChange={setAdmission} />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="cpf">Data de admissão</Label>
-            <Input
-              onChange={(e) => {
-                const converted =
-                  e.target.value === ""
-                    ? null
-                    : new Date(e.target.value).toISOString();
-                if (converted) setAdmissionDate(new Date(converted));
-                setFormData((prev) => ({
-                  ...prev,
-                  data_admissao: converted,
-                }));
-              }}
-              placeholder="Selecionar data"
-              type="date"
-            />
-          </div>
-
           {/* Payday */}
           {formData.tipo === "FIXO" && (
             <>
