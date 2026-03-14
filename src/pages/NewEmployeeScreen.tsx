@@ -127,7 +127,7 @@ const NewEmployeeScreen = () => {
 
     if (!formData.salario) {
       newErrors.baseSalary = "Salário é obrigatório";
-    } else if (parseCurrencyInput(inputSalario) <= 0) {
+    } else if (formData.salario <= 0) {
       newErrors.baseSalary = "Salário deve ser maior que zero";
     }
 
