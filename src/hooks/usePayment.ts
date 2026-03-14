@@ -6,8 +6,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 export function useListPayments(
   employeeId: string,
   filter: FilterData = {
-    data_fim: getToday().toISOString(),
     data_inicio: getFirstDayAtMounth().toISOString(),
+    data_fim: getToday().toISOString(),
   },
 ) {
   return useQuery({
