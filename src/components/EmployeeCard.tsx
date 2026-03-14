@@ -1,9 +1,9 @@
 import { useListPayments } from "@/hooks/usePayment";
 import { cn } from "@/lib/utils";
 import { FuncionarioResponseBody } from "@/types/funcionario.type";
-import { getToday } from "@/utils/date";
+import { getFirstDayAtMounth, getToday } from "@/utils/date";
 import { getFirstWord } from "@/utils/format";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { AvatarInitials } from "./AvatarInitials";
 import { MoneyDisplay } from "./MoneyDisplay";
@@ -24,8 +24,6 @@ export const EmployeeCard = ({ employee, className }: EmployeeCardProps) => {
 
   const {
     data: payments,
-    isRefetching,
-    isPending,
   } = useListPayments(employee.id);
 
   const paymentStatus = useMemo((): {
