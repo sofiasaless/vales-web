@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -27,7 +28,6 @@ const EditEmployeeScreen = () => {
   const [formData, setFormData] = useState<FuncionarioUpdateRequestBody>({
     ...employee
   });
-  const [inputSalario, setInputSalario] = useState('');
   const [pictureFile, setPictureFile] = useState<UploadFile[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -49,12 +49,6 @@ const EditEmployeeScreen = () => {
       formatted = `${digits.slice(0, 3)}.${digits.slice(3)}`;
     }
     handleInputChange('cpf', formatted);
-  };
-
-  const handleSalaryChange = (value: string) => {
-    setInputSalario(value);
-    const cleaned = value.replace(/[^\d,]/g, '');
-    handleInputChange('salario', cleaned);
   };
 
   const setAdmission: DatePickerProps['onChange'] = (date) => {
@@ -81,8 +75,10 @@ const EditEmployeeScreen = () => {
       }
     }
 
-    if (!inputSalario || parseCurrencyInput(inputSalario) <= 0) {
-      newErrors.baseSalary = 'Salário deve ser maior que zero';
+    if (!formData.salario) {
+      newErrors.baseSalary = "Salário é obrigatório";
+    } else if (formData.salario <= 0) {
+      newErrors.baseSalary = "Salário deve ser maior que zero";
     }
 
     if (formData.cpf && !validateCPF(formData.cpf)) {
@@ -102,7 +98,6 @@ const EditEmployeeScreen = () => {
     const toSend = { ...formData };
     toSend.nome = toSend.nome.trim();
     toSend.cargo = toSend.cargo.trim();
-    toSend.salario = parseCurrencyInput(inputSalario);
 
     if (toSend.tipo === 'DIARISTA') {
       toSend.primeiro_dia_pagamento = 0;
@@ -138,7 +133,6 @@ const EditEmployeeScreen = () => {
         foto_url: employee.foto_url || '',
         dias_trabalhados_semanal: employee.dias_trabalhados_semanal || 0,
       });
-      setInputSalario(employee.salario.toString().replace('.', ','));
       if (employee.foto_url) {
         setPictureFile([{
           uid: '-1',
