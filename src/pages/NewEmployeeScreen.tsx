@@ -37,7 +37,6 @@ const NewEmployeeScreen = () => {
   const [formData, setFormData] =
     useState<FuncionarioPostRequestBody>(emptyEmployee);
 
-  const [inputSalario, setInputSalario] = useState("");
   const [pictureFile, setPictureFile] = useState<UploadFile[]>([]);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -96,13 +95,6 @@ const NewEmployeeScreen = () => {
       formatted = `${digits.slice(0, 3)}.${digits.slice(3)}`;
     }
     handleInputChange("cpf", formatted);
-  };
-
-  const handleSalaryChange = (value: string) => {
-    // Allow only digits and comma
-    setInputSalario(value);
-    const cleaned = value.replace(/[^\d,]/g, "");
-    handleInputChange("salario", cleaned);
   };
 
   const validate = (): boolean => {
@@ -174,8 +166,6 @@ const NewEmployeeScreen = () => {
     // removendo os espaços em branco
     form.nome = form.nome.trim();
     form.cargo = form.cargo.trim();
-    // convertendo o salário para number
-    form.salario = parseCurrencyInput(inputSalario);
 
     return form;
   };
@@ -202,7 +192,6 @@ const NewEmployeeScreen = () => {
     if (registerEmployee.isPending) return;
     if (registerEmployee.isSuccess) {
       setFormData(emptyEmployee);
-      setInputSalario("");
       setAdmissionDate(new Date());
       setPictureFile([]);
 
