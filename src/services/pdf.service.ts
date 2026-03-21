@@ -251,7 +251,7 @@ export const PdfService = {
     page.drawText(`CLÁUSULA ${clausula++}°: DIREITO A FÉRIAS E GRATIFICAÇÃO (DÉCIMO TERCEIRO): Em caráter ESPONTÂNEO E NÃO OBRIGATÓRIO POR LEI, e reconhecendo a importância do bem-estar do(a) prestador(a) de serviços, o(a) CONTRATANTE se compromete a conceder ao(à) CONTRATADO(A), anualmente: a) Férias: Um período de 30 dias consecutivos de recesso, sem prestação de serviços, a ser agendado de comum acordo. Durante este período, o(a) CONTRATADO(A) receberá a remuneração mensal integral combinada. b) Gratificação de Final de Ano (Décimo Terceiro): Uma gratificação no valor equivalente a uma remuneração mensal integral, a ser paga até o dia 30 de dezembro de cada ano.`, { ...stylesText, y: yCursor -= 20 });
     page.drawText(`CLÁUSULA ${clausula++}°: RESCISÃO: Este contrato poderá ser rescindido por qualquer das partes, sem justa causa, ou imediatamente, em caso de descumprimento grave de qualquer cláusula.`, { ...stylesText, y: yCursor -= 125 });
 
-    const signature = employee.contrato.assinaturas.contratado
+    const signature = employee.contrato?.assinaturas?.contratado
 
     if (signature && digitalSignature) {
       try {
