@@ -234,7 +234,7 @@ export const PdfService = {
     let clausula = 1
 
     page.drawText(`DO OBJETO`, { ...stylesText, y: yCursor, font: timesBoldFont });
-    page.drawText(`CLÁUSULA ${clausula++}°: O presente instrumento tem por objeto a prestação de serviços autônomos, de natureza NÃO-EMPREGATÍCIA, a serem executados pelo(a) CONTRATADO(A) em favor do(a) CONTRATANTE, conforme especificado em anexo ou descrito a seguir: cozinhar as comida.`, { ...stylesText, y: yCursor -= 20 });
+    page.drawText(`CLÁUSULA ${clausula++}°: O presente instrumento tem por objeto a prestação de serviços autônomos, de natureza NÃO-EMPREGATÍCIA, a serem executados pelo(a) CONTRATADO(A) em favor do(a) CONTRATANTE, conforme especificado em anexo ou descrito a seguir: ${employee.contrato?.descricao_servicos}.`, { ...stylesText, y: yCursor -= 20 });
 
     page.drawText(`DA NATUREZA JURÍDICA E AUTONOMIA`, { ...stylesText, y: yCursor -= 60, font: timesBoldFont });
     page.drawText(`CLÁUSULA ${clausula++}°: ACEITAÇÃO DA CONDIÇÃO DE AUTÔNOMO: O(A) CONTRATADO(A) DECLARA, expressa e livremente, que aceita prestar os serviços sob o regime jurídico de Prestador Autônomo, não existindo vínculo empregatício de qualquer natureza (sem carteira de trabalho assinada – CLT), sendo esta a sua vontade e a forma que melhor atende aos seus interesses profissionais atuais.`, { ...stylesText, y: yCursor -= 20 });
