@@ -39,6 +39,7 @@ import { antdTheme } from "./theme/antTheme";
 import { EmpresaGuard } from "./guards/EmpresaGuard";
 import { ManagerGuard } from "./guards/ManagerGuard";
 import { BuildingPage } from "./components/BuildingPage";
+import { LoginGuard } from "./guards/LoginGuard";
 
 const queryClient = new QueryClient();
 
@@ -68,7 +69,11 @@ const App = () => (
                     <Routes>
                       <Route
                         path="/login"
-                        element={<RestaurantLoginScreen />}
+                        element={
+                          <LoginGuard>
+                            <RestaurantLoginScreen />
+                          </LoginGuard>
+                      }
                       />
 
                       <Route
