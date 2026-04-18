@@ -3,33 +3,20 @@ import { EmployeeCard } from "@/components/EmployeeCard";
 import { Loading } from "@/components/Loading";
 import { MoneyDisplay } from "@/components/MoneyDisplay";
 import { PageHeader } from "@/components/PageHeader";
-import { useListEmployee } from "@/hooks/useEmployee";
-import { useCurrentManager } from "@/hooks/useManager";
-import { calculateTotalVauchers } from "@/utils/calculate";
 import { Spin } from "antd";
 import { TrendingUp, Users } from "lucide-react";
-import { useMemo } from "react";
+import { useEmployeeListScreenController } from "./controller";
 
 const EmployeeListScreen = () => {
-  const { data: employees, isLoading, isPending } = useListEmployee();
-
-  const { data: currentManager, isLoading: loadingManager } =
-    useCurrentManager();
-
-  const totalVouchers = useMemo(() => {
-    return employees?.reduce((acc, func) => {
-      return acc + calculateTotalVauchers(func.vales);
-    }, 0);
-  }, [employees]);
-
-  const employeesWithVoucher = useMemo(() => {
-    return employees?.reduce((acc, func) => {
-      if (func.vales.length > 0) {
-        return acc + 1;
-      }
-      return acc + 0;
-    }, 0);
-  }, [employees]);
+  const {
+    loadingManager,
+    currentManager,
+    isLoading,
+    employees,
+    isPending,
+    employeesWithVoucher,
+    totalVouchers,
+  } = useEmployeeListScreenController();
 
   if (loadingManager) return <Loading />;
 

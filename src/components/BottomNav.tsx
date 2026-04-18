@@ -1,11 +1,11 @@
-import { useNavigate, useLocation } from 'react-router-dom';
-import { Users, UserPlus, Settings } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { useNavigate, useLocation } from "react-router-dom";
+import { Users, UserPlus, Settings } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const navItems = [
-  { path: '/', icon: Users, label: 'Funcionários' },
-  { path: '/new-employee', icon: UserPlus, label: 'Cadastrar' },
-  { path: '/settings', icon: Settings, label: 'Configurações' },
+  { path: "/", icon: Users, label: "Funcionários" },
+  { path: "/new-employee", icon: UserPlus, label: "Cadastrar" },
+  { path: "/settings", icon: Settings, label: "Configurações" },
 ];
 
 export const BottomNav = () => {
@@ -13,8 +13,19 @@ export const BottomNav = () => {
   const location = useLocation();
 
   // Hide on certain screens (including auth screens)
-  const hiddenPaths = ['/menu/', '/payment', '/employee/', '/login', '/select-manager', '/contract-employee', '/contract-signature', '/settings/'];
-  const shouldHide = hiddenPaths.some((path) => location.pathname.includes(path));
+  const hiddenPaths = [
+    "/menu/",
+    "/payment",
+    "/employee/",
+    "/login",
+    "/select-manager",
+    "/contract-employee",
+    "/contract-signature",
+    "/settings/",
+  ];
+  const shouldHide = hiddenPaths.some((path) =>
+    location.pathname.includes(path),
+  );
 
   if (shouldHide) return null;
 
@@ -30,14 +41,14 @@ export const BottomNav = () => {
               key={item.path}
               onClick={() => navigate(item.path)}
               className={cn(
-                'flex flex-col items-center justify-center flex-1 h-full tap-highlight-none transition-colors',
-                isActive ? 'text-primary' : 'text-muted-foreground'
+                "flex flex-col items-center justify-center flex-1 h-full tap-highlight-none transition-colors",
+                isActive ? "text-primary" : "text-muted-foreground",
               )}
             >
               <Icon
                 className={cn(
-                  'w-5 h-5 mb-1 transition-transform',
-                  isActive && 'scale-110'
+                  "w-5 h-5 mb-1 transition-transform",
+                  isActive && "scale-110",
                 )}
               />
               <span className="text-xs font-medium">{item.label}</span>
