@@ -16,7 +16,6 @@ import SelectManagerScreen from "@/pages/SelectManagerScreen";
 import CategoryExpensesScreen from "@/pages/CategoryExpensesScreen";
 import EditEmployeeScreen from "@/pages/EditEmployeeScreen";
 import EmployeeDetailScreen from "@/pages/EmployeeDetailScreen";
-import EmployeeListScreen from "@/pages/EmployeeListScreen";
 import EmployeeManagementScreen from "@/pages/EmployeeManagementScreen";
 import FinancesScreen from "@/pages/FinancesScreen";
 import IncentiveHistoryScreen from "@/pages/IncentiveHistoryScreen";
@@ -40,6 +39,7 @@ import { EmpresaGuard } from "./guards/EmpresaGuard";
 import { ManagerGuard } from "./guards/ManagerGuard";
 import { BuildingPage } from "./components/BuildingPage";
 import { LoginGuard } from "./guards/LoginGuard";
+import EmployeeListScreen from "./pages/EmployeeListScreen/EmployeeListScreen";
 
 const queryClient = new QueryClient();
 
@@ -73,7 +73,7 @@ const App = () => (
                           <LoginGuard>
                             <RestaurantLoginScreen />
                           </LoginGuard>
-                      }
+                        }
                       />
 
                       <Route

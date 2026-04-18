@@ -23,6 +23,12 @@ import { ptBR } from "date-fns/locale";
 import { toast } from "sonner";
 import { MensalidadeResponseBody } from "@/types/mensalidade";
 import { useListMonthlyFee } from "@/hooks/useMonthlyFee";
+import { AbstractModal } from "@/components/AbstractModal/AbstractModal";
+import { useLocation } from "react-router-dom";
+
+export interface SubscriptionsScreenStateProps {
+  invoiceModalOpen: boolean;
+}
 
 const SubscriptionsScreen = () => {
   const [selectedMonthlyFee, setSelectedMonthlyFee] =
@@ -73,9 +79,29 @@ const SubscriptionsScreen = () => {
     setCopied(false);
   };
 
+  const location = useLocation();
+  const { invoiceModalOpen } =
+    (location.state as SubscriptionsScreenStateProps) || {};
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(
+    invoiceModalOpen || false,
+  );
+  const handleCloseInvoiceModal = () => setIsModalOpen(false);
+
+  console.log(invoiceModalOpen);
+
   return (
     <div className="min-h-screen bg-background pb-20">
-      <PageHeader title="Mensalidades" showBack />
+      <PageHeader title="Mensalidades" showBack goBackToOption="/" />
+      <AbstractModal
+        onOk={handleCloseInvoiceModal}
+        onCancel={handleCloseInvoiceModal}
+        config={{
+          isOpen: isModalOpen,
+          title: "Acesso indisponível",
+          description:
+            "Sua fatura atual está atrasada! Verifique a seção de mensalidades.",
+        }}
+      />
 
       <div className="px-4 py-4 max-w-lg mx-auto space-y-3">
         {data?.map((subscription) => {
@@ -125,9 +151,7 @@ const SubscriptionsScreen = () => {
       <Dialog open={!!selectedMonthlyFee} onOpenChange={handleCloseModal}>
         <DialogContent className="max-w-sm mx-auto">
           <DialogHeader>
-            <DialogTitle>
-              Mensalidade selecionada
-            </DialogTitle>
+            <DialogTitle>Mensalidade selecionada</DialogTitle>
             <DialogDescription>Detalhes do pagamento</DialogDescription>
           </DialogHeader>
 
