@@ -4,6 +4,7 @@ import { type JSX } from "react";
 import { Navigate } from "react-router-dom";
 import { useManagerGuardController } from "./useManagerGuard.controller";
 import { Loading } from "@/components/Loading";
+import { AlertPage } from "@/components/AlertPage";
 
 export const ManagerGuard = ({
   children,
@@ -14,18 +15,22 @@ export const ManagerGuard = ({
 }) => {
   const { isLoadingInvoices, invoiceModalOpen, navigate } =
     useManagerGuardController();
+  const salvo = localStorage.getItem("usuario");
 
   if (isLoadingInvoices) return <Loading />;
 
   if (invoiceModalOpen) {
-    navigate("/settings/subscriptions", {
-      state: {
-        invoiceModalOpen: true,
-      },
-    });
+    if (permission === "GERENTE") {
+      navigate("/settings/subscriptions", {
+        state: {
+          invoiceModalOpen: true,
+        },
+      });
+    } else {
+      return <AlertPage />;
+    }
   }
 
-  const salvo = localStorage.getItem("usuario");
   if (!salvo) {
     return <Navigate to="/select-manager" replace />;
   }
