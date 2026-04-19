@@ -4,7 +4,6 @@ import { GerenteResponseBody, TiposGerente } from "@/types/gerente.type";
 import { type JSX } from "react";
 import { Navigate } from "react-router-dom";
 import { useManagerGuardController } from "./useManagerGuard.controller";
-import { AlertPage } from "@/components/AlertPage";
 
 export const ManagerGuard = ({
   children,
@@ -20,13 +19,6 @@ export const ManagerGuard = ({
   if (isLoadingInvoices) return <Loading />;
 
   if (invoiceModalOpen) {
-    if (permission === "GERENTE") {
-      navigate("/settings/subscriptions", {
-        state: {
-          invoiceModalOpen: true,
-        },
-      });
-    }
     if (usuario.tipo === "GERENTE") {
       return (
         <Navigate
