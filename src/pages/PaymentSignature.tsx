@@ -1,15 +1,15 @@
-import { PageHeader } from '@/components/PageHeader';
-import { Button } from '@/components/ui/button';
-import { useEmployee } from '@/hooks/useEmployee';
-import { usePayment } from '@/hooks/usePayment';
-import { CloudinaryService } from '@/services/clodinary.service';
-import { PagamentoPostRequestBody } from '@/types/pagamento.type';
-import { Button as ButtonAnt } from 'antd';
-import { CheckCircle, SignatureIcon, Trash2 } from 'lucide-react';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import SignaturePad from 'react-signature-pad-wrapper';
-import { toast } from 'sonner';
+import { PageHeader } from "@/components/PageHeader/PageHeader";
+import { Button } from "@/components/ui/button";
+import { useEmployee } from "@/hooks/useEmployee";
+import { usePayment } from "@/hooks/usePayment";
+import { CloudinaryService } from "@/services/clodinary.service";
+import { PagamentoPostRequestBody } from "@/types/pagamento.type";
+import { Button as ButtonAnt } from "antd";
+import { CheckCircle, SignatureIcon, Trash2 } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import SignaturePad from "react-signature-pad-wrapper";
+import { toast } from "sonner";
 
 const PaymentSignatureScreen = () => {
   const { id } = useParams<{ id: string }>();
@@ -27,26 +27,28 @@ const PaymentSignatureScreen = () => {
 
   const save = useCallback(() => {
     if (sigPad.current) {
-      const dataURL = sigPad.current.toDataURL('image/png');
+      const dataURL = sigPad.current.toDataURL("image/png");
       setSignatureUrl(dataURL);
       toast.success(`Assinatura salva com sucesso!`);
     }
   }, []);
 
-  const { pay } = usePayment()
+  const { pay } = usePayment();
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const handleFinalize = async () => {
     try {
       setIsLoading(true);
       if (!signatureUrl) {
-        return toast.error("A assinatura é obrigatória para finalizar o contrato.");
+        return toast.error(
+          "A assinatura é obrigatória para finalizar o contrato.",
+        );
       }
 
       const signatureLink = await CloudinaryService.sendPicture(signatureUrl);
       paymentBody.assinatura = signatureLink;
 
-      await pay.mutateAsync({ employeeId: id, body: paymentBody })
+      await pay.mutateAsync({ employeeId: id, body: paymentBody });
     } catch (error) {
       toast.error(`Erro ao realizar contratação: ${error}`);
     } finally {
@@ -58,8 +60,8 @@ const PaymentSignatureScreen = () => {
     if (pay.isPending) return;
 
     if (pay.isSuccess) {
-      toast.success('Pagamento confirmado com sucesso!');
-      navigate('/', { replace: true });
+      toast.success("Pagamento confirmado com sucesso!");
+      navigate("/", { replace: true });
     }
 
     if (pay.isError) {
@@ -68,10 +70,10 @@ const PaymentSignatureScreen = () => {
   }, [navigate, pay.error, pay.isError, pay.isPending, pay.isSuccess]);
 
   return (
-    <div style={{ minHeight: '100vh', paddingBottom: 32 }}>
+    <div style={{ minHeight: "100vh", paddingBottom: 32 }}>
       <PageHeader
         title={`Assinatura para pagamento`}
-        subtitle={'Assine dentro da área delimitada abaixo'}
+        subtitle={"Assine dentro da área delimitada abaixo"}
         showBack
       />
 
@@ -80,14 +82,14 @@ const PaymentSignatureScreen = () => {
           <SignaturePad
             ref={sigPad}
             options={{
-              penColor: 'black',
+              penColor: "black",
               minWidth: 1,
               maxWidth: 2,
             }}
             canvasProps={{
               style: {
-                width: '100%',
-                height: '500px',
+                width: "100%",
+                height: "500px",
               },
             }}
           />
@@ -108,7 +110,7 @@ const PaymentSignatureScreen = () => {
             onClick={save}
             icon={<CheckCircle size={16} />}
             className="w-full flex items-center justify-center"
-            style={{ backgroundColor: '#52c41a', borderColor: '#52c41a' }}
+            style={{ backgroundColor: "#52c41a", borderColor: "#52c41a" }}
           >
             Confirmar assinatura
           </ButtonAnt>

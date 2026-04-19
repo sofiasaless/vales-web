@@ -1,14 +1,17 @@
-import { PageHeader } from '@/components/PageHeader';
-import { Button } from '@/components/ui/button';
-import { useEmployee } from '@/hooks/useEmployee';
-import { CloudinaryService } from '@/services/clodinary.service';
-import { ContratoFuncionario, FuncionarioPostRequestBody } from '@/types/funcionario.type';
-import { Button as ButtonAnt } from 'antd';
-import { CheckCircle, SignatureIcon, Trash2 } from 'lucide-react';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import SignaturePad from 'react-signature-pad-wrapper';
-import { toast } from 'sonner';
+import { PageHeader } from "@/components/PageHeader/PageHeader";
+import { Button } from "@/components/ui/button";
+import { useEmployee } from "@/hooks/useEmployee";
+import { CloudinaryService } from "@/services/clodinary.service";
+import {
+  ContratoFuncionario,
+  FuncionarioPostRequestBody,
+} from "@/types/funcionario.type";
+import { Button as ButtonAnt } from "antd";
+import { CheckCircle, SignatureIcon, Trash2 } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import SignaturePad from "react-signature-pad-wrapper";
+import { toast } from "sonner";
 
 const ContractSignatureScreen = () => {
   const location = useLocation();
@@ -25,7 +28,7 @@ const ContractSignatureScreen = () => {
 
   const save = useCallback(() => {
     if (sigPad.current) {
-      const dataURL = sigPad.current.toDataURL('image/png');
+      const dataURL = sigPad.current.toDataURL("image/png");
       setSignatureUrl(dataURL);
       toast.success(`Assinatura salva com sucesso!`);
     }
@@ -38,7 +41,9 @@ const ContractSignatureScreen = () => {
     try {
       setIsLoading(true);
       if (!signatureUrl) {
-        return toast.error("A assinatura é obrigatória para finalizar o contrato.");
+        return toast.error(
+          "A assinatura é obrigatória para finalizar o contrato.",
+        );
       }
 
       const constractWithSignature: ContratoFuncionario = {
@@ -46,8 +51,8 @@ const ContractSignatureScreen = () => {
         descricao_servicos: employeeBody.contrato.descricao_servicos,
         assinaturas: {
           contratado: await CloudinaryService.sendPicture(signatureUrl),
-          contratante: ''
-        }
+          contratante: "",
+        },
       };
 
       employeeBody.contrato = constractWithSignature;
@@ -63,8 +68,8 @@ const ContractSignatureScreen = () => {
     if (registerEmployee.isPending) return;
 
     if (registerEmployee.isSuccess) {
-      toast.success('Funcionário contratado com sucesso!');
-      navigate('/', { replace: true });
+      toast.success("Funcionário contratado com sucesso!");
+      navigate("/", { replace: true });
     }
 
     if (registerEmployee.isError) {
@@ -73,10 +78,10 @@ const ContractSignatureScreen = () => {
   }, [registerEmployee.isPending]);
 
   return (
-    <div style={{ minHeight: '100vh', paddingBottom: 32 }}>
+    <div style={{ minHeight: "100vh", paddingBottom: 32 }}>
       <PageHeader
-        title={`Assinatura de ${employeeBody?.nome?.split(' ')[0] || 'Funcionário'}`}
-        subtitle={'Assine dentro da área delimitada abaixo'}
+        title={`Assinatura de ${employeeBody?.nome?.split(" ")[0] || "Funcionário"}`}
+        subtitle={"Assine dentro da área delimitada abaixo"}
         showBack
       />
 
@@ -85,14 +90,14 @@ const ContractSignatureScreen = () => {
           <SignaturePad
             ref={sigPad}
             options={{
-              penColor: 'black',
+              penColor: "black",
               minWidth: 1,
               maxWidth: 2,
             }}
             canvasProps={{
               style: {
-                width: '100%',
-                height: '500px',
+                width: "100%",
+                height: "500px",
               },
             }}
           />
@@ -113,7 +118,7 @@ const ContractSignatureScreen = () => {
             onClick={save}
             icon={<CheckCircle size={16} />}
             className="w-full flex items-center justify-center"
-            style={{ backgroundColor: '#52c41a', borderColor: '#52c41a' }}
+            style={{ backgroundColor: "#52c41a", borderColor: "#52c41a" }}
           >
             Confirmar assinatura
           </ButtonAnt>

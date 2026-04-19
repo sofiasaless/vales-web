@@ -1,11 +1,11 @@
-import { ActiveIncentiveCard } from "@/components/ActiveIncentiveCard";
-import { EmployeeCard } from "@/components/EmployeeCard";
-import { Loading } from "@/components/Loading";
-import { MoneyDisplay } from "@/components/MoneyDisplay";
-import { PageHeader } from "@/components/PageHeader";
+import { EmployeeCard } from "@/components/EmployeeCard/EmployeeCard";
+import { Loading } from "@/components/Loading/Loading";
+import { MoneyDisplay } from "@/components/MoneyDisplay/MoneyDisplay";
+import { PageHeader } from "@/components/PageHeader/PageHeader";
 import { Spin } from "antd";
 import { TrendingUp, Users } from "lucide-react";
 import { useEmployeeListScreenController } from "./controller";
+// import { ActiveIncentiveCard } from "@/components/ActiveIncentiveCard/ActiveIncentiveCard";
 
 const EmployeeListScreen = () => {
   const {
@@ -70,7 +70,7 @@ const EmployeeListScreen = () => {
         </div>
 
         {/* Active Incentive Card */}
-        <ActiveIncentiveCard />
+        {/*<ActiveIncentiveCard />*/}
 
         {/* Employee Grid */}
         <div className="grid grid-cols-2 gap-3">

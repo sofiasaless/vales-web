@@ -1,20 +1,16 @@
 import { useListPayments } from "@/hooks/usePayment";
-import { cn } from "@/lib/utils";
 import { FuncionarioResponseBody } from "@/types/funcionario.type";
-import { getFirstDayAtMounth, getToday } from "@/utils/date";
-import { getFirstWord } from "@/utils/format";
-import { useEffect, useMemo } from "react";
+import { getToday } from "@/utils/date";
+import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { AvatarInitials } from "./AvatarInitials";
-import { MoneyDisplay } from "./MoneyDisplay";
-import { StatusBadge } from "./StatusBadge";
 
-interface EmployeeCardProps {
+interface EmployeeCardControllerProps {
   employee: FuncionarioResponseBody | undefined;
-  className?: string;
 }
 
-export const EmployeeCard = ({ employee, className }: EmployeeCardProps) => {
+export function useEmployeeCardController({
+  employee,
+}: EmployeeCardControllerProps) {
   const navigate = useNavigate();
 
   const voucherTotal = employee.vales.reduce(
@@ -22,9 +18,7 @@ export const EmployeeCard = ({ employee, className }: EmployeeCardProps) => {
     0,
   );
 
-  const {
-    data: payments,
-  } = useListPayments(employee.id);
+  const { data: payments } = useListPayments(employee.id);
 
   const paymentStatus = useMemo((): {
     status: "pending" | "paid" | "today" | "due";
@@ -90,45 +84,10 @@ export const EmployeeCard = ({ employee, className }: EmployeeCardProps) => {
     payments,
   ]);
 
-  return (
-    <button
-      onClick={() => navigate(`/employee/${employee?.id}`)}
-      className={cn(
-        "glass-card rounded-xl p-4 text-left w-full card-interactive tap-highlight-none",
-        "hover:border-primary/30 focus:outline-none focus:ring-2 focus:ring-primary/50",
-        className,
-      )}
-    >
-      <div className="flex flex-col items-center text-center">
-        <AvatarInitials
-          photoUrl={employee?.foto_url}
-          name={employee?.nome}
-          size="lg"
-          className="mb-3"
-        />
-
-        <h3
-          style={{ fontSize: 16 }}
-          className="font-semibold text-foreground truncate w-full"
-        >
-          {getFirstWord(employee?.nome)}
-        </h3>
-
-        <p className="text-x text-muted-foreground mb-2">{employee?.cargo}</p>
-
-        <div className="mb-2">
-          <MoneyDisplay
-            value={voucherTotal}
-            size="md"
-            variant={voucherTotal > 0 ? "negative" : "default"}
-          />
-        </div>
-
-        {/* <StatusBadge
-          status={paymentStatus.status}
-          label={paymentStatus.label}
-        /> */}
-      </div>
-    </button>
-  );
-};
+  return {
+    navigate,
+    employee,
+    voucherTotal,
+    paymentStatus,
+  };
+}

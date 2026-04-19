@@ -1,6 +1,8 @@
-import { AvatarInitials } from "@/components/AvatarInitials";
-import { MoneyDisplay } from "@/components/MoneyDisplay";
-import { PageHeader } from "@/components/PageHeader";
+/* eslint-disable react-hooks/rules-of-hooks */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { AvatarInitials } from "@/components/AvatarInitials/AvatarInitials";
+import { MoneyDisplay } from "@/components/MoneyDisplay/MoneyDisplay";
+import { PageHeader } from "@/components/PageHeader/PageHeader";
 import {
   AlertDialog,
   AlertDialogAction,

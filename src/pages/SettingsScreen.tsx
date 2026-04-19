@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { AvatarInitials } from "@/components/AvatarInitials";
-import { Loading } from "@/components/Loading";
-import { PageHeader } from "@/components/PageHeader";
+import { AvatarInitials } from "@/components/AvatarInitials/AvatarInitials";
+import { Loading } from "@/components/Loading/Loading";
+import { PageHeader } from "@/components/PageHeader/PageHeader";
 import { Card } from "@/components/ui/card";
 import { useAuthActions } from "@/hooks/useAuth";
 import { useCurrentEnterprise } from "@/hooks/useEnterprise";
@@ -17,7 +17,7 @@ import {
   UserCog,
   Users,
   UtensilsCrossed,
-  Wallet
+  Wallet,
 } from "lucide-react";
 import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
@@ -38,13 +38,16 @@ const SettingsScreen = () => {
     const url = await CloudinaryService.sendPicture(file);
     await update.mutateAsync({
       managerId: manager.id,
-      payload: { img_perfil: url }
+      payload: { img_perfil: url },
     });
-    localStorage.setItem("usuario", JSON.stringify({
-      ...manager,
-      img_perfil: url,
-    }))
-    toast.success('Recarregue a página para sua foto aparecer!')
+    localStorage.setItem(
+      "usuario",
+      JSON.stringify({
+        ...manager,
+        img_perfil: url,
+      }),
+    );
+    toast.success("Recarregue a página para sua foto aparecer!");
   };
 
   const MenuItem = ({
@@ -60,12 +63,14 @@ const SettingsScreen = () => {
   }) => (
     <button
       onClick={onClick}
-      className={`flex items-center w-full p-4 tap-highlight-none transition-colors ${danger ? "text-danger" : "text-foreground"
-        }`}
+      className={`flex items-center w-full p-4 tap-highlight-none transition-colors ${
+        danger ? "text-danger" : "text-foreground"
+      }`}
     >
       <div
-        className={`p-2 rounded-lg mr-3 ${danger ? "bg-danger/10" : "bg-secondary"
-          }`}
+        className={`p-2 rounded-lg mr-3 ${
+          danger ? "bg-danger/10" : "bg-secondary"
+        }`}
       >
         <Icon
           className={`w-5 h-5 ${danger ? "text-danger" : "text-muted-foreground"}`}
@@ -90,33 +95,37 @@ const SettingsScreen = () => {
               ref={fileInputRef}
               type="file"
               accept="image/*"
-              style={{ display: 'none' }}
+              style={{ display: "none" }}
               onChange={(e) => {
                 const file = e.target.files?.[0];
                 if (file) handleSendImage(file);
               }}
             />
             <div
-              style={{ cursor: 'pointer', position: 'relative' }}
+              style={{ cursor: "pointer", position: "relative" }}
               onClick={() => fileInputRef.current?.click()}
             >
-
-              <AvatarInitials photoUrl={manager.img_perfil} name={manager?.nome} size="lg" />
+              <AvatarInitials
+                photoUrl={manager.img_perfil}
+                name={manager?.nome}
+                size="lg"
+              />
 
               {/* Overlay de edição */}
-              <div style={{
-                position: 'absolute',
-                inset: 0,
-                borderRadius: '50%',
-                background: 'rgba(0,0,0,0.35)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                opacity: 0,
-                transition: 'opacity 0.2s',
-              }}
-                onMouseEnter={e => (e.currentTarget.style.opacity = '1')}
-                onMouseLeave={e => (e.currentTarget.style.opacity = '0')}
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  borderRadius: "50%",
+                  background: "rgba(0,0,0,0.35)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  opacity: 0,
+                  transition: "opacity 0.2s",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.opacity = "1")}
+                onMouseLeave={(e) => (e.currentTarget.style.opacity = "0")}
               >
                 <Camera className="w-5 h-5 text-white" />
               </div>

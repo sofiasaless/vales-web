@@ -5,7 +5,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 export function useManagerGuardController() {
   const location = useLocation();
-  const navigate = useNavigate();
 
   const { data: invoices, isLoading: isLoadingInvoices } = useListMonthlyFee();
   const [invoiceModalOpen, setInvoiceModalOpen] = useState(false);
@@ -24,6 +23,5 @@ export function useManagerGuardController() {
   return {
     invoiceModalOpen,
     isLoadingInvoices,
-    navigate,
   };
 }
