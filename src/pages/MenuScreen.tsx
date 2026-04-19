@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import { MenuItemCard } from "@/components/MenuItemCard/MenuItemCard";
 import { MoneyDisplay } from "@/components/MoneyDisplay/MoneyDisplay";
 import { PageHeader } from "@/components/PageHeader/PageHeader";
 import { useEmployee } from "@/hooks/useEmployee";
+import { useCurrentManager } from "@/hooks/useManager";
 import { useListMenu } from "@/hooks/useMenu";
 import { Vale } from "@/types/vale.type";
 import { Button, Input, Spin } from "antd";
@@ -74,6 +76,8 @@ const MenuScreen = () => {
 
   const { addMultipleVouchers } = useEmployee();
 
+  const { data: currentManager } = useCurrentManager();
+
   const handleAddToVoucher = async () => {
     if (selectedItems.length === 0) return;
 
@@ -85,6 +89,10 @@ const MenuScreen = () => {
         descricao: product.descricao,
         preco_unit: product.preco,
         quantidade: selected.quantity,
+        criadoPor: {
+          ...currentManager,
+          data_criacao: new Date(currentManager.data_criacao),
+        },
       };
     });
 

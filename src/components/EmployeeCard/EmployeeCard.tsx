@@ -1,10 +1,6 @@
-import { useListPayments } from "@/hooks/usePayment";
 import { cn } from "@/lib/utils";
 import { FuncionarioResponseBody } from "@/types/funcionario.type";
-import { getToday } from "@/utils/date";
 import { getFirstWord } from "@/utils/format";
-import { useMemo } from "react";
-import { useNavigate } from "react-router-dom";
 import { AvatarInitials } from "../AvatarInitials/AvatarInitials";
 import { MoneyDisplay } from "../MoneyDisplay/MoneyDisplay";
 import { useEmployeeCardController } from "./useEmployeeCard.controller";

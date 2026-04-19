@@ -84,6 +84,10 @@ const EmployeeManagementScreen = () => {
             descricao: cashDescription.trim(),
             preco_unit: cashValue,
             quantidade: 1,
+            criadoPor: {
+              ...manager,
+              data_criacao: new Date(manager.data_criacao),
+            },
           },
         },
       });
