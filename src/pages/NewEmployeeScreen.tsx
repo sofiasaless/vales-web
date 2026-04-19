@@ -25,8 +25,6 @@ import { toast } from "sonner";
 const emptyEmployee: FuncionarioPostRequestBody = {
   cargo: "",
   nome: "",
-  incentivo: [],
-  vales: [],
   primeiro_dia_pagamento: 0,
   segundo_dia_pagamento: 0,
   salario: 0,

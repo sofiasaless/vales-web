@@ -26,15 +26,15 @@ export const EmployeeService = {
   },
 
   async removeVoucher(payload: VoucherMutation) {
-    return await api.put(`/funcionario/vale/remover/${payload.employeeId}`, payload.voucher);
+    return await api.put(`/funcionario/vale/remover/${payload.employeeId}`, {vale: payload.voucher});
   },
 
   async addVoucher(payload: VoucherMutation) {
-    return await api.put(`/funcionario/vale/adicionar/${payload.employeeId}`, payload.voucher);
+    return await api.put(`/funcionario/vale/adicionar/${payload.employeeId}`, { vale: payload.voucher});
   },
 
   async addMultipleVouchers(payload: VouchersMutation) {
-    return await api.put(`/funcionario/vale/adicionar-multiplos/${payload.employeeId}`, payload.vouchers);
+    return await api.put(`/funcionario/vale/adicionar-multiplos/${payload.employeeId}`, { vales: payload.vouchers});
   },
 
   async update(employeeId: string, body: FuncionarioUpdateRequestBody) {

@@ -12,7 +12,9 @@ export type GerenteResponseBody = {
   data_criacao: string
 }
 
-export type GerenteAutenticateRequestBody = Pick<GerenteResponseBody, "id" | "senha">
+export type GerenteAutenticateRequestBody = Pick<GerenteResponseBody, "id"> & {
+  password: string;
+}
 
 export type GerenteAutenticatedResponseBody = {
   resultado: boolean,

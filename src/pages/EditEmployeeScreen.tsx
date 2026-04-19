@@ -105,7 +105,7 @@ const EditEmployeeScreen = () => {
       return;
     }
 
-    const toSend = { ...formData };
+    let toSend = { ...formData };
     toSend.nome = toSend.nome.trim();
     toSend.cargo = toSend.cargo.trim();
 
@@ -122,7 +122,8 @@ const EditEmployeeScreen = () => {
         pictureFile[0].originFileObj as File,
       );
     } else if (pictureFile.length === 0) {
-      toSend.foto_url = "";
+      const { foto_url, ...valuesToSend } = toSend; 
+      toSend = valuesToSend;
     }
 
     console.info("form ", toSend);
@@ -162,7 +163,7 @@ const EditEmployeeScreen = () => {
     if (updateEmployee.isPending) return;
     if (updateEmployee.isSuccess) {
       toast.success("Funcionário atualizado com sucesso!");
-      navigate(-1);
+      navigate('/', { replace: true });
     }
     if (updateEmployee.isError) {
       toast.error(`Erro ao atualizar: ${updateEmployee.error}`);
