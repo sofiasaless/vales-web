@@ -30,6 +30,13 @@ export function useEmployeeListScreenController() {
     }, 0);
   }, [employees]);
 
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const filteredEmployees = useMemo(() => {
+    return employees?.filter((func) =>
+      func.nome.toLowerCase().includes(searchQuery.toLowerCase()),
+    );
+  }, [employees, searchQuery]);
+
   return {
     isModalOpen,
     handleCloseModal,
@@ -40,5 +47,8 @@ export function useEmployeeListScreenController() {
     isLoading,
     isPending,
     employees,
+    searchQuery,
+    setSearchQuery,
+    filteredEmployees,
   };
 }
