@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { PageHeader } from "@/components/PageHeader";
+import { PageHeader } from "@/components/PageHeader/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -8,7 +8,12 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useEmployee } from "@/hooks/useEmployee";
 import { CloudinaryService } from "@/services/clodinary.service";
 import { FuncionarioPostRequestBody } from "@/types/funcionario.type";
-import { onChangeNumberInput, onKeyDownNumberInput, parseCurrencyInput, validateCPF } from "@/utils/format";
+import {
+  onChangeNumberInput,
+  onKeyDownNumberInput,
+  parseCurrencyInput,
+  validateCPF,
+} from "@/utils/format";
 import { PlusOutlined } from "@ant-design/icons";
 import { Button as ButtonAnt, DatePicker, DatePickerProps, Upload } from "antd";
 import { UploadFile } from "antd/lib/upload";
@@ -43,21 +48,21 @@ const NewEmployeeScreen = () => {
 
   const [admissionDate, setAdmissionDate] = useState<Date>(new Date());
 
-  const setAdmission: DatePickerProps['onChange'] = (date, dateString) => {
-    const converted = ((date as any).$d as Date)
-    setAdmissionDate(converted)
+  const setAdmission: DatePickerProps["onChange"] = (date, dateString) => {
+    const converted = (date as any).$d as Date;
+    setAdmissionDate(converted);
     setFormData((prev) => ({
       ...prev,
-      data_admissao: converted.toISOString()
-    }))
+      data_admissao: converted.toISOString(),
+    }));
   };
 
-  const setBirth: DatePickerProps['onChange'] = (date, dateString) => {
-    const converted = ((date as any).$d as Date).toISOString()
+  const setBirth: DatePickerProps["onChange"] = (date, dateString) => {
+    const converted = ((date as any).$d as Date).toISOString();
     setFormData((prev) => ({
       ...prev,
-      data_nascimento: converted
-    }))
+      data_nascimento: converted,
+    }));
   };
 
   const calculatePaydays = () => {
@@ -306,7 +311,7 @@ const NewEmployeeScreen = () => {
                   setFormData((prev) => ({
                     ...prev,
                     salario: onChangeNumberInput(e),
-                  }))
+                  }));
                 }}
                 placeholder="0,00"
                 className={`pl-10 ${errors.baseSalary ? "border-danger" : ""}`}
@@ -369,14 +374,28 @@ const NewEmployeeScreen = () => {
           </div>
 
           {/* Birth Date */}
-          <div style={{ display: 'flex', flexDirection: 'column' }} className="space-y-2">
+          <div
+            style={{ display: "flex", flexDirection: "column" }}
+            className="space-y-2"
+          >
             <Label htmlFor="birthDate">Data de Nascimento</Label>
-            <DatePicker id="birthDate" format={'DD/MM/YYYY'} onChange={setBirth} />
+            <DatePicker
+              id="birthDate"
+              format={"DD/MM/YYYY"}
+              onChange={setBirth}
+            />
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column' }} className="space-y-2">
+          <div
+            style={{ display: "flex", flexDirection: "column" }}
+            className="space-y-2"
+          >
             <Label htmlFor="admissionDate">Data de Admissão</Label>
-            <DatePicker id="admissionDate" format={'DD/MM/YYYY'} onChange={setAdmission} />
+            <DatePicker
+              id="admissionDate"
+              format={"DD/MM/YYYY"}
+              onChange={setAdmission}
+            />
           </div>
 
           {/* Payday */}

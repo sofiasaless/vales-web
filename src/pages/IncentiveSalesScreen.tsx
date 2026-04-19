@@ -1,21 +1,28 @@
-import { useNavigate } from 'react-router-dom';
-import { PageHeader } from '@/components/PageHeader';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { AvatarInitials } from '@/components/AvatarInitials';
-import { useIncentive } from '@/context/IncentiveContext';
-import { useEmployees } from '@/context/EmployeeContext';
-import { Trophy, Minus, Plus, Crown, Target } from 'lucide-react';
-import { toast } from 'sonner';
-import { useEffect } from 'react';
+import { useNavigate } from "react-router-dom";
+import { PageHeader } from "@/components/PageHeader/PageHeader";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { AvatarInitials } from "@/components/AvatarInitials/AvatarInitials";
+import { useIncentive } from "@/context/IncentiveContext";
+import { Trophy, Minus, Plus, Crown, Target } from "lucide-react";
+import { toast } from "sonner";
+import { useEffect } from "react";
 
 const IncentiveSalesScreen = () => {
   const navigate = useNavigate();
-  const { state: incentiveState, getActiveIncentive, getEmployeeCounter, incrementCounter, decrementCounter, setWinner } = useIncentive();
-  const { state: employeeState } = useEmployees();
+  const {
+    state: incentiveState,
+    getActiveIncentive,
+    getEmployeeCounter,
+    incrementCounter,
+    decrementCounter,
+    setWinner,
+  } = useIncentive();
+  // const { state: employeeState } = useEmployees();
 
   const activeIncentive = getActiveIncentive();
-  const employees = employeeState.employees;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const employees = [];
 
   // Check for winner when counters change
   useEffect(() => {
@@ -25,15 +32,23 @@ const IncentiveSalesScreen = () => {
       const counter = getEmployeeCounter(employee.id);
       if (counter >= activeIncentive.meta && !activeIncentive.ganhador_id) {
         setWinner(employee.id, employee.name);
-        toast.success(`🎉 ${employee.name} atingiu a meta e ganhou o incentivo!`);
+        toast.success(
+          `🎉 ${employee.name} atingiu a meta e ganhou o incentivo!`,
+        );
         break;
       }
     }
-  }, [incentiveState.employeeCounters, activeIncentive, employees, setWinner, getEmployeeCounter]);
+  }, [
+    incentiveState.employeeCounters,
+    activeIncentive,
+    employees,
+    setWinner,
+    getEmployeeCounter,
+  ]);
 
   const handleIncrement = (employeeId: string) => {
     if (activeIncentive?.ganhador_id) {
-      toast.error('O incentivo já tem um ganhador');
+      toast.error("O incentivo já tem um ganhador");
       return;
     }
     incrementCounter(employeeId);
@@ -41,7 +56,7 @@ const IncentiveSalesScreen = () => {
 
   const handleDecrement = (employeeId: string) => {
     if (activeIncentive?.ganhador_id) {
-      toast.error('O incentivo já tem um ganhador');
+      toast.error("O incentivo já tem um ganhador");
       return;
     }
     decrementCounter(employeeId);
@@ -50,20 +65,18 @@ const IncentiveSalesScreen = () => {
   if (!activeIncentive) {
     return (
       <div className="min-h-screen bg-background pb-20">
-      <PageHeader 
-          title="Registrar Vendas" 
-          subtitle="Incentivo" 
-          showBack 
-        />
+        <PageHeader title="Registrar Vendas" subtitle="Incentivo" showBack />
         <div className="px-4 py-8 max-w-lg mx-auto text-center">
           <Trophy className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-          <p className="text-muted-foreground text-lg">Nenhum incentivo ativo</p>
+          <p className="text-muted-foreground text-lg">
+            Nenhum incentivo ativo
+          </p>
           <p className="text-sm text-muted-foreground mt-2">
             Crie um novo incentivo nas configurações
           </p>
-          <Button 
+          <Button
             className="mt-4"
-            onClick={() => navigate('/settings/incentives')}
+            onClick={() => navigate("/settings/incentives")}
           >
             Ir para Incentivos
           </Button>
@@ -72,16 +85,16 @@ const IncentiveSalesScreen = () => {
     );
   }
 
-  const winner = activeIncentive.ganhador_id 
-    ? employees.find(e => e.id === activeIncentive.ganhador_id)
+  const winner = activeIncentive.ganhador_id
+    ? employees.find((e) => e.id === activeIncentive.ganhador_id)
     : null;
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      <PageHeader 
-        title="Registrar Vendas" 
-        subtitle={activeIncentive.descricao} 
-        showBack 
+      <PageHeader
+        title="Registrar Vendas"
+        subtitle={activeIncentive.descricao}
+        showBack
       />
 
       <div className="px-4 py-4 max-w-lg mx-auto space-y-4">
@@ -128,13 +141,16 @@ const IncentiveSalesScreen = () => {
           {employees.map((employee) => {
             const counter = getEmployeeCounter(employee.id);
             const isWinner = activeIncentive.ganhador_id === employee.id;
-            const progress = Math.min((counter / activeIncentive.meta) * 100, 100);
+            const progress = Math.min(
+              (counter / activeIncentive.meta) * 100,
+              100,
+            );
 
             return (
-              <Card 
-                key={employee.id} 
+              <Card
+                key={employee.id}
                 className={`p-4 glass-card border-border ${
-                  isWinner ? 'border-success/50 bg-success/5' : ''
+                  isWinner ? "border-success/50 bg-success/5" : ""
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -148,13 +164,15 @@ const IncentiveSalesScreen = () => {
                         <Crown className="w-4 h-4 text-success shrink-0" />
                       )}
                     </div>
-                    <p className="text-xs text-muted-foreground">{employee.role}</p>
-                    
+                    <p className="text-xs text-muted-foreground">
+                      {employee.role}
+                    </p>
+
                     {/* Progress bar */}
                     <div className="mt-2 h-1.5 bg-secondary rounded-full overflow-hidden">
-                      <div 
+                      <div
                         className={`h-full transition-all duration-300 ${
-                          isWinner ? 'bg-success' : 'bg-primary'
+                          isWinner ? "bg-success" : "bg-primary"
                         }`}
                         style={{ width: `${progress}%` }}
                       />

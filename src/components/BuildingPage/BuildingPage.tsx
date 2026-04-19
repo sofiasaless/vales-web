@@ -1,6 +1,6 @@
-import { PageHeader } from "./PageHeader";
+import { PageHeader } from "../PageHeader/PageHeader";
 
-export const BuildingPage = ({pageName}: {pageName: string}) => {
+export const BuildingPage = ({ pageName }: { pageName: string }) => {
   return (
     <div className="min-h-screen bg-background pb-20">
       <PageHeader title={pageName} showBack />
@@ -13,7 +13,7 @@ export const BuildingPage = ({pageName}: {pageName: string}) => {
           alignContent: "center",
           height: "100vh",
           justifyItems: "center",
-          flexDirection: 'column',
+          flexDirection: "column",
         }}
       >
         <h1

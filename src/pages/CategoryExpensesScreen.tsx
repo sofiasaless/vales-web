@@ -1,17 +1,17 @@
-import { useState, useMemo } from 'react';
-import { useLocation } from 'react-router-dom';
-import { PageHeader } from '@/components/PageHeader';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { formatCurrency, formatDate } from '@/utils/format';
+import { useState, useMemo } from "react";
+import { useLocation } from "react-router-dom";
+import { PageHeader } from "@/components/PageHeader/PageHeader";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { formatCurrency, formatDate } from "@/utils/format";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from "@/components/ui/select";
 import {
   ShoppingCart,
   Wine,
@@ -22,8 +22,8 @@ import {
   Package,
   Plus,
   Calendar,
-} from 'lucide-react';
-import type { ExpenseCategory } from './FinancesScreen';
+} from "lucide-react";
+import type { ExpenseCategory } from "./FinancesScreen";
 
 interface Expense {
   id: string;
@@ -33,55 +33,90 @@ interface Expense {
 }
 
 const iconMap: Record<string, any> = {
-  'shopping-cart': ShoppingCart,
-  'wine': Wine,
-  'beef': Beef,
-  'trending-up': TrendingUp,
-  'truck': Truck,
-  'utensils': Utensils,
-  'package': Package,
+  "shopping-cart": ShoppingCart,
+  wine: Wine,
+  beef: Beef,
+  "trending-up": TrendingUp,
+  truck: Truck,
+  utensils: Utensils,
+  package: Package,
 };
 
 // Mock expenses
 const mockExpenses: Record<string, Expense[]> = {
-  '1': [
-    { id: '1', description: 'Arroz e Feijão', amount: 150.00, date: new Date('2026-01-10') },
-    { id: '2', description: 'Óleo e Temperos', amount: 85.50, date: new Date('2026-01-08') },
-    { id: '3', description: 'Produtos de Limpeza', amount: 120.00, date: new Date('2026-01-05') },
+  "1": [
+    {
+      id: "1",
+      description: "Arroz e Feijão",
+      amount: 150.0,
+      date: new Date("2026-01-10"),
+    },
+    {
+      id: "2",
+      description: "Óleo e Temperos",
+      amount: 85.5,
+      date: new Date("2026-01-08"),
+    },
+    {
+      id: "3",
+      description: "Produtos de Limpeza",
+      amount: 120.0,
+      date: new Date("2026-01-05"),
+    },
   ],
-  '2': [
-    { id: '1', description: 'Refrigerantes', amount: 320.00, date: new Date('2026-01-11') },
-    { id: '2', description: 'Cervejas', amount: 450.50, date: new Date('2026-01-09') },
+  "2": [
+    {
+      id: "1",
+      description: "Refrigerantes",
+      amount: 320.0,
+      date: new Date("2026-01-11"),
+    },
+    {
+      id: "2",
+      description: "Cervejas",
+      amount: 450.5,
+      date: new Date("2026-01-09"),
+    },
   ],
-  '3': [
-    { id: '1', description: 'Picanha 10kg', amount: 890.00, date: new Date('2026-01-10') },
-    { id: '2', description: 'Frango 20kg', amount: 280.00, date: new Date('2026-01-07') },
+  "3": [
+    {
+      id: "1",
+      description: "Picanha 10kg",
+      amount: 890.0,
+      date: new Date("2026-01-10"),
+    },
+    {
+      id: "2",
+      description: "Frango 20kg",
+      amount: 280.0,
+      date: new Date("2026-01-07"),
+    },
   ],
 };
 
-type PeriodFilter = 'month' | 'week' | 'all';
+type PeriodFilter = "month" | "week" | "all";
 
 const CategoryExpensesScreen = () => {
   const location = useLocation();
   const category = location.state?.category as ExpenseCategory | undefined;
-  
+
   const [expenses, setExpenses] = useState<Expense[]>(
-    category ? mockExpenses[category.id] || [] : []
+    category ? mockExpenses[category.id] || [] : [],
   );
-  const [period, setPeriod] = useState<PeriodFilter>('month');
-  const [newExpense, setNewExpense] = useState({ description: '', amount: '' });
+  const [period, setPeriod] = useState<PeriodFilter>("month");
+  const [newExpense, setNewExpense] = useState({ description: "", amount: "" });
 
   const filteredExpenses = useMemo(() => {
     const now = new Date();
     return expenses.filter((expense) => {
       const expenseDate = new Date(expense.date);
       switch (period) {
-        case 'week': {
+        case "week": {
           const weekAgo = new Date(now);
           weekAgo.setDate(weekAgo.getDate() - 7);
           return expenseDate >= weekAgo;
         }
-        case 'month': {
+        case "month": {
           return (
             expenseDate.getMonth() === now.getMonth() &&
             expenseDate.getFullYear() === now.getFullYear()
@@ -93,7 +128,10 @@ const CategoryExpensesScreen = () => {
     });
   }, [expenses, period]);
 
-  const totalFiltered = filteredExpenses.reduce((sum, exp) => sum + exp.amount, 0);
+  const totalFiltered = filteredExpenses.reduce(
+    (sum, exp) => sum + exp.amount,
+    0,
+  );
 
   const handleAddExpense = () => {
     if (!newExpense.description.trim() || !newExpense.amount) return;
@@ -101,12 +139,12 @@ const CategoryExpensesScreen = () => {
     const expense: Expense = {
       id: Date.now().toString(),
       description: newExpense.description,
-      amount: parseFloat(newExpense.amount.replace(',', '.')),
+      amount: parseFloat(newExpense.amount.replace(",", ".")),
       date: new Date(),
     };
 
     setExpenses([expense, ...expenses]);
-    setNewExpense({ description: '', amount: '' });
+    setNewExpense({ description: "", amount: "" });
   };
 
   if (!category) {
@@ -145,7 +183,10 @@ const CategoryExpensesScreen = () => {
         {/* Period Filter */}
         <div className="flex items-center gap-2">
           <Calendar className="w-4 h-4 text-muted-foreground" />
-          <Select value={period} onValueChange={(v) => setPeriod(v as PeriodFilter)}>
+          <Select
+            value={period}
+            onValueChange={(v) => setPeriod(v as PeriodFilter)}
+          >
             <SelectTrigger className="w-full bg-secondary border-border">
               <SelectValue />
             </SelectTrigger>
@@ -167,13 +208,17 @@ const CategoryExpensesScreen = () => {
             <Input
               placeholder="Descrição"
               value={newExpense.description}
-              onChange={(e) => setNewExpense({ ...newExpense, description: e.target.value })}
+              onChange={(e) =>
+                setNewExpense({ ...newExpense, description: e.target.value })
+              }
               className="flex-1"
             />
             <Input
               placeholder="R$ 0,00"
               value={newExpense.amount}
-              onChange={(e) => setNewExpense({ ...newExpense, amount: e.target.value })}
+              onChange={(e) =>
+                setNewExpense({ ...newExpense, amount: e.target.value })
+              }
               className="w-28"
               type="text"
               inputMode="decimal"

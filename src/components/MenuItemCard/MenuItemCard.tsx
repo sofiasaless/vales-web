@@ -1,9 +1,9 @@
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { cn } from '@/lib/utils';
-import { ItemMenuResponseBody } from '@/types/menu.type';
-import { Minus, Plus } from 'lucide-react';
-import { MoneyDisplay } from './MoneyDisplay';
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { cn } from "@/lib/utils";
+import { ItemMenuResponseBody } from "@/types/menu.type";
+import { Minus, Plus } from "lucide-react";
+import { MoneyDisplay } from "../MoneyDisplay/MoneyDisplay";
 
 interface MenuItemCardProps {
   product: ItemMenuResponseBody;
@@ -25,21 +25,23 @@ export const MenuItemCard = ({
   return (
     <div
       className={cn(
-        'flex items-center gap-4 p-4 rounded-xl transition-all tap-highlight-none',
+        "flex items-center gap-4 p-4 rounded-xl transition-all tap-highlight-none",
         selected
-          ? 'bg-primary/10 border border-primary/30'
-          : 'bg-card border border-border hover:border-primary/20',
-        className
+          ? "bg-primary/10 border border-primary/30"
+          : "bg-card border border-border hover:border-primary/20",
+        className,
       )}
-      style={{ cursor: 'pointer' }}
+      style={{ cursor: "pointer" }}
       onClick={onToggle}
     >
-
       <div className="flex-1 min-w-0">
         <p className="font-medium text-foreground">{product.descricao}</p>
       </div>
 
-      <div style={{ flexDirection: 'column' }} className="flex items-center gap-3">
+      <div
+        style={{ flexDirection: "column" }}
+        className="flex items-center gap-3"
+      >
         <MoneyDisplay value={product.preco} size="md" />
 
         {selected && (

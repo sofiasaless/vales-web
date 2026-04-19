@@ -1,4 +1,4 @@
-import { Loading } from "@/components/Loading";
+import { Loading } from "@/components/Loading/Loading";
 import { useAuth } from "@/context/AuthContext";
 import type { JSX } from "react";
 import { Navigate } from "react-router-dom";

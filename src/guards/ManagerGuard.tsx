@@ -1,5 +1,5 @@
-import { Loading } from "@/components/Loading";
-import { NotAllowedPage } from "@/components/NotAllowedPage";
+import { Loading } from "@/components/Loading/Loading";
+import { NotAllowedPage } from "@/components/NotAllowedPage/NotAllowedPage";
 import { GerenteResponseBody, TiposGerente } from "@/types/gerente.type";
 import { type JSX } from "react";
 import { Navigate } from "react-router-dom";
@@ -12,8 +12,7 @@ export const ManagerGuard = ({
   children: JSX.Element;
   permission?: TiposGerente;
 }) => {
-  const { isLoadingInvoices, invoiceModalOpen, navigate } =
-    useManagerGuardController();
+  const { isLoadingInvoices, invoiceModalOpen } = useManagerGuardController();
   const salvo = localStorage.getItem("usuario");
   const usuario = JSON.parse(salvo) as GerenteResponseBody;
 

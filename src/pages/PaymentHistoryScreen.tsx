@@ -1,5 +1,5 @@
-import { MoneyDisplay } from "@/components/MoneyDisplay";
-import { PageHeader } from "@/components/PageHeader";
+import { MoneyDisplay } from "@/components/MoneyDisplay/MoneyDisplay";
+import { PageHeader } from "@/components/PageHeader/PageHeader";
 import { useListPayments } from "@/hooks/usePayment";
 import { FilterData } from "@/services/payment.service";
 import { PdfService } from "@/services/pdf.service";
@@ -29,8 +29,8 @@ const PaymentHistoryScreen = () => {
 
   const [filter, setFilter] = useState<FilterData>({
     data_inicio: new Date(new Date().setDate(1)).toISOString(),
-    data_fim: new Date().toISOString()
-  })
+    data_fim: new Date().toISOString(),
+  });
 
   const { data: payments, isLoading, isPending } = useListPayments(id, filter);
 
@@ -95,13 +95,13 @@ const PaymentHistoryScreen = () => {
             }}
           >
             <DatePicker
-              format={'DD/MM/YYYY'}
+              format={"DD/MM/YYYY"}
               value={dayjs(filter.data_inicio)}
               onChange={(v) => {
                 setFilter((prev) => ({
                   ...prev,
-                  data_inicio: v?.toISOString()
-                }))
+                  data_inicio: v?.toISOString(),
+                }));
               }}
               style={{ flex: 1 }}
             />
@@ -111,13 +111,13 @@ const PaymentHistoryScreen = () => {
             </span>
 
             <DatePicker
-              format={'DD/MM/YYYY'}
+              format={"DD/MM/YYYY"}
               value={dayjs(filter.data_fim)}
               onChange={(v) => {
                 setFilter((prev) => ({
                   ...prev,
-                  data_fim: v?.toISOString()
-                }))
+                  data_fim: v?.toISOString(),
+                }));
               }}
               style={{ flex: 1 }}
             />
