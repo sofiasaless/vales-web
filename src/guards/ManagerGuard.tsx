@@ -1,10 +1,14 @@
+import { Loading } from "@/components/Loading";
 import { NotAllowedPage } from "@/components/NotAllowedPage";
 import { GerenteResponseBody, TiposGerente } from "@/types/gerente.type";
 import { type JSX } from "react";
 import { Navigate } from "react-router-dom";
 import { useManagerGuardController } from "./useManagerGuard.controller";
+<<<<<<< HEAD
 import { Loading } from "@/components/Loading";
 import { AlertPage } from "@/components/AlertPage";
+=======
+>>>>>>> 0e3e9fb (fix: handle para auxiliares em pendências de fatura)
 
 export const ManagerGuard = ({
   children,
@@ -16,10 +20,15 @@ export const ManagerGuard = ({
   const { isLoadingInvoices, invoiceModalOpen, navigate } =
     useManagerGuardController();
   const salvo = localStorage.getItem("usuario");
+<<<<<<< HEAD
+=======
+  const usuario = JSON.parse(salvo) as GerenteResponseBody;
+>>>>>>> 0e3e9fb (fix: handle para auxiliares em pendências de fatura)
 
   if (isLoadingInvoices) return <Loading />;
 
   if (invoiceModalOpen) {
+<<<<<<< HEAD
     if (permission === "GERENTE") {
       navigate("/settings/subscriptions", {
         state: {
@@ -28,6 +37,19 @@ export const ManagerGuard = ({
       });
     } else {
       return <AlertPage />;
+=======
+    if (usuario.tipo === "GERENTE") {
+      return (
+        <Navigate
+          to={"/settings/subscriptions"}
+          state={{
+            invoiceModalOpen: true,
+          }}
+        />
+      );
+    } else {
+      return <Navigate to={"/alert/invoice"} />;
+>>>>>>> 0e3e9fb (fix: handle para auxiliares em pendências de fatura)
     }
   }
 
@@ -35,7 +57,6 @@ export const ManagerGuard = ({
     return <Navigate to="/select-manager" replace />;
   }
 
-  const usuario = JSON.parse(salvo) as GerenteResponseBody;
   if (permission === "AUXILIAR") {
     return children;
   }

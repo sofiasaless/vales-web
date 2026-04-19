@@ -40,6 +40,7 @@ import { ManagerGuard } from "./guards/ManagerGuard";
 import { BuildingPage } from "./components/BuildingPage";
 import { LoginGuard } from "./guards/LoginGuard";
 import EmployeeListScreen from "./pages/EmployeeListScreen/EmployeeListScreen";
+import { AlertPage } from "./components/AlertPage";
 
 const queryClient = new QueryClient();
 
@@ -292,6 +293,7 @@ const App = () => (
 
                       {/* Catch-all */}
                       <Route path="*" element={<NotFound />} />
+                      <Route path="/alert/invoice" element={<AlertPage />} />
                     </Routes>
                     <BottomNav />
                   </div>

@@ -22,6 +22,7 @@ export const BottomNav = () => {
     "/contract-employee",
     "/contract-signature",
     "/settings/",
+    "/alert/invoice",
   ];
   const shouldHide = hiddenPaths.some((path) =>
     location.pathname.includes(path),
