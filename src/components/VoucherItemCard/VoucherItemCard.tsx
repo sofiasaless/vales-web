@@ -54,6 +54,11 @@ export const VoucherItemCard = ({
         <p className="text-sm text-muted-foreground">
           Adc. em {new Date(item.data_adicao).toLocaleString()}
         </p>
+        {item.criadoPor && (
+          <p className="text-sm text-muted-foreground">
+            Criado por: {item.criadoPor.nome}
+          </p>
+        )}
       </div>
 
       <div className="flex items-center gap-3">
