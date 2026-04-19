@@ -1,8 +1,6 @@
 import { useState } from "react";
-import { PageHeader } from "@/components/PageHeader";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { MoneyDisplay } from "@/components/MoneyDisplay";
 import {
   Dialog,
   DialogContent,
@@ -25,6 +23,8 @@ import { MensalidadeResponseBody } from "@/types/mensalidade";
 import { useListMonthlyFee } from "@/hooks/useMonthlyFee";
 import { AbstractModal } from "@/components/AbstractModal/AbstractModal";
 import { useLocation } from "react-router-dom";
+import { MoneyDisplay } from "@/components/MoneyDisplay/MoneyDisplay";
+import { PageHeader } from "@/components/PageHeader/PageHeader";
 
 export interface SubscriptionsScreenStateProps {
   invoiceModalOpen: boolean;

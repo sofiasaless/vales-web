@@ -1,10 +1,9 @@
-import { NotAllowedPage } from "@/components/NotAllowedPage";
+import { Loading } from "@/components/Loading/Loading";
+import { NotAllowedPage } from "@/components/NotAllowedPage/NotAllowedPage";
 import { GerenteResponseBody, TiposGerente } from "@/types/gerente.type";
 import { type JSX } from "react";
 import { Navigate } from "react-router-dom";
 import { useManagerGuardController } from "./useManagerGuard.controller";
-import { Loading } from "@/components/Loading";
-import { AlertPage } from "@/components/AlertPage";
 
 export const ManagerGuard = ({
   children,
@@ -13,21 +12,24 @@ export const ManagerGuard = ({
   children: JSX.Element;
   permission?: TiposGerente;
 }) => {
-  const { isLoadingInvoices, invoiceModalOpen, navigate } =
-    useManagerGuardController();
+  const { isLoadingInvoices, invoiceModalOpen } = useManagerGuardController();
   const salvo = localStorage.getItem("usuario");
+  const usuario = JSON.parse(salvo) as GerenteResponseBody;
 
   if (isLoadingInvoices) return <Loading />;
 
   if (invoiceModalOpen) {
-    if (permission === "GERENTE") {
-      navigate("/settings/subscriptions", {
-        state: {
-          invoiceModalOpen: true,
-        },
-      });
+    if (usuario.tipo === "GERENTE") {
+      return (
+        <Navigate
+          to={"/settings/subscriptions"}
+          state={{
+            invoiceModalOpen: true,
+          }}
+        />
+      );
     } else {
-      return <AlertPage />;
+      return <Navigate to={"/alert/invoice"} />;
     }
   }
 
@@ -35,7 +37,6 @@ export const ManagerGuard = ({
     return <Navigate to="/select-manager" replace />;
   }
 
-  const usuario = JSON.parse(salvo) as GerenteResponseBody;
   if (permission === "AUXILIAR") {
     return children;
   }

@@ -1,31 +1,8 @@
-import { useNavigate, useLocation } from "react-router-dom";
-import { Users, UserPlus, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-const navItems = [
-  { path: "/", icon: Users, label: "Funcionários" },
-  { path: "/new-employee", icon: UserPlus, label: "Cadastrar" },
-  { path: "/settings", icon: Settings, label: "Configurações" },
-];
+import { useBottomNavController } from "./useBottomNav.controller";
 
 export const BottomNav = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  // Hide on certain screens (including auth screens)
-  const hiddenPaths = [
-    "/menu/",
-    "/payment",
-    "/employee/",
-    "/login",
-    "/select-manager",
-    "/contract-employee",
-    "/contract-signature",
-    "/settings/",
-  ];
-  const shouldHide = hiddenPaths.some((path) =>
-    location.pathname.includes(path),
-  );
+  const { navigate, navItems, shouldHide, location } = useBottomNavController();
 
   if (shouldHide) return null;
 

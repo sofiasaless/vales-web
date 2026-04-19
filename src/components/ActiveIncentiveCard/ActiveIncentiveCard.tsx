@@ -1,36 +1,14 @@
-import { useNavigate } from 'react-router-dom';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { MoneyDisplay } from '@/components/MoneyDisplay';
-import { useIncentive } from '@/context/IncentiveContext';
-import { useEmployees } from '@/context/EmployeeContext';
-import { Trophy, Calendar, Target, Crown, ShoppingCart } from 'lucide-react';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import { MoneyDisplay } from "@/components/MoneyDisplay/MoneyDisplay";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import { Calendar, Crown, ShoppingCart, Target, Trophy } from "lucide-react";
+import { useActiveIncentiveCardController } from "./useActiveIncentiveCard.controller";
 
 export const ActiveIncentiveCard = () => {
-  const navigate = useNavigate();
-  const { getActiveIncentive, getEmployeeCounter } = useIncentive();
-  const { state: employeeState } = useEmployees();
-
-  const activeIncentive = getActiveIncentive();
-
-  if (!activeIncentive) return null;
-
-  const winner = activeIncentive.ganhador_id 
-    ? employeeState.employees.find(e => e.id === activeIncentive.ganhador_id)
-    : null;
-
-  // Find current leader
-  let leader = { name: '', count: 0 };
-  if (!winner) {
-    for (const employee of employeeState.employees) {
-      const count = getEmployeeCounter(employee.id);
-      if (count > leader.count) {
-        leader = { name: employee.name, count };
-      }
-    }
-  }
+  const { winner, leader, activeIncentive, navigate } =
+    useActiveIncentiveCardController();
 
   return (
     <Card className="p-4 glass-card border-primary/30 bg-gradient-to-br from-primary/10 to-transparent">
@@ -46,7 +24,9 @@ export const ActiveIncentiveCard = () => {
       <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
         <span className="flex items-center gap-1">
           <Calendar className="w-4 h-4" />
-          {format(new Date(activeIncentive.data_expiracao), "dd/MM", { locale: ptBR })}
+          {format(new Date(activeIncentive.data_expiracao), "dd/MM", {
+            locale: ptBR,
+          })}
         </span>
         <span className="flex items-center gap-1">
           <Target className="w-4 h-4" />
@@ -55,12 +35,12 @@ export const ActiveIncentiveCard = () => {
       </div>
 
       <div className="flex items-center justify-between mb-3">
-        <MoneyDisplay 
-          value={activeIncentive.valor_incentivo} 
-          size="lg" 
-          variant="positive" 
+        <MoneyDisplay
+          value={activeIncentive.valor_incentivo}
+          size="lg"
+          variant="positive"
         />
-        
+
         {winner ? (
           <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-success/20 border border-success/30">
             <Crown className="w-4 h-4 text-success" />
@@ -79,9 +59,9 @@ export const ActiveIncentiveCard = () => {
       </div>
 
       {!winner && (
-        <Button 
+        <Button
           className="w-full gap-2"
-          onClick={() => navigate('/incentive/sales')}
+          onClick={() => navigate("/incentive/sales")}
         >
           <ShoppingCart className="w-4 h-4" />
           Registrar Vendas

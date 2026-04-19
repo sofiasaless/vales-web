@@ -1,13 +1,13 @@
-import { AvatarInitials } from '@/components/AvatarInitials';
-import { Loading } from '@/components/Loading';
-import { MoneyDisplay } from '@/components/MoneyDisplay';
-import { PageHeader } from '@/components/PageHeader';
-import { VoucherItemCard } from '@/components/VoucherItemCard';
-import { useEmployee, useFindEmployee } from '@/hooks/useEmployee';
-import { useCurrentManager } from '@/hooks/useManager';
-import { calculateTotalVauchers } from '@/utils/calculate';
-import { onChangeNumberInput, onKeyDownNumberInput } from '@/utils/format';
-import { App, Button, Card, Input, Modal } from 'antd';
+import { AvatarInitials } from "@/components/AvatarInitials/AvatarInitials";
+import { Loading } from "@/components/Loading/Loading";
+import { MoneyDisplay } from "@/components/MoneyDisplay/MoneyDisplay";
+import { PageHeader } from "@/components/PageHeader/PageHeader";
+import { VoucherItemCard } from "@/components/VoucherItemCard/VoucherItemCard";
+import { useEmployee, useFindEmployee } from "@/hooks/useEmployee";
+import { useCurrentManager } from "@/hooks/useManager";
+import { calculateTotalVauchers } from "@/utils/calculate";
+import { onChangeNumberInput, onKeyDownNumberInput } from "@/utils/format";
+import { App, Button, Card, Input, Modal } from "antd";
 import {
   AlertCircle,
   CreditCard,
@@ -15,10 +15,10 @@ import {
   History,
   Plus,
   ShoppingBag,
-  User
-} from 'lucide-react';
-import { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+  User,
+} from "lucide-react";
+import { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 
 const EmployeeManagementScreen = () => {
   const { id } = useParams<{ id: string }>();
@@ -29,22 +29,35 @@ const EmployeeManagementScreen = () => {
   const { data: employee, isLoading } = useFindEmployee(id);
 
   const [cashModalOpen, setCashModalOpen] = useState(false);
-  const [cashDescription, setCashDescription] = useState('');
+  const [cashDescription, setCashDescription] = useState("");
   const [cashValue, setCashValue] = useState<number | null>(null);
   const [cashLoading, setCashLoading] = useState(false);
 
   const { data: manager, isLoading: loadingManager } = useCurrentManager();
-  
+
   if (isLoading || loadingManager) {
-    return <Loading />
+    return <Loading />;
   }
 
   if (!employee) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 16 }}>
-        <AlertCircle style={{ width: 48, height: 48, color: 'var(--danger)' }} />
-        <p style={{ fontSize: 18, fontWeight: 500 }}>Funcionário não encontrado</p>
-        <Button onClick={() => navigate('/')}>Voltar</Button>
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexDirection: "column",
+          gap: 16,
+        }}
+      >
+        <AlertCircle
+          style={{ width: 48, height: 48, color: "var(--danger)" }}
+        />
+        <p style={{ fontSize: 18, fontWeight: 500 }}>
+          Funcionário não encontrado
+        </p>
+        <Button onClick={() => navigate("/")}>Voltar</Button>
       </div>
     );
   }
@@ -53,11 +66,11 @@ const EmployeeManagementScreen = () => {
 
   const handleCashVoucherSubmit = async () => {
     if (!cashDescription.trim()) {
-      message.warning('Preencha a descrição');
+      message.warning("Preencha a descrição");
       return;
     }
     if (!cashValue || cashValue <= 0) {
-      message.warning('Informe um valor válido');
+      message.warning("Informe um valor válido");
       return;
     }
 
@@ -71,38 +84,63 @@ const EmployeeManagementScreen = () => {
             descricao: cashDescription.trim(),
             preco_unit: cashValue,
             quantidade: 1,
+            criadoPor: {
+              ...manager,
+              data_criacao: new Date(manager.data_criacao),
+            },
           },
         },
       });
-      message.success('Vale em dinheiro adicionado');
+      message.success("Vale em dinheiro adicionado");
       setCashModalOpen(false);
-      setCashDescription('');
+      setCashDescription("");
       setCashValue(null);
     } catch {
-      message.error('Erro ao adicionar vale em dinheiro');
+      message.error("Erro ao adicionar vale em dinheiro");
     } finally {
       setCashLoading(false);
     }
   };
 
   return (
-    <div style={{ minHeight: '100vh', paddingBottom: 32 }}>
-      <PageHeader
-        title={employee?.nome}
-        subtitle={employee?.cargo}
-        showBack
-      />
+    <div style={{ minHeight: "100vh", paddingBottom: 32 }}>
+      <PageHeader title={employee?.nome} subtitle={employee?.cargo} showBack />
 
-      <div style={{ padding: '16px', maxWidth: 512, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div
+        style={{
+          padding: "16px",
+          maxWidth: 512,
+          margin: "0 auto",
+          display: "flex",
+          flexDirection: "column",
+          gap: 16,
+        }}
+      >
         {/* Employee Header */}
         <Card className="glass-card">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-            <AvatarInitials photoUrl={employee?.foto_url} name={employee?.nome} size="lg" />
+          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+            <AvatarInitials
+              photoUrl={employee?.foto_url}
+              name={employee?.nome}
+              size="lg"
+            />
             <div style={{ flex: 1 }}>
-              <h2 style={{ fontSize: 20, fontWeight: 700, margin: 0 }}>{employee?.nome}</h2>
-              <p style={{ color: 'var(--text-secondary)', margin: 0 }}>{employee?.cargo}</p>
-              <p style={{ fontSize: 13, color: 'var(--text-secondary)', margin: 0 }}>
-                {employee?.tipo === 'DIARISTA' ? 'Diarista' : 'Fixo (Quinzenas)'}
+              <h2 style={{ fontSize: 20, fontWeight: 700, margin: 0 }}>
+                {employee?.nome}
+              </h2>
+              <p style={{ color: "var(--text-secondary)", margin: 0 }}>
+                {employee?.cargo}
+              </p>
+              <p
+                style={{
+                  fontSize: 13,
+                  color: "var(--text-secondary)",
+                  margin: 0,
+                }}
+              >
+                {employee?.tipo === "DIARISTA"
+                  ? "Diarista"
+                  : "Fixo (Quinzenas)"}
               </p>
             </div>
           </div>
@@ -121,9 +159,27 @@ const EmployeeManagementScreen = () => {
 
         {/* Current Voucher Section */}
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-            <h3 style={{ fontSize: 18, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8, margin: 0 }}>
-              <ShoppingBag style={{ width: 20, height: 20, color: 'var(--primary)' }} />
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              marginBottom: 12,
+            }}
+          >
+            <h3
+              style={{
+                fontSize: 18,
+                fontWeight: 600,
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                margin: 0,
+              }}
+            >
+              <ShoppingBag
+                style={{ width: 20, height: 20, color: "var(--primary)" }}
+              />
               Vale Atual
             </h3>
             <Button
@@ -137,7 +193,16 @@ const EmployeeManagementScreen = () => {
           </div>
 
           {employee?.vales.length > 0 ? (
-            <div style={{ maxHeight: 300, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 8, paddingRight: 4 }}>
+            <div
+              style={{
+                maxHeight: 300,
+                overflowY: "auto",
+                display: "flex",
+                flexDirection: "column",
+                gap: 8,
+                paddingRight: 4,
+              }}
+            >
               {employee?.vales.map((item) => (
                 <VoucherItemCard
                   key={item.id}
@@ -147,10 +212,25 @@ const EmployeeManagementScreen = () => {
               ))}
             </div>
           ) : (
-            <Card className="glass-card" style={{ textAlign: 'center' }}>
-              <ShoppingBag style={{ width: 32, height: 32, color: 'var(--text-secondary)', margin: '0 auto 8px' }} />
-              <p style={{ color: 'var(--text-secondary)', margin: 0 }}>Nenhum item no vale</p>
-              <p style={{ fontSize: 13, color: 'var(--text-secondary)', margin: 0 }}>
+            <Card className="glass-card" style={{ textAlign: "center" }}>
+              <ShoppingBag
+                style={{
+                  width: 32,
+                  height: 32,
+                  color: "var(--text-secondary)",
+                  margin: "0 auto 8px",
+                }}
+              />
+              <p style={{ color: "var(--text-secondary)", margin: 0 }}>
+                Nenhum item no vale
+              </p>
+              <p
+                style={{
+                  fontSize: 13,
+                  color: "var(--text-secondary)",
+                  margin: 0,
+                }}
+              >
                 Toque em "+ Itens" para adicionar
               </p>
             </Card>
@@ -158,19 +238,32 @@ const EmployeeManagementScreen = () => {
 
           {/* Voucher Total */}
           <Card style={{ marginTop: 12 }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
               <span style={{ fontWeight: 500 }}>Total do Vale</span>
               <MoneyDisplay
                 value={voucherTotal}
                 size="lg"
-                variant={voucherTotal > 0 ? 'negative' : 'default'}
+                variant={voucherTotal > 0 ? "negative" : "default"}
               />
             </div>
           </Card>
         </div>
 
         {/* Action Buttons */}
-        <div style={{ display: manager.tipo === "AUXILIAR" ? "none" : "flex", flexDirection: 'column', gap: 12, paddingTop: 16 }}>
+        <div
+          style={{
+            display: manager.tipo === "AUXILIAR" ? "none" : "flex",
+            flexDirection: "column",
+            gap: 12,
+            paddingTop: 16,
+          }}
+        >
           <Button
             type="primary"
             block
@@ -182,7 +275,9 @@ const EmployeeManagementScreen = () => {
             Pagar Funcionário
           </Button>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <div
+            style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}
+          >
             <Button
               size="large"
               icon={<User style={{ width: 16, height: 16 }} />}
@@ -195,7 +290,11 @@ const EmployeeManagementScreen = () => {
             <Button
               size="large"
               icon={<History style={{ width: 16, height: 16 }} />}
-              onClick={() => navigate(`/employee/${employee?.id}/history`, { state: employee })}
+              onClick={() =>
+                navigate(`/employee/${employee?.id}/history`, {
+                  state: employee,
+                })
+              }
               style={{ height: 48 }}
             >
               Histórico
@@ -210,7 +309,7 @@ const EmployeeManagementScreen = () => {
         open={cashModalOpen}
         onCancel={() => {
           setCashModalOpen(false);
-          setCashDescription('');
+          setCashDescription("");
           setCashValue(null);
         }}
         onOk={handleCashVoucherSubmit}
@@ -218,9 +317,20 @@ const EmployeeManagementScreen = () => {
         okText="Confirmar"
         cancelText="Cancelar"
       >
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16, paddingTop: 8 }}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 16,
+            paddingTop: 8,
+          }}
+        >
           <div>
-            <label style={{ display: 'block', marginBottom: 4, fontWeight: 500 }}>Descrição</label>
+            <label
+              style={{ display: "block", marginBottom: 4, fontWeight: 500 }}
+            >
+              Descrição
+            </label>
             <Input
               placeholder="Ex: Adiantamento, empréstimo..."
               value={cashDescription}
@@ -229,7 +339,11 @@ const EmployeeManagementScreen = () => {
             />
           </div>
           <div>
-            <label style={{ display: 'block', marginBottom: 4, fontWeight: 500 }}>Valor (R$)</label>
+            <label
+              style={{ display: "block", marginBottom: 4, fontWeight: 500 }}
+            >
+              Valor (R$)
+            </label>
             <Input
               placeholder="0,00"
               value={cashValue?.toFixed(2) || (0).toFixed(2)}
@@ -237,7 +351,7 @@ const EmployeeManagementScreen = () => {
               onChange={(val) => {
                 setCashValue(onChangeNumberInput(val));
               }}
-              style={{ width: '100%' }}
+              style={{ width: "100%" }}
             />
           </div>
         </div>
