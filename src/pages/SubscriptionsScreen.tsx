@@ -1,30 +1,30 @@
-import { useState } from "react";
-import { Card } from "@/components/ui/card";
+import { AbstractModal } from "@/components/AbstractModal/AbstractModal";
+import { MoneyDisplay } from "@/components/MoneyDisplay/MoneyDisplay";
+import { PageHeader } from "@/components/PageHeader/PageHeader";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
 } from "@/components/ui/dialog";
-import {
-  Calendar,
-  Copy,
-  Check,
-  Clock,
-  AlertCircle,
-  CheckCircle2,
-} from "lucide-react";
+import { useListMonthlyFee } from "@/hooks/useMonthlyFee";
+import { MensalidadeResponseBody } from "@/types/mensalidade";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { toast } from "sonner";
-import { MensalidadeResponseBody } from "@/types/mensalidade";
-import { useListMonthlyFee } from "@/hooks/useMonthlyFee";
-import { AbstractModal } from "@/components/AbstractModal/AbstractModal";
+import {
+  AlertCircle,
+  Calendar,
+  Check,
+  CheckCircle2,
+  Clock,
+  Copy,
+} from "lucide-react";
+import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { MoneyDisplay } from "@/components/MoneyDisplay/MoneyDisplay";
-import { PageHeader } from "@/components/PageHeader/PageHeader";
+import { toast } from "sonner";
 
 export interface SubscriptionsScreenStateProps {
   invoiceModalOpen: boolean;
@@ -80,14 +80,13 @@ const SubscriptionsScreen = () => {
   };
 
   const location = useLocation();
-  const { invoiceModalOpen } =
-    (location.state as SubscriptionsScreenStateProps) || {};
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(
-    invoiceModalOpen || false,
-  );
-  const handleCloseInvoiceModal = () => setIsModalOpen(false);
+  const state = location.state as SubscriptionsScreenStateProps;
 
-  console.log(invoiceModalOpen);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(
+    !!state?.invoiceModalOpen,
+  );
+
+  const handleCloseInvoiceModal = () => setIsModalOpen(false);
 
   return (
     <div className="min-h-screen bg-background pb-20">
