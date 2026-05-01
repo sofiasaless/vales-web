@@ -14,7 +14,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { CloudinaryService } from "@/services/clodinary.service";
 import { useEmployee } from "@/hooks/useEmployee";
 import { toast } from "sonner";
-import { getFirstWord } from "@/utils/format";
+import { getFirstAndSecondName } from "@/utils/format";
 
 const NewEmployeeContractScreen = () => {
   const location = useLocation();
@@ -79,7 +79,7 @@ const NewEmployeeContractScreen = () => {
   return (
     <div style={{ minHeight: "100vh", paddingBottom: 32 }}>
       <PageHeader
-        title={`Contrato de ${getFirstWord(employeeBody.nome)}`}
+        title={`Contrato de ${getFirstAndSecondName(employeeBody.nome)}`}
         subtitle={"Termos do contrato"}
         showBack
       />

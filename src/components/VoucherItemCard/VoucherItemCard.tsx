@@ -5,6 +5,7 @@ import { MoneyDisplay } from "../MoneyDisplay/MoneyDisplay";
 import { useEmployee } from "@/hooks/useEmployee";
 import { toast } from "sonner";
 import { useEffect } from "react";
+import { formatDate } from "date-fns";
 
 interface VoucherItemCardProps {
   item: Vale;
@@ -52,7 +53,7 @@ export const VoucherItemCard = ({
           {item.quantidade}x <MoneyDisplay value={item.preco_unit} size="sm" />
         </p>
         <p className="text-sm text-muted-foreground">
-          Adc. em {new Date(item.data_adicao).toLocaleString()}
+          {formatDate(new Date(item.data_adicao), "dd/MM/yyyy HH:mm")}
         </p>
         {item.criadoPor && (
           <p className="text-sm text-muted-foreground">
