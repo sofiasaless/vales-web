@@ -87,9 +87,14 @@ export const validateCPF = (cpf: string): boolean => {
   return true;
 };
 
-export const getFirstWord = (value: string) => {
+export const getFirstAndSecondName = (value: string) => {
+  const excludeNames = ["de", "do", "da", "dos", "das"];
   const splited = value.trim().split(" ");
-  return `${splited[0]} ${splited[1] || ""}`;
+  let secondName = splited[1];
+  if (excludeNames.includes(secondName?.toLowerCase())) {
+    secondName += " " + splited[2];
+  }
+  return `${splited[0]} ${secondName || ""}`;
 };
 
 export function formatMoney(value: number) {

@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import { FuncionarioResponseBody } from "@/types/funcionario.type";
-import { getFirstWord } from "@/utils/format";
+import { getFirstAndSecondName } from "@/utils/format";
 import { AvatarInitials } from "../AvatarInitials/AvatarInitials";
 import { MoneyDisplay } from "../MoneyDisplay/MoneyDisplay";
 import { useEmployeeCardController } from "./useEmployeeCard.controller";
@@ -36,7 +36,7 @@ export const EmployeeCard = ({ employee, className }: EmployeeCardProps) => {
           style={{ fontSize: 16 }}
           className="font-semibold text-foreground truncate w-full"
         >
-          {getFirstWord(employee?.nome)}
+          {getFirstAndSecondName(employee?.nome)}
         </h3>
 
         <p className="text-x text-muted-foreground mb-2">{employee?.cargo}</p>
