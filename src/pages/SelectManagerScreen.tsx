@@ -54,7 +54,7 @@ const SelectManagerScreen = () => {
     }
 
     autenticate.mutateAsync({
-      body: { id: selectedManagerId, senha: password },
+      body: { id: selectedManagerId, password },
     });
   };
 

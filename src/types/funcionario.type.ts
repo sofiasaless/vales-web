@@ -21,7 +21,7 @@ export type FuncionarioResponseBody = {
   contrato?: ContratoFuncionario
 }
 
-export type FuncionarioPostRequestBody = Omit<FuncionarioResponseBody, "id" | "data_cadastro" | "restaurante_ref">
+export type FuncionarioPostRequestBody = Omit<FuncionarioResponseBody, "id" | "data_cadastro" | "restaurante_ref" | "vales" | "incentivo">
 
 export type FuncionarioUpdateRequestBody = Pick<
   FuncionarioResponseBody,

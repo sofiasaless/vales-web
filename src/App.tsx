@@ -40,6 +40,10 @@ import PaymentSignatureScreen from "./pages/PaymentSignature";
 import { antdTheme } from "./theme/antTheme";
 
 const queryClient = new QueryClient();
+queryClient.defaultQueryOptions({
+  refetchOnWindowFocus: false,
+  queryKey: [],
+});
 
 const App = () => (
   <ConfigProvider theme={antdTheme} locale={ptBR}>

@@ -53,8 +53,8 @@ export const PdfService = {
     yCursor -= 40;
 
     page.drawText(`Declaro, para os devidos fins, que eu, ${employee.nome} , recebi da empresa o valor ${formatMoney(finalSalary)} referente à minha remuneração quinzenal, correspondente ao período de apuração informado em meu contracheque.`, { ...stylesText, y: yCursor });
-    page.drawText(`Declaro ainda que o payment foi realizado de forma correta, estando de acordo com os valores discriminados no respectivo contracheque, incluindo a remuneração pactuada e eventuais adicionais ou benefícios concedidos.`, { ...stylesText, y: yCursor -= 50 });
-    page.drawText(`Afirmo que o valor recebido corresponde integralmente ao que me era devido no período mencionado, não havendo, até a presente data, qualquer reclamação, divergência ou pendência financeira relacionada ao payment efetuado, dando plena, geral e irrevogável quitação quanto aos valores recebidos.`, { ...stylesText, y: yCursor -= 50 });
+    page.drawText(`Declaro ainda que o pagamento foi realizado de forma correta, estando de acordo com os valores discriminados no respectivo contracheque, incluindo a remuneração pactuada e eventuais adicionais ou benefícios concedidos.`, { ...stylesText, y: yCursor -= 50 });
+    page.drawText(`Afirmo que o valor recebido corresponde integralmente ao que me era devido no período mencionado, não havendo, até a presente data, qualquer reclamação, divergência ou pendência financeira relacionada ao pagamento efetuado, dando plena, geral e irrevogável quitação quanto aos valores recebidos.`, { ...stylesText, y: yCursor -= 50 });
 
     // signature area
     if (payment.assinatura && digitalSignature) {

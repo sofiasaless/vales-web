@@ -198,7 +198,7 @@ const MenuManagementScreen = () => {
                 </span>
                 <Input
                   id="productPrice"
-                  value={formData.preco}
+                  value={formData.preco.toFixed(2)}
                   onKeyDown={onKeyDownNumberInput}
                   onChange={(e) =>
                     setFormData({
