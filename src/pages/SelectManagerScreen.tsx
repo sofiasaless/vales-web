@@ -108,7 +108,7 @@ const SelectManagerScreen = () => {
             <Users className="w-8 h-8 text-primary" />
           </div>
           <div>
-            <CardTitle className="text-2xl">Selecione seu usuário</CardTitle>
+            <CardTitle className="text-2xl">Selecione O SEU usuário</CardTitle>
             <CardDescription className="mt-2">
               {restaurant?.nome_fantasia}
             </CardDescription>
