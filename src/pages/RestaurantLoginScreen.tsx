@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuthActions } from '@/hooks/useAuth';
-import { Loader2, Lock, Mail, Store } from 'lucide-react';
+import { Loader2, Lock, Mail, Store, Eye, EyeOff } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -12,6 +12,7 @@ const RestaurantLoginScreen = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const { login } = useAuthActions()
 
@@ -26,8 +27,6 @@ const RestaurantLoginScreen = () => {
     login.mutate({ email, password })
   };
 
-  const [isLoading] = useState(login.isPending);
-
   useEffect(() => {
     if (login.isPending) return;
 
@@ -41,7 +40,7 @@ const RestaurantLoginScreen = () => {
       toast.error(`Erro ao fazer login: ${login.error.message}`);
       return
     }
-  }, [login.isPending])
+  }, [login.isPending, login.isSuccess, login.isError, login.error, navigate])
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -82,20 +81,33 @@ const RestaurantLoginScreen = () => {
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
                   id="password"
-                  type="password"
+                  // O tipo muda dinamicamente entre password e text
+                  type={showPassword ? 'text' : 'password'}
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="pl-10"
+                  className="pl-10 pr-10" // Adicionado padding na direita para o ícone não sobrepor o texto
                   disabled={login.isPending}
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  tabIndex={-1} // Evita que o Tab pare no ícone antes do botão de entrar
+                >
+                  {showPassword ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
+                </button>
               </div>
             </div>
 
             <Button type="submit" className="w-full" disabled={login.isPending}>
               {login.isPending ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <Loader2 className="w-4 h-4 animate-spin mr-2" />
                   Entrando...
                 </>
               ) : (

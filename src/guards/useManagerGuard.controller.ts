@@ -9,7 +9,11 @@ export function useManagerGuardController() {
   const { data: invoices, isLoading: isLoadingInvoices } = useListMonthlyFee();
   const [invoiceModalOpen, setInvoiceModalOpen] = useState(false);
 
-  const verifyLastInvoicePaymentStatus = (invoice: MensalidadeResponseBody) => {
+  const verifyLastInvoicePaymentStatus = (invoice: MensalidadeResponseBody | undefined) => {
+    if (!invoice) {
+      setInvoiceModalOpen(false);
+      return
+    }
     if (invoice.status === "VENCIDO") setInvoiceModalOpen(true);
     else setInvoiceModalOpen(false);
   };
