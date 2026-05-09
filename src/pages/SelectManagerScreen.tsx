@@ -34,7 +34,12 @@ const SelectManagerScreen = () => {
   const [selectedManagerId, setSelectedManagerId] = useState("");
   const [password, setPassword] = useState("");
 
-  const { data: activeManagers, isLoading, isPending } = useListManagers();
+  const {
+    data: activeManagers,
+    isLoading,
+    isFetching,
+    isPending,
+  } = useListManagers();
   const { autenticate } = useManagers();
 
   const { logout } = useAuthActions();
@@ -79,7 +84,6 @@ const SelectManagerScreen = () => {
         toast.error(autenticate.data.mensagem);
       }
     }
-
   }, [
     logout.isPending,
     autenticate.isPending,
@@ -90,6 +94,11 @@ const SelectManagerScreen = () => {
     navigate,
     autenticate.data,
   ]);
+
+  useEffect(() => {
+    setSelectedManagerId("");
+    setPassword("");
+  }, []);
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -111,6 +120,7 @@ const SelectManagerScreen = () => {
             <div className="space-y-3">
               <Label>Operadores</Label>
               <Radio.Group
+                key={activeManagers?.length ?? "loading"}
                 value={selectedManagerId}
                 onChange={(e) => setSelectedManagerId(e.target.value)}
                 style={{
@@ -120,7 +130,7 @@ const SelectManagerScreen = () => {
                   gap: 8,
                 }}
               >
-                {isLoading || isPending ? (
+                {isLoading || isFetching ? (
                   <>
                     <Spin />
                   </>
