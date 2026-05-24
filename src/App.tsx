@@ -25,7 +25,7 @@ import NotFound from "@/pages/NotFound";
 import PaymentConfirmationScreen from "@/pages/PaymentConfirmationScreen";
 import PaymentHistoryScreen from "@/pages/PaymentHistoryScreen";
 import SettingsScreen from "@/pages/SettingsScreen";
-import SubscriptionsScreen from "@/pages/SubscriptionsScreen";
+import SubscriptionsScreen from "@/pages/SubscriptionScreen/SubscriptionsScreen";
 import { App as AntApp, ConfigProvider } from "antd";
 import ptBR from "antd/locale/pt_BR";
 import { AlertPage } from "./components/AlertPage/AlertPage";
