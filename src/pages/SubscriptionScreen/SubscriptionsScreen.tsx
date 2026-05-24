@@ -10,83 +10,30 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useListMonthlyFee } from "@/hooks/useMonthlyFee";
-import { MensalidadeResponseBody } from "@/types/mensalidade";
+import { Upload } from "antd";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import {
-  AlertCircle,
-  Calendar,
-  Check,
-  CheckCircle2,
-  Clock,
-  Copy,
-} from "lucide-react";
-import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
-import { toast } from "sonner";
-
-export interface SubscriptionsScreenStateProps {
-  invoiceModalOpen: boolean;
-}
+import { Calendar, Check, Copy, UploadCloud } from "lucide-react";
+import { useSubscriptionsScreenController } from "./useSubscriptionsScreen.controller";
+import Image from "antd/lib/image";
 
 const SubscriptionsScreen = () => {
-  const [selectedMonthlyFee, setSelectedMonthlyFee] =
-    useState<MensalidadeResponseBody | null>(null);
-  const [copied, setCopied] = useState(false);
-
-  const { data } = useListMonthlyFee();
-
-  const getStatusConfig = (status: MensalidadeResponseBody["status"]) => {
-    switch (status) {
-      case "PAGO":
-        return {
-          label: "Pago",
-          bgClass: "bg-success/10",
-          textClass: "text-success",
-          icon: CheckCircle2,
-        };
-      case "PENDENTE":
-        return {
-          label: "Pendente",
-          bgClass: "bg-warning/10",
-          textClass: "text-warning",
-          icon: Clock,
-        };
-      case "VENCIDO":
-        return {
-          label: "Vencido",
-          bgClass: "bg-danger/10",
-          textClass: "text-danger",
-          icon: AlertCircle,
-        };
-    }
-  };
-
-  const handleCopyPixKey = async (pixKey: string) => {
-    try {
-      await navigator.clipboard.writeText(pixKey);
-      setCopied(true);
-      toast.success("Chave PIX copiada!");
-      setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      toast.error("Erro ao copiar chave PIX");
-    }
-  };
-
-  const handleCloseModal = () => {
-    setSelectedMonthlyFee(null);
-    setCopied(false);
-  };
-
-  const location = useLocation();
-  const state = location.state as SubscriptionsScreenStateProps;
-
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(
-    !!state?.invoiceModalOpen,
-  );
-
-  const handleCloseInvoiceModal = () => setIsModalOpen(false);
+  const {
+    isModalOpen,
+    copied,
+    data,
+    getStatusConfig,
+    handleCloseInvoiceModal,
+    handleCloseModal,
+    handleCopyPixKey,
+    pictureFile,
+    selectedMonthlyFee,
+    setPictureFile,
+    setSelectedMonthlyFee,
+    handleSendPayment,
+    disabledSendProof,
+    isSending,
+  } = useSubscriptionsScreenController();
 
   return (
     <div className="min-h-screen bg-background pb-20">
@@ -148,7 +95,7 @@ const SubscriptionsScreen = () => {
 
       {/* Modal de Detalhes */}
       <Dialog open={!!selectedMonthlyFee} onOpenChange={handleCloseModal}>
-        <DialogContent className="max-w-sm mx-auto">
+        <DialogContent className="max-w-md mx-auto">
           <DialogHeader>
             <DialogTitle>Mensalidade selecionada</DialogTitle>
             <DialogDescription>Detalhes do pagamento</DialogDescription>
@@ -197,7 +144,38 @@ const SubscriptionsScreen = () => {
                 );
               })()}
 
-              {/* Chave PIX */}
+              {selectedMonthlyFee.status !== "PAGO" && (
+                <div style={{ display: "flex", width: "100%" }}>
+                  <Upload
+                    listType="picture"
+                    fileList={pictureFile}
+                    maxCount={1}
+                    beforeUpload={() => false}
+                    onChange={({ fileList }) => {
+                      setPictureFile(fileList.slice(-1));
+                    }}
+                    disabled={disabledSendProof}
+                  >
+                    <Button
+                      className="w-full h-10 text-base"
+                      variant="outline"
+                      disabled={disabledSendProof}
+                    >
+                      <UploadCloud className="w-5 h-5 mr-2" />
+                      Anexar comprovante
+                    </Button>
+                  </Upload>
+                </div>
+              )}
+
+              {selectedMonthlyFee.comprovante && pictureFile.length === 0 && (
+                <Image
+                  width={100}
+                  alt="basic"
+                  src={selectedMonthlyFee.comprovante}
+                />
+              )}
+
               <div className="space-y-2">
                 <p className="text-sm text-muted-foreground">
                   Chave PIX para pagamento:
@@ -221,13 +199,23 @@ const SubscriptionsScreen = () => {
                 </div>
               </div>
 
-              <Button
-                className="w-full"
-                variant="outline"
-                onClick={handleCloseModal}
-              >
-                Fechar
-              </Button>
+              <div className="flex gap-3">
+                <Button
+                  className="w-full"
+                  variant="outline"
+                  onClick={handleCloseModal}
+                >
+                  Fechar
+                </Button>
+
+                <Button
+                  className="w-full bg-primary hover:bg-primary/90"
+                  onClick={handleSendPayment}
+                  disabled={disabledSendProof || isSending}
+                >
+                  Enviar
+                </Button>
+              </div>
             </div>
           )}
         </DialogContent>
