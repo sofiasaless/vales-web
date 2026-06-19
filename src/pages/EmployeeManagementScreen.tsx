@@ -320,7 +320,7 @@ const EmployeeManagementScreen = () => {
           setCashValue(null);
         }}
         onOk={handleCashVoucherSubmit}
-        confirmLoading={cashLoading}
+        confirmLoading={cashLoading || addVoucher.isPending}
         okText="Confirmar"
         cancelText="Cancelar"
       >
