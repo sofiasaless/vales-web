@@ -203,6 +203,7 @@ const MenuScreen = () => {
               icon={<ShoppingCart style={{ width: 20, height: 20 }} />}
               onClick={handleAddToVoucher}
               style={{ height: 56 }}
+              loading={addMultipleVouchers.isPending}
             >
               Adicionar ao Vale ({totalItems} itens) •{" "}
               <MoneyDisplay value={totalValue} size="md" />

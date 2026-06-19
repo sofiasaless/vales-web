@@ -1,3 +1,4 @@
+import { EmployeeStatus } from "@/enum/employee.enum";
 import { GanhosIncentivo } from "./incentivo.type";
 import { Vale } from "./vale.type";
 
@@ -18,7 +19,9 @@ export type FuncionarioResponseBody = {
   segundo_dia_pagamento: number,
   restaurante_ref: string,
   data_cadastro: Date,
-  contrato?: ContratoFuncionario
+  contrato?: ContratoFuncionario,
+  status?: EmployeeStatus,
+  arquivadoEm?: string | null
 }
 
 export type FuncionarioPostRequestBody = Omit<FuncionarioResponseBody, "id" | "data_cadastro" | "restaurante_ref" | "vales" | "incentivo">
