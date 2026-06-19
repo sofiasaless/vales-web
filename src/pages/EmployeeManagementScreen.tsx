@@ -6,6 +6,7 @@ import { VoucherItemCard } from "@/components/VoucherItemCard/VoucherItemCard";
 import { useEmployee, useFindEmployee } from "@/hooks/useEmployee";
 import { useCurrentManager } from "@/hooks/useManager";
 import { calculateTotalVauchers } from "@/utils/calculate";
+import { isArchived } from "@/utils/employee";
 import { onChangeNumberInput, onKeyDownNumberInput } from "@/utils/format";
 import { App, Button, Card, Input, Modal } from "antd";
 import {
@@ -102,6 +103,8 @@ const EmployeeManagementScreen = () => {
     }
   };
 
+  const isDisabled = isArchived(employee);
+
   return (
     <div style={{ minHeight: "100vh", paddingBottom: 32 }}>
       <PageHeader title={employee?.nome} subtitle={employee?.cargo} showBack />
@@ -153,6 +156,7 @@ const EmployeeManagementScreen = () => {
           icon={<DollarSign style={{ width: 18, height: 18 }} />}
           onClick={() => setCashModalOpen(true)}
           style={{ height: 48 }}
+          disabled={isDisabled}
         >
           Adicionar Vale em Dinheiro
         </Button>
@@ -187,6 +191,7 @@ const EmployeeManagementScreen = () => {
               size="small"
               icon={<Plus style={{ width: 16, height: 16 }} />}
               onClick={() => navigate(`/menu/${employee?.id}`)}
+              disabled={isDisabled}
             >
               Itens
             </Button>
@@ -208,6 +213,7 @@ const EmployeeManagementScreen = () => {
                   key={item.id}
                   item={item}
                   employeeId={employee.id}
+                  showControls={!isDisabled}
                 />
               ))}
             </div>
@@ -271,6 +277,7 @@ const EmployeeManagementScreen = () => {
             icon={<CreditCard style={{ width: 20, height: 20 }} />}
             onClick={() => navigate(`/payment`, { state: employee })}
             style={{ height: 48 }}
+            disabled={isDisabled}
           >
             Pagar Funcionário
           </Button>

@@ -3,10 +3,7 @@ import { AvatarInitials } from "@/components/AvatarInitials/AvatarInitials";
 import { Loading } from "@/components/Loading/Loading";
 import { PageHeader } from "@/components/PageHeader/PageHeader";
 import { Card } from "@/components/ui/card";
-import { useAuthActions } from "@/hooks/useAuth";
-import { useCurrentEnterprise } from "@/hooks/useEnterprise";
-import { useCurrentManager, useManagers } from "@/hooks/useManager";
-import { CloudinaryService } from "@/services/clodinary.service";
+
 import {
   Camera,
   ChefHat,
@@ -19,36 +16,20 @@ import {
   UtensilsCrossed,
   Wallet,
 } from "lucide-react";
-import { useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
+import { useSettingsScreenController } from "./useSettingsScreen.controller";
 
 const SettingsScreen = () => {
-  const navigate = useNavigate();
-
-  const { data: enterprise } = useCurrentEnterprise();
-  const { data: manager, isLoading } = useCurrentManager();
-
-  const { logout } = useAuthActions();
-  const { logoutManager, update } = useManagers();
-
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleSendImage = async (file: any) => {
-    const url = await CloudinaryService.sendPicture(file);
-    await update.mutateAsync({
-      managerId: manager.id,
-      payload: { img_perfil: url },
-    });
-    localStorage.setItem(
-      "usuario",
-      JSON.stringify({
-        ...manager,
-        img_perfil: url,
-      }),
-    );
-    toast.success("Recarregue a página para sua foto aparecer!");
-  };
+  const {
+    navigate,
+    options,
+    enterprise,
+    fileInputRef,
+    handleSendImage,
+    isLoading,
+    manager,
+    logout,
+    logoutManager,
+  } = useSettingsScreenController();
 
   const MenuItem = ({
     icon: Icon,
@@ -167,36 +148,13 @@ const SettingsScreen = () => {
           }}
           className="glass-card border-border overflow-hidden divide-y divide-border"
         >
-          <MenuItem
-            icon={ChefHat}
-            label="Gerenciar Cardápio"
-            onClick={() => navigate("/settings/menu")}
-          />
-          <MenuItem
-            icon={Wallet}
-            label="Finanças"
-            onClick={() => navigate("/settings/finances")}
-          />
-          <MenuItem
-            icon={CreditCard}
-            label="Mensalidades"
-            onClick={() => navigate("/settings/subscriptions")}
-          />
-          <MenuItem
-            icon={Trophy}
-            label="Começar Incentivo"
-            onClick={() => navigate("/settings/incentives")}
-          />
-          <MenuItem
-            icon={Users}
-            label="Gerentes e Auxiliares"
-            onClick={() => navigate("/settings/managers")}
-          />
-          {/* <MenuItem
-            icon={Bell}
-            label="Notificações"
-            onClick={() => {}}
-          /> */}
+          {options.map(op => (
+            <MenuItem
+              icon={op.icon}
+              label={op.title}
+              onClick={op.onClick}
+            />
+          ))}
         </Card>
 
         {/* Logout Options */}

@@ -1,37 +1,19 @@
 import { EmployeeStatus } from "@/enum/employee.enum";
 import { useListEmployee } from "@/hooks/useEmployee";
 import { useCurrentManager } from "@/hooks/useManager";
-import { calculateTotalVauchers } from "@/utils/calculate";
 import { useMemo, useState } from "react";
-import { useLocation } from "react-router-dom";
 
-export function useEmployeeListScreenController() {
+export function useArchivedEmployeeListController() {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(true);
   const handleCloseModal = () => setIsModalOpen(false);
   const {
     data: employees,
     isLoading,
     isPending,
-  } = useListEmployee(EmployeeStatus.ACTIVE);
-  const location = useLocation();
+  } = useListEmployee(EmployeeStatus.ARCHIVED);
 
   const { data: currentManager, isLoading: loadingManager } =
     useCurrentManager();
-
-  const totalVouchers = useMemo(() => {
-    return employees?.reduce((acc, func) => {
-      return acc + calculateTotalVauchers(func.vales);
-    }, 0);
-  }, [employees]);
-
-  const employeesWithVoucher = useMemo(() => {
-    return employees?.reduce((acc, func) => {
-      if (func.vales.length > 0) {
-        return acc + 1;
-      }
-      return acc + 0;
-    }, 0);
-  }, [employees]);
 
   const [searchQuery, setSearchQuery] = useState<string>("");
   const filteredEmployees = useMemo(() => {
@@ -43,13 +25,9 @@ export function useEmployeeListScreenController() {
   return {
     isModalOpen,
     handleCloseModal,
-    currentManager,
-    totalVouchers,
-    employeesWithVoucher,
     loadingManager,
     isLoading,
     isPending,
-    employees,
     searchQuery,
     setSearchQuery,
     filteredEmployees,

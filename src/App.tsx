@@ -14,7 +14,6 @@ import SelectManagerScreen from "@/pages/SelectManagerScreen";
 // Pages
 import CategoryExpensesScreen from "@/pages/CategoryExpensesScreen";
 import EditEmployeeScreen from "@/pages/EditEmployeeScreen";
-import EmployeeDetailScreen from "@/pages/EmployeeDetailScreen";
 import EmployeeManagementScreen from "@/pages/EmployeeManagementScreen";
 import IncentiveSalesScreen from "@/pages/IncentiveSalesScreen";
 import ManagersScreen from "@/pages/ManagersScreen";
@@ -24,7 +23,7 @@ import NewEmployeeScreen from "@/pages/NewEmployeeScreen";
 import NotFound from "@/pages/NotFound";
 import PaymentConfirmationScreen from "@/pages/PaymentConfirmationScreen";
 import PaymentHistoryScreen from "@/pages/PaymentHistoryScreen";
-import SettingsScreen from "@/pages/SettingsScreen";
+import SettingsScreen from "@/pages/SettingsScreen/SettingsScreen";
 import SubscriptionsScreen from "@/pages/SubscriptionScreen/SubscriptionsScreen";
 import { App as AntApp, ConfigProvider } from "antd";
 import ptBR from "antd/locale/pt_BR";
@@ -38,6 +37,8 @@ import EmployeeListScreen from "./pages/EmployeeListScreen/EmployeeListScreen";
 import NewEmployeeContractScreen from "./pages/NewEmployeeContractScreen";
 import PaymentSignatureScreen from "./pages/PaymentSignature";
 import { antdTheme } from "./theme/antTheme";
+import EmployeeDetailScreen from "./pages/EmployeeDetailScreen/EmployeeDetailScreen";
+import ArchivedEmployeeList from "./pages/ArchivedEmployeeList/ArchivedEmployeeList";
 
 const queryClient = new QueryClient();
 queryClient.defaultQueryOptions({
@@ -274,6 +275,17 @@ const App = () => (
                         <EmpresaGuard>
                           <ManagerGuard>
                             <ManagersScreen />
+                          </ManagerGuard>
+                        </EmpresaGuard>
+                      }
+                    />
+
+                    <Route
+                      path="/settings/archived"
+                      element={
+                        <EmpresaGuard>
+                          <ManagerGuard>
+                            <ArchivedEmployeeList />
                           </ManagerGuard>
                         </EmpresaGuard>
                       }

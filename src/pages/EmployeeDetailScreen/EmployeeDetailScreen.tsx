@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AvatarInitials } from "@/components/AvatarInitials/AvatarInitials";
 import { MoneyDisplay } from "@/components/MoneyDisplay/MoneyDisplay";
@@ -16,31 +15,36 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { useEmployee, useFindEmployee } from "@/hooks/useEmployee";
+import { PdfService } from "@/services/pdf.service";
 import { formatCPF, formatDate, getPaydayText } from "@/utils/format";
+import { Button as ButtonAnt } from "antd";
 import {
   AlertCircle,
+  Archive,
   Briefcase,
   Calendar,
   CreditCard,
   Edit,
-  Trash2,
   User,
   Wallet,
+  ArchiveX,
+  Trash,
 } from "lucide-react";
-import { useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { toast } from "sonner";
-import { Button as ButtonAnt } from "antd";
-import { PdfService } from "@/services/pdf.service";
+import { useEmployeeDetailScreenController } from "./useEmployeeDetailScreen.controller";
+import { EmployeeStatus } from "@/enum/employee.enum";
+import { isArchived } from "@/utils/employee";
 
 const EmployeeDetailScreen = () => {
-  const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
-
-  const { data: employee, isLoading } = useFindEmployee(id);
-
-  const { deleteEmployee } = useEmployee();
+  const {
+    employee,
+    handleArchive,
+    handleDelete,
+    navigate,
+    isLoading,
+    archiveAlertMessage,
+    archiveButtonLabel,
+    archiveEmployee,
+  } = useEmployeeDetailScreenController();
 
   if (!employee && isLoading) {
     return (
@@ -59,23 +63,6 @@ const EmployeeDetailScreen = () => {
       </div>
     );
   }
-
-  const handleDelete = async () => {
-    await deleteEmployee.mutateAsync({ employeeId: employee.id });
-  };
-
-  useEffect(() => {
-    if (deleteEmployee.isPending) return;
-    if (deleteEmployee.isSuccess) {
-      toast.success("Funcionário demitido e excluído com sucesso!");
-      navigate("/", { replace: true });
-    }
-    if (deleteEmployee.isError) {
-      toast.error(
-        `Erro ao tentar demitir funcionário: ${deleteEmployee.error}`,
-      );
-    }
-  }, [deleteEmployee.isPending]);
 
   const InfoRow = ({
     icon: Icon,
@@ -192,6 +179,13 @@ const EmployeeDetailScreen = () => {
               label="2° Dia do Pagamento"
               value={getPaydayText(employee?.segundo_dia_pagamento)}
             />
+            {employee.status === EmployeeStatus.ARCHIVED && (
+              <InfoRow
+                icon={ArchiveX}
+                label="Data de arquivamento"
+                value={formatDate(new Date(employee.arquivadoEm))}
+              />
+            )}
           </div>
         </Card>
 
@@ -201,6 +195,7 @@ const EmployeeDetailScreen = () => {
             variant="outline"
             className="flex-1 h-12"
             onClick={() => navigate(`/employee/edit`, { state: employee })}
+            disabled={isArchived(employee)}
           >
             <Edit className="w-4 h-4 mr-2" />
             Editar
@@ -208,33 +203,76 @@ const EmployeeDetailScreen = () => {
 
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant="destructive" className="flex-1 h-12">
-                <Trash2 className="w-4 h-4 mr-2" />
-                Demitir
+              <Button variant="secondary" className="flex-1 h-12">
+                <Archive className="w-4 h-4 mr-2" />
+                {archiveButtonLabel()}
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent className="bg-card border-border">
               <AlertDialogHeader>
-                <AlertDialogTitle>Excluir Funcionário</AlertDialogTitle>
+                <AlertDialogTitle>
+                  {archiveButtonLabel()} Funcionário
+                </AlertDialogTitle>
                 <AlertDialogDescription>
-                  Tem certeza que deseja demitir/excluir{" "}
-                  <strong>{employee?.nome}</strong>? Esta ação não poderá ser
-                  desfeita.
+                  Tem certeza que deseja {archiveButtonLabel().toLowerCase()}{" "}
+                  <strong>{employee?.nome}</strong>? {archiveAlertMessage()}
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancelar</AlertDialogCancel>
                 <AlertDialogAction
-                  disabled={deleteEmployee.isPending}
-                  onClick={handleDelete}
-                  className="bg-danger hover:bg-danger/90"
+                  disabled={archiveEmployee.isPending}
+                  onClick={() =>
+                    handleArchive(
+                      employee.status === EmployeeStatus.ARCHIVED
+                        ? "unarchive"
+                        : "archive",
+                    )
+                  }
+                  className="bg-success hover:bg-success/90"
                 >
-                  Excluir
+                  Confirmar
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
         </div>
+
+        {isArchived(employee) && (
+          <div className="flex gap-3">
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive" className="flex-1 h-8">
+                  <Trash className="w-4 h-4 mr-2" />
+                  Deletar
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent className="bg-card border-border">
+                <AlertDialogHeader>
+                  <AlertDialogTitle>
+                    Deletar/demitir Funcionário
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Tem certeza que deseja deletar/demitir{" "}
+                    <strong>{employee?.nome}</strong>? Essa é uma ação
+                    irreversível, todas as informações serão perdidas e NÃO
+                    poderão ser recuperadas.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                  <AlertDialogAction
+                    disabled={archiveEmployee.isPending}
+                    onClick={handleDelete}
+                    className="bg-danger hover:bg-danger/90"
+                  >
+                    Confirmar
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        )}
       </div>
     </div>
   );
